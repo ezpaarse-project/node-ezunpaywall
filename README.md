@@ -1,6 +1,6 @@
 # node-ezunpaywall
 
-> Tools for ezMESURE administration
+> Tools for ezunpaywall
 
 ## Configuration
 | Env. var | Description |
@@ -25,11 +25,11 @@ The module provides an `ezunpaywall` command (aliased `ezu`).
 
 | Name | Description |
 | --- | --- |
-| [update] <list> [startLine] [endLine] (optionnal) | list of update files present in ez-unpaywall |
-| [update] <file> [startLine] [endLine] (optionnal) | update the data with the update files present in ez-unpaywall with name |
-| [update] <startDate> [endDate] (optionnal) | download, insert the update coming from unpaywall in a given period |
-| [reports] <latest> [error/succes] (optionnal) | see the latest insert reports |
-| [reports] <list> [error/succes] (optionnal) | list of insert reports |
+| update <list> [startLine] [endLine] (optionnal) | list of update files present in ez-unpaywall |
+| update <file> [startLine] [endLine] (optionnal) | update the data with the update files present in ez-unpaywall with name |
+| update <startDate> [endDate] (optionnal) | download, insert the update coming from unpaywall in a given period |
+| reports <latest> [error/succes] (optionnal) | see the latest insert reports |
+| reports <list> [error/succes] (optionnal) | list of insert reports |
 
 ## Commands details
 

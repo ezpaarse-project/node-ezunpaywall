@@ -58,16 +58,16 @@ module.exports = {
     // check format Date
     const pattern = /^[0-9]*-[0-9]{2}-[0-9]{2}$/;
     if (opts.startDate && !pattern.test(opts.startDate)) {
-      console.log('startDate are in bad format, expected YYYY-mm-dd');
+      console.log('error: startDate are in bad format, expected YYYY-mm-dd');
       process.exit(1);
     }
     if (opts.endDate && !pattern.test(opts.endDate)) {
-      console.log('endDate are in bad format, expected YYYY-mm-dd');
+      console.log('error: endDate are in bad format, expected YYYY-mm-dd');
       process.exit(1);
     }
     if (opts.startDate && opts.endDate) {
       if (new Date(opts.endDate).getTime() < new Date(opts.startDate).getTime()) {
-        console.log('end date is lower than start date');
+        console.log('error: end date is lower than start date');
         process.exit(1);
       }
     }

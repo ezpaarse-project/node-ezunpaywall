@@ -14,7 +14,6 @@ module.exports = {
       console.log('error: option --file is impossible to use with --list');
       process.exit(1);
     }
-
     // check file and latest, status
     if (opts.file && opts.latest) {
       console.log('error: option --latest is impossible to use with --file');
@@ -24,20 +23,33 @@ module.exports = {
       console.log('error: option --status is impossible to use with --file');
       process.exit(1);
     }
+    if (opts.status) {
+      if (opts.status !== 'error' && opts.status !== 'success') {
+        console.log('error: option --status only use <error> or <success>');
+        process.exit(1);
+      }
+    }
 
     let reports;
+    let res1;
+    let url = '';
+    let query = {};
+    if (!opts.status && !opts.latest) query = null;
+    if (opts.status) query.status = opts.status;
+    // if -l --list
     if (opts.list) {
       try {
         reports = await axios({
           method: 'GET',
           url: '/reports',
+          params: query,
         });
       } catch (err) {
+        console.log('ez-unpaywall not available');
         logger.error(err);
-        console.error(err);
         process.exit(1);
       }
-      if (!reports?.data?.files.length) {
+      if (!reports?.data?.files?.length) {
         console.log('no reports available');
         process.exit(0);
       }
@@ -56,14 +68,10 @@ module.exports = {
       }]);
       opts.file = report;
     }
-    let res1;
-    let res2;
-    let url = '';
-    let query = {};
-    if (!opts.status && !opts.latest) query = null;
+
     if (opts.file) url += `/${opts.file}`;
-    if (opts.status) query.status = opts.status;
     if (opts.latest) query.latest = opts.latest;
+    // if -f --file -l --latest
     try {
       res1 = await axios({
         method: 'get',
@@ -71,16 +79,11 @@ module.exports = {
         params: query,
       });
     } catch (err) {
-      process.exit(1);
+      if (res1?.status === 404) {
+        console.log('name of report doesn\'t exit');
+        process.exit(1);
+      }
     }
-    try {
-      res2 = await axios({
-        method: 'get',
-        url: `/reports/${res1.data.files}`,
-      });
-    } catch (err) {
-      process.exit(1);
-    }
-    console.log(res2);
+    console.log(res1.data);
   },
 };
