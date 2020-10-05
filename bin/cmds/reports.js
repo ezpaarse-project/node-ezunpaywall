@@ -1,6 +1,5 @@
 const inquirer = require('inquirer');
 const axios = require('../../lib/axios');
-const logger = require('../../lib/logger');
 
 module.exports = {
   getReports: async (args) => {
