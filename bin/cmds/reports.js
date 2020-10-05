@@ -45,8 +45,7 @@ module.exports = {
           params: query,
         });
       } catch (err) {
-        console.log('ez-unpaywall not available');
-        logger.error(err);
+        console.log('error: service unavailable');
         process.exit(1);
       }
       if (!reports?.data?.files?.length) {
@@ -79,10 +78,12 @@ module.exports = {
         params: query,
       });
     } catch (err) {
-      if (res1?.status === 404) {
-        console.log('name of report doesn\'t exit');
+      if (res1?.response?.status === 404) {
+        console.log('file doesn\'t exist');
         process.exit(1);
       }
+      console.log('error: service unavailable');
+      process.exit(1);
     }
     console.log(res1.data);
   },

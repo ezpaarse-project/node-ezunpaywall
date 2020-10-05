@@ -80,7 +80,11 @@ module.exports = {
           url: `/download/${opts.file}`,
         });
       } catch (err) {
-        console.log(`error: file "${opts.file}" doesn't exist`);
+        if (err?.responses?.status === 404) {
+          console.log(`error: file "${opts.file}" doesn't exist`);
+          process.exit(1);
+        }
+        console.log('error: service unavailable');
         process.exit(1);
       }
     }
@@ -95,8 +99,7 @@ module.exports = {
           params: query,
         });
       } catch (err) {
-        logger.error(err);
-        console.error(err);
+        console.log('error: service unavailable');
         process.exit(1);
       }
       const snapshot = await inquirer.prompt([{
@@ -119,15 +122,21 @@ module.exports = {
     if (opts.limit) query.limit = opts.limit;
     if (opts.startDate) query.startDate = opts.startDate;
     if (opts.endDate) query.endDate = opts.endDate;
+    let res;
     try {
-      const res = await axios({
+      res = await axios({
         method: 'post',
         url: `/update${url}`,
         params: query,
       });
-      console.log(res.data.message);
     } catch (err) {
+      if (err?.response?.status === 409) {
+        console.log('info: process in progress');
+        process.exit(1);
+      }
+      console.log('error: service unavailable ');
       process.exit(1);
     }
+    console.log(res.data.message);
   },
 };
