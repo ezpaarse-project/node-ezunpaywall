@@ -8,7 +8,7 @@
     "ezu": "./bin/ezunpaywall"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "precommit": "npm run lint"
   },
   "author": "",
   "license": "ISC",
