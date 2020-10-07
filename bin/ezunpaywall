@@ -5,6 +5,7 @@ const pkg = require('../package.json');
 const { startProcess } = require('./cmds/updates');
 const { getReports } = require('./cmds/reports');
 const { getTasks } = require('./cmds/status');
+const { enricher } = require('./cmds/enricher');
 
 program.on('command:*', () => {
   console.error(`Invalid command: ${program.args.join(' ')}\nSee --help for a list of available commands.`);
@@ -21,7 +22,7 @@ program
   .option('-of --offset <offset>', 'line where processing will start')
   .option('-li --limit <limit>', 'line where processing will end')
   .description('Launch the insertions process with the snapshots present in ezunpaywall')
-  .action((opts) => { startProcess(opts); });
+  .action((args) => { startProcess(args); });
 
 program
   .version(pkg.version)
@@ -31,12 +32,19 @@ program
   .option('-la --latest [latest]', 'boolean')
   .option('-s --status <status>', 'status of report, success and error only accepted')
   .description('get report')
-  .action((opts) => { getReports(opts); });
+  .action((args) => { getReports(args); });
 
 program
   .version(pkg.version)
   .command('tasks')
   .description('get status of processus in courses')
   .action(() => { getTasks(); });
+
+program
+  .version(pkg.version)
+  .command('enricher')
+  .option('-f --file <file>', 'file which must be enriched')
+  .description('enricher a file with unpaywall datas')
+  .action((args) => { enricher(args); });
 
 program.parse(process.argv);
