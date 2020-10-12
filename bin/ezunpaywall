@@ -44,6 +44,7 @@ program
   .version(pkg.version)
   .command('enricher')
   .option('-f --file <file>', 'file which must be enriched')
+  .option('-a --attributes <attributes...>', 'file which must be enriched')
   .description('enricher a file with unpaywall datas')
   .action((args) => { enricher(args); });
 
