@@ -2,7 +2,28 @@
 
 > Tools for [ezunpaywall](https://github.com/ezpaarse-project/ez-unpaywall)
 
+
+**Table of content**
+- [Prerequisites](#prerequisites)
+- [Installation](#Installation)
+- [Configuration](#Configuration)
+- [Global options](#Global-options)
+- [Command line usage](#Command-line-usage)
+- [Commands](#Commands)
+
+## Prerequisites
+
+The tools you need to let node-ezunpaywall run are :
+* npm
+
+## Installation
+
+```bash
+npm i -g .
+ ```
+
 ## Configuration
+
 | Env. var | Description |
 | --- | --- |
 | NODE_EZUNPAYWALL_URL | ez-unpaywall url |
