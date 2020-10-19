@@ -60,7 +60,6 @@ const stringifyAttributes = (name, attributes) => {
  */
 const createFetchAttributes = () => {
   let best_oa_location = [];
-  let oa_locations = [];
   let z_authors = [];
   enricherAttributesCSV.forEach((attr) => {
     // complexe attributes (like best_oa_location.license)
@@ -68,10 +67,6 @@ const createFetchAttributes = () => {
       const str = attr.split('.');
       if (str[0] === 'best_oa_location') {
         best_oa_location.push(str[1]);
-        return;
-      }
-      if (str[0] === 'oa_locations') {
-        oa_locations.push(str[1]);
         return;
       }
       if (str[0] === 'z_authors') {
@@ -86,10 +81,6 @@ const createFetchAttributes = () => {
   if (best_oa_location.length !== 0) {
     best_oa_location = stringifyAttributes('best_oa_location', best_oa_location);
     fetchAttributes.push(best_oa_location);
-  }
-  if (oa_locations.length !== 0) {
-    oa_locations = stringifyAttributes('oa_locations', oa_locations);
-    fetchAttributes.push(oa_locations);
   }
   if (z_authors.length !== 0) {
     z_authors = stringifyAttributes('z_authors', z_authors);
@@ -108,7 +99,7 @@ const checkAttributesCSV = (attributes) => {
   }
   attributes.forEach((attr) => {
     if (!enricherAttributesCSV.includes(attr)) {
-      console.log(`error: attribut ${attr} doesn't on unpaywall data`);
+      console.log(`error: attribut ${attr} cannot be enriched on CSV file`);
       process.exit(1);
     }
   });
@@ -140,20 +131,18 @@ const enricherTab = (tab, response) => {
     enricherAttributesCSV.forEach((attr) => {
       // if complex attribute (like best_oa_location.url)
       if (attr.includes('.')) {
-        let enrich;
         const str = attr.split('.');
         // array attributes
         if (Array.isArray(data[str[0]])) {
           const arrayAttributes = [];
           // TODO use map
           data[str[0]].forEach((a) => {
-            arrayAttributes.push(a[str[1]]);
+            arrayAttributes.push(JSON.stringify(a));
           });
-          enrich = arrayAttributes.join(',');
+          el.z_authors = arrayAttributes.join('');
         } else {
-          enrich = get(data, str, 0, str, 1);
+          el[attr] = get(data, str, 0, str, 1);
         }
-        el[attr] = enrich;
         return;
       }
       // simple attributes
@@ -167,8 +156,10 @@ const enricherTab = (tab, response) => {
  * @param {*} tab array of line enriched
  */
 const writeInFileCSV = async (tab) => {
+  const parsedTab = JSON.stringify(tab);
+  await new Promise((resolve) => { setTimeout(resolve, 100); });
   try {
-    const val = await Papa.unparse(tab, {
+    const val = await Papa.unparse(parsedTab, {
       header: false,
       delimiter: ',',
       columns: headers,
@@ -184,16 +175,14 @@ const writeInFileCSV = async (tab) => {
  * enrich the header with enricherAttributesCSV
  * @param {*} header header will be enrich
  */
-const enricherHeaderCSV = async (header) => {
+const enricherHeaderCSV = (header) => {
   // delete attributes already in header
-  await header.forEach((el) => {
-    if (enricherAttributesCSV.includes(el)) {
-      const index = enricherAttributesCSV.indexOf(el);
-      enricherAttributesCSV.splice(index, 1);
-    }
-  });
+  const res1 = header.filter((el) => !enricherAttributesCSV.includes(el));
+  // if array, enrichessment will be in one column
+  const res2 = enricherAttributesCSV.filter((el) => !el.includes('z_authors'));
+  res2.push('z_authors');
   // enricher header
-  return header.concat(enricherAttributesCSV);
+  return res1.concat(res2);
 };
 
 /**
@@ -214,39 +203,46 @@ const writeHeaderCSV = async (header) => {
  * starts the enrichment process for files CSV
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileCSV = (readStream) => {
+const enrichmentFileCSV = async (readStream) => {
   let tab = [];
   let head = true;
-  Papa.parse(readStream, {
-    delimiter: ',',
-    header: true,
-    transformHeader: (header) => {
-      headers.push(header.trim());
-      return header.trim();
-    },
-    step: async (results, parser) => {
-      // first step: write enriched header
-      if (head) {
-        head = false;
-        await parser.pause();
-        headers = await enricherHeaderCSV(headers, fetchAttributes);
-        await writeHeaderCSV(headers);
-        await parser.resume();
-      }
-      if (tab.length !== 100) {
+  await new Promise((resolve) => {
+    Papa.parse(readStream, {
+      delimiter: ',',
+      header: true,
+      transformHeader: (header) => {
+        headers.push(header.trim());
+        return header.trim();
+      },
+      step: async (results, parser) => {
+        // first step: write enriched header
+        if (head) {
+          head = false;
+          await parser.pause();
+          headers = await enricherHeaderCSV(headers, fetchAttributes);
+          await writeHeaderCSV(headers);
+          await parser.resume();
+        }
         tab.push(results.data);
-      }
-      if (tab.length === 100) {
-        const needEnriched = tab;
-        tab = [];
-        await parser.pause();
-        const response = await fetchEzUnpaywall(needEnriched, fetchAttributes);
-        enricherTab(needEnriched, response);
-        await writeInFileCSV(needEnriched);
-        await parser.resume();
-      }
-    },
+        if (tab.length === 100) {
+          const tabWillBeEnriched = tab;
+          tab = [];
+          await parser.pause();
+          const response = await fetchEzUnpaywall(tabWillBeEnriched, fetchAttributes);
+          enricherTab(tabWillBeEnriched, response);
+          await writeInFileCSV(tabWillBeEnriched);
+          await parser.resume();
+        }
+      },
+      complete: () => resolve(),
+    });
   });
+  // last insertion
+  if (tab.length !== 0) {
+    const response = await fetchEzUnpaywall(tab, fetchAttributes);
+    enricherTab(tab, response);
+    await writeInFileCSV(tab);
+  }
 };
 
 module.exports = {

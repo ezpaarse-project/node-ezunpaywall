@@ -1,6 +1,6 @@
 # node-ezunpaywall
 
-> Tools for ezunpaywall
+> Tools for [ezunpaywall](https://github.com/ezpaarse-project/ez-unpaywall)
 
 ## Configuration
 | Env. var | Description |
@@ -33,6 +33,12 @@ The module provides an `ezunpaywall` command (aliased `ezu`).
 
 ## Commands details
 
+### update
+
+if you use "update" without parameter, it will download the last update published by unpaywall and insert its content.
+for automated this, it is possible to call this command via a cron (
+unpaywall publishes an update every Tuesday UTC-7)
+
 ### update -l --list
 
 Displays the list of update files found in the server.
@@ -45,10 +51,12 @@ Select a file found in the list to insert its content.
 | -sl --startLine | Integer | line at which insertion begins |
 | -el --endLine | Integer | line at which insertion ends |
 
-Examples :
+Examples:
 ```bash
+# insert all the content of the selected file on list
 $ ezunpaywall update -l
-$ ezunpaywall update -l -sl 1000 -el 100000
+# insert the content between line 1 000 and 400 000 of the selected file on list
+$ ezunpaywall update -l -sl 1000 -el 400000
 ```
 
 ### update -f --file
@@ -62,10 +70,12 @@ insert the contents of the file according to the name of this one.
 | -sl --startLine | Integer | line at which insertion begins |
 | -el --endLine | Integer | line at which insertion ends |
 
-Examples :
+Examples:
 ```bash
-$ ezunpaywall -f changed_dois_with_versions_2020-04-14T080001_to_2020-04-23T080001.jsonl.gz 
-$ ezunpaywall -f changed_dois_with_versions_2020-04-14T080001_to_2020-04-23T080001.jsonl.gz -sl 1000 -el 100000
+# insert all the content of fils.json.gz
+$ ezunpaywall -f ./file.jsonl.gz 
+# insert the content between line 1 000 and 400 000 of fils.json.gz
+$ ezunpaywall -f ./file.jsonl.gz -sl 1000 -el 400000
 ```
 
 ### update -sd --startDate
@@ -76,10 +86,12 @@ Downloads and inserts all updates from unpaywall during a given period. (startDa
 | --- | --- | --- |
 | -ed --endDate | Date YYYY-mm-dd | period end date |
 
-Examples :
+Examples:
 ```bash
+# Downloads and inserts all updates from unpaywall between 2020-04-27 and now
 $ ezunpaywall -sd 2020-04-27
-$ ezunpaywall -sd 2020-04-27 -se 2020-09-01
+# Downloads and inserts all updates from unpaywall between 2020-04-27 and 2020-07-01 
+$ ezunpaywall -sd 2020-04-27 -se 2020-07-01
 ```
 
 ### reports -la --latest
@@ -90,10 +102,13 @@ Displays the contents of latest update report on ezunpaywall
 | --- | --- | --- |
 | '-s --status | String | status of file, either success either, error |
 
-Examples :
+Examples:
 ```bash
+# display the latest report
 $ ezunpaywall report -la
+# display the latest success report
 $ ezunpaywall report -la -s success
+# display the latest error report
 $ ezunpaywall report -la -s error
 ```
 
@@ -106,9 +121,27 @@ Select a file found in the list to see its content.
 | --- | --- | --- |
 | '-s --status | String | type of file, either success either, error |
 
-Examples :
+Examples:
 ```bash
+# display the list of all reports
 $ ezunpaywall report -l
+# display the list of success reports
 $ ezunpaywall report -l -s success
+# display the list of error reports
 $ ezunpaywall report -l -s error
 ```
+
+### enricher 
+
+Enriched a file (JSON/CSV) with attributes unpaywall
+by default, if no attributes is informed, we enriched with all attributes
+
+Examples:
+```bash
+# enrich with all attributes
+$ ezunpaywall enricher -f ./pathOfFile.json
+# enrich only with oa_status and best_oa_location.url
+$ ezunpaywall enricher -f ./pathOfFile.csv -a oa_status best_oa_location.url
+```
+
+To see all available unpaywall attributes, [click here](https://github.com/ezpaarse-project/ez-unpaywall/tree/master#object-structure)

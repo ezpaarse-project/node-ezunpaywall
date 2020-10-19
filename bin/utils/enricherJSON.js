@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 const fs = require('fs-extra');
 const readline = require('readline');
-const get = require('lodash.get');
 
 const { fetchEzUnpaywall } = require('./enricher');
 
@@ -116,7 +115,7 @@ const checkAttributesJSON = (attributes) => {
   }
   attributes.forEach((attr) => {
     if (!enricherAttributesJSON.includes(attr)) {
-      console.log(`error: attribut ${attr} doesn't on unpaywall data`);
+      console.log(`error: attribut ${attr} cannot be enriched on JSON file`);
       process.exit(1);
     }
   });
@@ -155,7 +154,7 @@ const enricherTab = (tab, response) => {
  */
 const writeInFileJSON = async (tab) => {
   try {
-    const stringTab = tab.map((el) => JSON.stringify(el)).join('\n');
+    const stringTab = `${tab.map((el) => JSON.stringify(el)).join('\n')}\n`;
     await fs.appendFile('out.json', stringTab);
   } catch (err) {
     console.error(err);
@@ -173,14 +172,9 @@ const enrichmentFileJSON = async (readStream) => {
   });
 
   let tab = [];
-  let parsedLine;
-
   // eslint-disable-next-line no-restricted-syntax
   for await (const line of rl) {
-    parsedLine = JSON.parse(line);
-    if (tab.length !== 100) {
-      tab.push(parsedLine);
-    }
+    tab.push(JSON.parse(line));
     if (tab.length === 100) {
       const response = await fetchEzUnpaywall(tab, fetchAttributes);
       enricherTab(tab, response);
