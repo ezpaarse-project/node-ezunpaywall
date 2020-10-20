@@ -94,9 +94,9 @@ insert the contents of the file according to the name of this one.
 Examples:
 ```bash
 # insert all the content of fils.json.gz
-$ ezunpaywall -f ./file.jsonl.gz 
+$ ezunpaywall update -f ./file.jsonl.gz 
 # insert the content between line 1 000 and 400 000 of fils.json.gz
-$ ezunpaywall -f ./file.jsonl.gz -sl 1000 -el 400000
+$ ezunpaywall update -f ./file.jsonl.gz -sl 1000 -el 400000
 ```
 
 ### update -sd --startDate
@@ -110,9 +110,9 @@ Downloads and inserts all updates from unpaywall during a given period. (startDa
 Examples:
 ```bash
 # Downloads and inserts all updates from unpaywall between 2020-04-27 and now
-$ ezunpaywall -sd 2020-04-27
+$ ezunpaywall update -sd 2020-04-27
 # Downloads and inserts all updates from unpaywall between 2020-04-27 and 2020-07-01 
-$ ezunpaywall -sd 2020-04-27 -se 2020-07-01
+$ ezunpaywall update -sd 2020-04-27 -se 2020-07-01
 ```
 
 ### reports -la --latest
