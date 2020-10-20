@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.20.0",
     "commander": "^6.1.0",
     "fs-extra": "^9.0.1",
     "inquirer": "^7.3.3",
