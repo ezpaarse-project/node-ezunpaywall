@@ -1,8 +1,13 @@
 /* eslint-disable camelcase */
 const fs = require('fs-extra');
 const readline = require('readline');
+const cliProgress = require('cli-progress');
 
 const { fetchEzUnpaywall } = require('./enricher');
+
+const bar = new cliProgress.SingleBar({
+  format: 'progress [{bar}] {percentage}% | {value}/{total} bytes',
+});
 
 let enricherAttributesJSON = [
   'oa_locations.evidence',
@@ -46,6 +51,7 @@ let enricherAttributesJSON = [
   'year',
 ];
 
+let out;
 const fetchAttributes = [];
 
 /**
@@ -155,7 +161,7 @@ const enricherTab = (tab, response) => {
 const writeInFileJSON = async (tab) => {
   try {
     const stringTab = `${tab.map((el) => JSON.stringify(el)).join('\n')}\n`;
-    await fs.appendFile('out.json', stringTab);
+    await fs.appendFile(out, stringTab);
   } catch (err) {
     console.error(err);
   }
@@ -165,10 +171,20 @@ const writeInFileJSON = async (tab) => {
  * starts the enrichment process for files JSON
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileJSON = async (readStream) => {
+const enrichmentFileJSON = async (outFile, readStream) => {
+  out = outFile;
+  let loaded = 0;
+
+  const stat = await fs.stat(readStream.path);
+  bar.start(stat.size, 0);
+
   const rl = readline.createInterface({
     input: readStream,
     crlfDelay: Infinity,
+  });
+
+  readStream.on('data', (chunk) => {
+    loaded += chunk.length;
   });
 
   let tab = [];
@@ -179,6 +195,7 @@ const enrichmentFileJSON = async (readStream) => {
       const response = await fetchEzUnpaywall(tab, fetchAttributes);
       enricherTab(tab, response);
       await writeInFileJSON(tab);
+      bar.update(loaded);
       tab = [];
     }
   }
@@ -187,7 +204,9 @@ const enrichmentFileJSON = async (readStream) => {
     const response = await fetchEzUnpaywall(tab, fetchAttributes);
     enricherTab(tab, response);
     await writeInFileJSON(tab);
+    bar.update(loaded);
   }
+  bar.stop();
 };
 
 module.exports = {

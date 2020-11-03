@@ -4,6 +4,10 @@ const Papa = require('papaparse');
 const get = require('lodash.get');
 const cliProgress = require('cli-progress');
 
+const bar = new cliProgress.SingleBar({
+  format: 'progress [{bar}] {percentage}% | {value}/{total} bytes',
+});
+
 const { fetchEzUnpaywall } = require('./enricher');
 
 let enricherAttributesCSV = [
@@ -17,6 +21,16 @@ let enricherAttributesCSV = [
   'best_oa_location.url_for_landing_page',
   'best_oa_location.url_for_pdf',
   'best_oa_location.version',
+  'first_oa_location.evidence',
+  'first_oa_location.host_type',
+  'first_oa_location.is_best',
+  'first_oa_location.license',
+  'first_oa_location.pmh_id',
+  'first_oa_location.updated',
+  'first_oa_location.url',
+  'first_oa_location.url_for_landing_page',
+  'first_oa_location.url_for_pdf',
+  'first_oa_location.version',
   'z_authors.family',
   'z_authors.given',
   'z_authors.sequence',
@@ -41,7 +55,7 @@ let enricherAttributesCSV = [
 const fetchAttributes = [];
 let headers = [];
 let separator = ',';
-let out = 'out';
+let out;
 
 /**
  * parse the complexes attributes so that they can be used in the graphql query
@@ -62,6 +76,7 @@ const stringifyAttributes = (name, attributes) => {
  */
 const createFetchAttributes = () => {
   let best_oa_location = [];
+  let first_oa_location = [];
   let z_authors = [];
   enricherAttributesCSV.forEach((attr) => {
     // complexe attributes (like best_oa_location.license)
@@ -69,6 +84,10 @@ const createFetchAttributes = () => {
       const str = attr.split('.');
       if (str[0] === 'best_oa_location') {
         best_oa_location.push(str[1]);
+        return;
+      }
+      if (str[0] === 'first_oa_location') {
+        first_oa_location.push(str[1]);
         return;
       }
       if (str[0] === 'z_authors') {
@@ -83,6 +102,10 @@ const createFetchAttributes = () => {
   if (best_oa_location.length !== 0) {
     best_oa_location = stringifyAttributes('best_oa_location', best_oa_location);
     fetchAttributes.push(best_oa_location);
+  }
+  if (first_oa_location.length !== 0) {
+    first_oa_location = stringifyAttributes('first_oa_location', first_oa_location);
+    fetchAttributes.push(first_oa_location);
   }
   if (z_authors.length !== 0) {
     z_authors = stringifyAttributes('z_authors', z_authors);
@@ -139,7 +162,7 @@ const enricherTab = (tab, response) => {
           const author = data[str[0]].filter((a) => a.sequence === 'first');
           if (author[0]) {
             // TODO other syntax
-            el.z_authors = JSON.stringify(author[0]).replace('{', '').replace('}', '').replace('"', '');
+            el.z_authors = `${author[0].family}, ${author[0].given}`;
           }
         } else {
           el[attr] = get(data, str, 0, str, 1);
@@ -181,7 +204,6 @@ const enricherHeaderCSV = (header) => {
   res1 = res1.concat(enricherAttributesCSV);
   const found = res1.find((element) => element.includes('z_authors'));
   res1 = enricherAttributesCSV.filter((el) => !el.includes('z_authors'));
-  console.log(res1);
   if (found) {
     res1.push('z_authors');
   }
@@ -207,10 +229,17 @@ const writeHeaderCSV = async (header) => {
  * @param {*} readStream read the stream of the file you want to enrich
  */
 const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
+  const stat = await fs.stat(readStream.path);
+  bar.start(stat.size, 0);
+
+  let loadedBefore = 0;
+  let loadedAfter;
+
   out = outFile;
   separator = separatorFile;
   let tab = [];
   let head = true;
+
   await new Promise((resolve) => {
     Papa.parse(readStream, {
       delimiter: ',',
@@ -228,14 +257,25 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
           await writeHeaderCSV(headers);
           await parser.resume();
         }
+
         tab.push(results.data);
+
         if (tab.length === 100) {
+          if (loadedBefore === 0) {
+            loadedAfter = results.meta.cursor;
+          } else {
+            loadedBefore = loadedAfter;
+            loadedAfter = results.meta.cursor;
+          }
           const tabWillBeEnriched = tab;
           tab = [];
           await parser.pause();
           const response = await fetchEzUnpaywall(tabWillBeEnriched, fetchAttributes);
           enricherTab(tabWillBeEnriched, response);
           await writeInFileCSV(tabWillBeEnriched);
+
+          bar.update(loadedAfter - loadedBefore);
+
           await parser.resume();
         }
       },
@@ -244,10 +284,12 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
   });
   // last insertion
   if (tab.length !== 0) {
+    bar.update(100);
     const response = await fetchEzUnpaywall(tab, fetchAttributes);
     enricherTab(tab, response);
     await writeInFileCSV(tab);
   }
+  bar.stop();
 };
 
 module.exports = {

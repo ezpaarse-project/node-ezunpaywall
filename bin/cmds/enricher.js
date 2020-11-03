@@ -18,11 +18,11 @@ module.exports = {
   enricher: async (args) => {
     let out;
     let separator;
-    const file = path.resolve(args.file);
     if (!args.file) {
       console.log('error: file expected');
       process.exit(1);
     }
+    const file = path.resolve(args.file);
     const ifFileExist = await fs.pathExists(file);
     if (!ifFileExist) {
       console.log('error: file not found');
@@ -41,6 +41,13 @@ module.exports = {
         out = 'out.csv';
       }
     }
+    if (typeOfFile === 'jsonl') {
+      if (args.out) {
+        out = args.out;
+      } else {
+        out = 'out.json';
+      }
+    }
 
     let readStream;
     try {
@@ -50,7 +57,7 @@ module.exports = {
     }
     if (typeOfFile === 'jsonl') {
       checkAttributesJSON(args.attributes);
-      enrichmentFileJSON(readStream);
+      enrichmentFileJSON(out, readStream);
     }
     if (typeOfFile === 'csv') {
       checkAttributesCSV(args.attributes);
