@@ -58,9 +58,12 @@ The module provides an `ezunpaywall` command (aliased `ezu`).
 ### update
 
 if you use "update" without parameter, it will download the last update published by unpaywall and insert its content.
-for automated this, it is possible to call this command via a cron (
-unpaywall publishes an update every Tuesday UTC-7)
+for automated this, it is possible to call this command via a cron (unpaywall publishes an update every Thursday UTC-7)
 
+`crontab -e`
+```bash
+0 0 * * FRI . PATH/node-ezunpaywall/env.sh; PATH/node-ezunpaywall/bin/ezunpaywall update
+```
 ### update -l --list
 
 Displays the list of update files found in the server.

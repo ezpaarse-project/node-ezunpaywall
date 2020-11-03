@@ -2,6 +2,7 @@
 const fs = require('fs-extra');
 const Papa = require('papaparse');
 const get = require('lodash.get');
+const cliProgress = require('cli-progress');
 
 const { fetchEzUnpaywall } = require('./enricher');
 
@@ -38,8 +39,9 @@ let enricherAttributesCSV = [
 ];
 
 const fetchAttributes = [];
-
 let headers = [];
+let separator = ',';
+let out = 'out';
 
 /**
  * parse the complexes attributes so that they can be used in the graphql query
@@ -49,7 +51,7 @@ let headers = [];
 const stringifyAttributes = (name, attributes) => {
   let res;
   if (attributes.length !== 0) {
-    res = attributes.join(',');
+    res = attributes.join(separator);
   }
   res = `${name}{${res}}`;
   return res;
@@ -90,7 +92,7 @@ const createFetchAttributes = () => {
 
 /**
  * checks if the attributes entered by the command are related to the unpaywall data model
- * @param {*} attributes array of attributes
+ * @param {*} attributes array of attributesconst cliProgress = require('cli-progress');
  */
 const checkAttributesCSV = (attributes) => {
   if (!attributes?.length) {
@@ -132,14 +134,13 @@ const enricherTab = (tab, response) => {
       // if complex attribute (like best_oa_location.url)
       if (attr.includes('.')) {
         const str = attr.split('.');
-        // array attributes
+        // array attributes z_authors
         if (Array.isArray(data[str[0]])) {
-          const arrayAttributes = [];
-          // TODO use map
-          data[str[0]].forEach((a) => {
-            arrayAttributes.push(JSON.stringify(a));
-          });
-          el.z_authors = arrayAttributes.join('');
+          const author = data[str[0]].filter((a) => a.sequence === 'first');
+          if (author[0]) {
+            // TODO other syntax
+            el.z_authors = JSON.stringify(author[0]).replace('{', '').replace('}', '').replace('"', '');
+          }
         } else {
           el[attr] = get(data, str, 0, str, 1);
         }
@@ -157,15 +158,14 @@ const enricherTab = (tab, response) => {
  */
 const writeInFileCSV = async (tab) => {
   const parsedTab = JSON.stringify(tab);
-  await new Promise((resolve) => { setTimeout(resolve, 100); });
   try {
     const val = await Papa.unparse(parsedTab, {
       header: false,
-      delimiter: ',',
+      delimiter: separator,
       columns: headers,
     });
     // TODO passé par un stream d'écriture writeFileStream
-    await fs.appendFile('out.csv', `${val}\r\n`);
+    await fs.appendFile(out, `${val}\r\n`);
   } catch (err) {
     console.error(err);
   }
@@ -177,12 +177,15 @@ const writeInFileCSV = async (tab) => {
  */
 const enricherHeaderCSV = (header) => {
   // delete attributes already in header
-  const res1 = header.filter((el) => !enricherAttributesCSV.includes(el));
-  // if array, enrichessment will be in one column
-  const res2 = enricherAttributesCSV.filter((el) => !el.includes('z_authors'));
-  res2.push('z_authors');
-  // enricher header
-  return res1.concat(res2);
+  let res1 = header.filter((el) => !enricherAttributesCSV.includes(el));
+  res1 = res1.concat(enricherAttributesCSV);
+  const found = res1.find((element) => element.includes('z_authors'));
+  res1 = enricherAttributesCSV.filter((el) => !el.includes('z_authors'));
+  console.log(res1);
+  if (found) {
+    res1.push('z_authors');
+  }
+  return header.concat(res1);
 };
 
 /**
@@ -192,7 +195,7 @@ const enricherHeaderCSV = (header) => {
 const writeHeaderCSV = async (header) => {
   try {
     // TODO passé par un stream d'écriture writeFileStream
-    await fs.appendFile('out.csv', `${header}\r\n`);
+    await fs.appendFile(out, `${header.join(separator)}\r\n`);
   } catch (err) {
     console.log('error: write stream bug');
     process.exit(1);
@@ -203,7 +206,9 @@ const writeHeaderCSV = async (header) => {
  * starts the enrichment process for files CSV
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileCSV = async (readStream) => {
+const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
+  out = outFile;
+  separator = separatorFile;
   let tab = [];
   let head = true;
   await new Promise((resolve) => {

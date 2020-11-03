@@ -45,6 +45,8 @@ program
   .command('enricher')
   .option('-f --file <file>', 'file which must be enriched')
   .option('-a --attributes <attributes...>', 'file which must be enriched')
+  .option('-s --separator <separator>', 'separator of csv file')
+  .option('-o --out <out>', 'name of enriched file')
   .description('enricher a file with unpaywall datas')
   .action((args) => { enricher(args); });
 

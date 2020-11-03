@@ -16,6 +16,8 @@ const getExtensionOfFile = (file) => {
 
 module.exports = {
   enricher: async (args) => {
+    let out;
+    let separator;
     const file = path.resolve(args.file);
     if (!args.file) {
       console.log('error: file expected');
@@ -26,19 +28,33 @@ module.exports = {
       console.log('error: file not found');
       process.exit(1);
     }
+    const typeOfFile = getExtensionOfFile(file);
+    if (typeOfFile === 'csv') {
+      if (args.separator) {
+        separator = args.separator;
+      } else {
+        separator = ',';
+      }
+      if (args.out) {
+        out = args.out;
+      } else {
+        out = 'out.csv';
+      }
+    }
+
     let readStream;
     try {
       readStream = fs.createReadStream(file);
     } catch (err) {
       console.log('error: impossible de read file');
     }
-    if (getExtensionOfFile(file) === 'jsonl') {
+    if (typeOfFile === 'jsonl') {
       checkAttributesJSON(args.attributes);
       enrichmentFileJSON(readStream);
     }
-    if (getExtensionOfFile(file) === 'csv') {
+    if (typeOfFile === 'csv') {
       checkAttributesCSV(args.attributes);
-      enrichmentFileCSV(readStream);
+      enrichmentFileCSV(out, separator, readStream);
     }
   },
 };

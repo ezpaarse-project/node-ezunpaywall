@@ -24,6 +24,7 @@ const fetchEzUnpaywall = async (tab, fetchAttributes) => {
       },
     });
   } catch (err) {
+    console.log(fetchAttributes.toString());
     if (!err.response) {
       console.log('error: url server incorrect');
     }
