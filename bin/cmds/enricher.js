@@ -41,6 +41,13 @@ module.exports = {
         out = 'out.csv';
       }
     }
+    if (typeOfFile === 'jsonl') {
+      if (args.out) {
+        out = args.out;
+      } else {
+        out = 'out.json';
+      }
+    }
 
     let readStream;
     try {
@@ -50,7 +57,7 @@ module.exports = {
     }
     if (typeOfFile === 'jsonl') {
       checkAttributesJSON(args.attributes);
-      enrichmentFileJSON(readStream);
+      enrichmentFileJSON(out, readStream);
     }
     if (typeOfFile === 'csv') {
       checkAttributesCSV(args.attributes);

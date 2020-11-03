@@ -4,6 +4,10 @@ const Papa = require('papaparse');
 const get = require('lodash.get');
 const cliProgress = require('cli-progress');
 
+const bar = new cliProgress.SingleBar({
+  format: 'progress [{bar}] {percentage}% | {value}/{total} bytes',
+});
+
 const { fetchEzUnpaywall } = require('./enricher');
 
 let enricherAttributesCSV = [
@@ -41,7 +45,7 @@ let enricherAttributesCSV = [
 const fetchAttributes = [];
 let headers = [];
 let separator = ',';
-let out = 'out';
+let out;
 
 /**
  * parse the complexes attributes so that they can be used in the graphql query
@@ -181,7 +185,6 @@ const enricherHeaderCSV = (header) => {
   res1 = res1.concat(enricherAttributesCSV);
   const found = res1.find((element) => element.includes('z_authors'));
   res1 = enricherAttributesCSV.filter((el) => !el.includes('z_authors'));
-  console.log(res1);
   if (found) {
     res1.push('z_authors');
   }
@@ -207,10 +210,17 @@ const writeHeaderCSV = async (header) => {
  * @param {*} readStream read the stream of the file you want to enrich
  */
 const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
+  const stat = await fs.stat(readStream.path);
+  bar.start(stat.size, 0);
+
+  let loadedBefore = 0;
+  let loadedAfter;
+
   out = outFile;
   separator = separatorFile;
   let tab = [];
   let head = true;
+
   await new Promise((resolve) => {
     Papa.parse(readStream, {
       delimiter: ',',
@@ -228,7 +238,9 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
           await writeHeaderCSV(headers);
           await parser.resume();
         }
+
         tab.push(results.data);
+
         if (tab.length === 100) {
           const tabWillBeEnriched = tab;
           tab = [];
@@ -236,7 +248,18 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
           const response = await fetchEzUnpaywall(tabWillBeEnriched, fetchAttributes);
           enricherTab(tabWillBeEnriched, response);
           await writeInFileCSV(tabWillBeEnriched);
+
+          bar.update(loadedAfter - loadedBefore);
+
           await parser.resume();
+        }
+      },
+      chunk: async (results) => {
+        if (loadedBefore === 0) {
+          loadedAfter = results.meta.cursor;
+        } else {
+          loadedBefore = loadedAfter;
+          loadedAfter = results.meta.cursor;
         }
       },
       complete: () => resolve(),
@@ -244,10 +267,12 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
   });
   // last insertion
   if (tab.length !== 0) {
+    bar.update(100);
     const response = await fetchEzUnpaywall(tab, fetchAttributes);
     enricherTab(tab, response);
     await writeInFileCSV(tab);
   }
+  bar.stop();
 };
 
 module.exports = {
