@@ -284,7 +284,7 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
   });
   // last insertion
   if (tab.length !== 0) {
-    bar.update(100);
+    bar.update(stat.size);
     const response = await fetchEzUnpaywall(tab, fetchAttributes);
     enricherTab(tab, response);
     await writeInFileCSV(tab);
