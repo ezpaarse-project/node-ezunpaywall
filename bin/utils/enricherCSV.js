@@ -279,14 +279,6 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
           await parser.resume();
         }
       },
-      chunk: async (results) => {
-        if (loadedBefore === 0) {
-          loadedAfter = results.meta.cursor;
-        } else {
-          loadedBefore = loadedAfter;
-          loadedAfter = results.meta.cursor;
-        }
-      },
       complete: () => resolve(),
     });
   });
