@@ -157,13 +157,25 @@ const enricherTab = (tab, response) => {
       // if complex attribute (like best_oa_location.url)
       if (attr.includes('.')) {
         const str = attr.split('.');
+        const authors = data[str[0]];
         // array attributes z_authors
-        if (Array.isArray(data[str[0]])) {
-          const author = data[str[0]].filter((a) => a.sequence === 'first');
-          if (author[0]) {
+        if (Array.isArray(authors)) {
+          const [firstAuthor] = authors.filter((a) => a.sequence === 'first');
+          if (firstAuthor) {
             // TODO other syntax
-            el.z_authors = `${author[0].family}, ${author[0].given}`;
+            el.first_authors = `${firstAuthor.family} ${firstAuthor.given}`;
           }
+          // the first ten other authors
+          let otherAuthors = '';
+          let i = 1;
+          while (i <= 10) {
+            if (!authors[i]?.family || !authors[i]?.given) {
+              break;
+            }
+            otherAuthors += `${authors[i]?.family} ${authors[i]?.given}, `;
+            i += 1;
+          }
+          el.additional_authors = otherAuthors;
         } else {
           el[attr] = get(data, str, 0, str, 1);
         }
@@ -205,7 +217,8 @@ const enricherHeaderCSV = (header) => {
   const found = res1.find((element) => element.includes('z_authors'));
   res1 = enricherAttributesCSV.filter((el) => !el.includes('z_authors'));
   if (found) {
-    res1.push('z_authors');
+    res1.push('first_authors');
+    res1.push('additional_authors');
   }
   return header.concat(res1);
 };
@@ -242,7 +255,7 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
 
   await new Promise((resolve) => {
     Papa.parse(readStream, {
-      delimiter: ',',
+      delimiter: ';',
       header: true,
       transformHeader: (header) => {
         headers.push(header.trim());
