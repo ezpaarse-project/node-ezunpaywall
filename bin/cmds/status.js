@@ -7,12 +7,12 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 const axios = require('../../lib/axios');
 
 module.exports = {
-  getTasks: async () => {
+  getTask: async () => {
     let res;
     try {
       res = await axios({
         method: 'get',
-        url: '/tasks',
+        url: '/task',
       });
     } catch (err) {
       console.log(`error: service unavailable ${config.url}:${config.port}`);

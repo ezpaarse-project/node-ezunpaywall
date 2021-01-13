@@ -5,7 +5,7 @@ const pkg = require('../package.json');
 const { config } = require('./cmds/config');
 const { startProcess } = require('./cmds/updates');
 const { getReports } = require('./cmds/reports');
-const { getTasks } = require('./cmds/status');
+const { getTask } = require('./cmds/status');
 const {
   enrichJSON,
   enrichCSV,
@@ -27,6 +27,11 @@ program
   .action((args) => { config(args); });
 
 program
+  .command('ping')
+  .description('Check if service is available')
+  .action(() => { ping(); });
+
+program
   .command('update')
   .option('-f --file <file>', 'snapshot\'s file installed on ezunpaywall')
   .option('-l --list', 'list of snapshot installed on ezunpaywall')
@@ -34,8 +39,13 @@ program
   .option('-ed --endDate <endDate>', 'end date to download and insert updates from unpaywall')
   .option('-of --offset <offset>', 'line where processing will start')
   .option('-li --limit <limit>', 'line where processing will end')
-  .description('Launch the insertions process with the snapshots present in ezunpaywall')
+  .description('Starts an unpaywall data update process')
   .action((args) => { startProcess(args); });
+
+program
+  .command('task')
+  .description('get status of processus in courses')
+  .action(() => { getTask(); });
 
 program
   .command('reports')
@@ -47,15 +57,10 @@ program
   .action((args) => { getReports(args); });
 
 program
-  .command('tasks')
-  .description('get status of processus in courses')
-  .action(() => { getTasks(); });
-
-program
   .command('enrichJSON')
   .option('-f --file <file>', 'file which must be enriched')
-  .option('-a --attributes <attributes>', 'attributes which must be enriched (separeted by comma). By default, all attributes are added.')
-  .option('-o --out <out>', 'name of enriched file. By default, the output file is named: out.jsonl.')
+  .option('-a --attributes <attributes>', 'attributes which must be enriched (separeted by comma). By default, all attributes are added')
+  .option('-o --out <out>', 'name of enriched file. By default, the output file is named: out.jsonl')
   .option('-v --verbose', 'logs how much lines are enriched')
   .description('enrich a json file with unpaywall attributes')
   .action((args) => { enrichJSON(args); });
@@ -63,16 +68,11 @@ program
 program
   .command('enrichCSV')
   .option('-f --file <file>', 'file which must be enriched')
-  .option('-a --attributes <attributes>', 'attributes which must be enriched (separeted by comma) By default, all attributes are added.')
+  .option('-a --attributes <attributes>', 'attributes which must be enriched (separeted by comma) By default, all attributes are added')
   .option('-s --separator <separator>', 'separator of csv out file')
   .option('-o --out <out>', 'name of enriched file')
   .option('-v --verbose', 'logs how much lines are enriched')
   .description('enrich a csv file with unpaywall attributes')
   .action((args) => { enrichCSV(args); });
-
-program
-  .command('ping')
-  .description('check if service is available')
-  .action(() => { ping(); });
 
 program.parse(process.argv);
