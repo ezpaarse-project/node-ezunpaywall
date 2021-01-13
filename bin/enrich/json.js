@@ -1,9 +1,11 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable camelcase */
 const fs = require('fs-extra');
 const readline = require('readline');
 const cliProgress = require('cli-progress');
+const logger = require('../../lib/logger');
 
-const { fetchEzUnpaywall } = require('./enricher');
+const { fetchEzUnpaywall } = require('./utils');
 
 const bar = new cliProgress.SingleBar({
   format: 'progress [{bar}] {percentage}% | {value}/{total} bytes',
@@ -53,6 +55,9 @@ let enricherAttributesJSON = [
 
 let out;
 const fetchAttributes = [];
+
+let lineRead = 0;
+let lineEnrich = 0;
 
 /**
  * parse the complexes attributes so that they can be used in the graphql query
@@ -112,9 +117,10 @@ const createFetchAttributes = () => {
 
 /**
  * checks if the attributes entered by the command are related to the unpaywall data model
- * @param {*} attributes array of attributes
+ * @param {*} attr String of attributes
  */
-const checkAttributesJSON = (attributes) => {
+const checkAttributesJSON = (attrs) => {
+  const attributes = attrs.split(',');
   if (!attributes?.length) {
     createFetchAttributes();
     return;
@@ -171,10 +177,18 @@ const writeInFileJSON = async (tab) => {
  * starts the enrichment process for files JSON
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileJSON = async (outFile, readStream) => {
+const enrichmentFileJSON = async (outFile, readStream, verbose) => {
   out = outFile;
+
   let loaded = 0;
 
+  // empty the file
+  const ifFileExist = await fs.pathExists(out);
+  if (ifFileExist) {
+    fs.unlink(out, (err) => {
+      if (err) throw err;
+    });
+  }
   const stat = await fs.stat(readStream.path);
   bar.start(stat.size, 0);
 
@@ -194,7 +208,12 @@ const enrichmentFileJSON = async (outFile, readStream) => {
     if (tab.length === 100) {
       const response = await fetchEzUnpaywall(tab, fetchAttributes);
       enricherTab(tab, response);
+      lineRead += 100;
+      lineEnrich += response.length;
       await writeInFileJSON(tab);
+      if (verbose) {
+        logger.info(`${response.length} lines enriched`);
+      }
       bar.update(loaded);
       tab = [];
     }
@@ -202,11 +221,14 @@ const enrichmentFileJSON = async (outFile, readStream) => {
   // last insertion
   if (tab.length !== 0) {
     const response = await fetchEzUnpaywall(tab, fetchAttributes);
+    lineRead += tab.length;
+    lineEnrich += response.length;
     enricherTab(tab, response);
     await writeInFileJSON(tab);
     bar.update(loaded);
   }
   bar.stop();
+  console.log(`${lineEnrich}/${lineRead} lines enriched`);
 };
 
 module.exports = {

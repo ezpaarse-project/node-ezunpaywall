@@ -1,4 +1,9 @@
+const fs = require('fs-extra');
+const path = require('path');
 const axios = require('../../lib/axios');
+
+const configPath = path.resolve(__dirname, '..', '..', '.ezunpaywallrc');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
 /**
  * fetch ez-unpaywall with array of dois and fetchAttributes
@@ -17,21 +22,18 @@ const fetchEzUnpaywall = async (tab, fetchAttributes) => {
       method: 'post',
       url: '/graphql',
       data: {
-        query: `query ($dois: [ID!]!) {getDatasUPW(dois: $dois) { doi, ${fetchAttributes.toString()} }}`,
+        query: `query ($dois: [ID!]!) {getDataUPW(dois: $dois) { doi, ${fetchAttributes.toString()} }}`,
         variables: {
           dois,
         },
       },
     });
   } catch (err) {
-    console.log(err);
-    if (!err.response) {
-      console.log('error: url server incorrect');
-    }
+    console.log(`error: service unavailable ${config.url}:${config.port}`);
     process.exit(1);
   }
   // TODO verif
-  return response.data.data.getDatasUPW;
+  return response.data.data.getDataUPW;
 };
 
 module.exports = {

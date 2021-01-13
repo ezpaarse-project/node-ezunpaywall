@@ -2,10 +2,15 @@
 
 const program = require('commander');
 const pkg = require('../package.json');
+const { config } = require('./cmds/config');
 const { startProcess } = require('./cmds/updates');
 const { getReports } = require('./cmds/reports');
 const { getTasks } = require('./cmds/status');
-const { enricher } = require('./cmds/enricher');
+const {
+  enrichJSON,
+  enrichCSV,
+} = require('./cmds/enrich');
+const { ping } = require('./cmds/ping');
 
 program.on('command:*', () => {
   console.error(`Invalid command: ${program.args.join(' ')}\nSee --help for a list of available commands.`);
@@ -13,6 +18,13 @@ program.on('command:*', () => {
 });
 
 program.version(pkg.version);
+
+program
+  .command('config')
+  .option('-u --url <url>', 'ezunpaywall url')
+  .option('-p --port <port>', 'ezunpaywall port')
+  .description('make the config to fetch ezunpaywall')
+  .action((args) => { config(args); });
 
 program
   .command('update')
@@ -40,12 +52,27 @@ program
   .action(() => { getTasks(); });
 
 program
-  .command('enricher')
+  .command('enrichJSON')
   .option('-f --file <file>', 'file which must be enriched')
-  .option('-a --attributes <attributes...>', 'attributes which must be enriched')
-  .option('-s --separator <separator>', 'separator of csv file')
+  .option('-a --attributes <attributes>', 'attributes which must be enriched (separeted by comma). By default, all attributes are added.')
+  .option('-o --out <out>', 'name of enriched file. By default, the output file is named: out.jsonl.')
+  .option('-v --verbose', 'logs how much lines are enriched')
+  .description('enrich a json file with unpaywall attributes')
+  .action((args) => { enrichJSON(args); });
+
+program
+  .command('enrichCSV')
+  .option('-f --file <file>', 'file which must be enriched')
+  .option('-a --attributes <attributes>', 'attributes which must be enriched (separeted by comma) By default, all attributes are added.')
+  .option('-s --separator <separator>', 'separator of csv out file')
   .option('-o --out <out>', 'name of enriched file')
-  .description('enricher a file with unpaywall datas')
-  .action((args) => { enricher(args); });
+  .option('-v --verbose', 'logs how much lines are enriched')
+  .description('enrich a csv file with unpaywall attributes')
+  .action((args) => { enrichCSV(args); });
+
+program
+  .command('ping')
+  .description('check if service is available')
+  .action(() => { ping(); });
 
 program.parse(process.argv);

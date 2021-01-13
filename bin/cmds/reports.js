@@ -1,5 +1,12 @@
 const inquirer = require('inquirer');
+const fs = require('fs-extra');
+const path = require('path');
+
+const configPath = path.resolve(__dirname, '..', '..', '.ezunpaywallrc');
+
+const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 const axios = require('../../lib/axios');
+
 
 module.exports = {
   getReports: async (args) => {
@@ -44,7 +51,7 @@ module.exports = {
           params: query,
         });
       } catch (err) {
-        console.log('error: service unavailable');
+        console.log(`error: service unavailable ${config.url}:${config.port}`);
         process.exit(1);
       }
       if (!reports?.data?.files?.length) {
@@ -81,7 +88,7 @@ module.exports = {
         console.log('file doesn\'t exist');
         process.exit(1);
       }
-      console.log('error: service unavailable');
+      console.log(`error: service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
     console.log(res1.data);

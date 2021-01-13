@@ -1,5 +1,11 @@
 const inquirer = require('inquirer');
+const fs = require('fs-extra');
+const path = require('path');
 const axios = require('../../lib/axios');
+
+const configPath = path.resolve(__dirname, '..', '..', '.ezunpaywallrc');
+
+const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
 module.exports = {
   startProcess: async (args) => {
@@ -83,7 +89,7 @@ module.exports = {
           console.log(`error: file "${opts.file}" doesn't exist`);
           process.exit(1);
         }
-        console.log('error: service unavailable');
+        console.log(`error: service unavailable ${config.url}:${config.port}`);
         process.exit(1);
       }
     }
@@ -98,7 +104,7 @@ module.exports = {
           params: query,
         });
       } catch (err) {
-        console.log('error: service unavailable');
+        console.log(`error: service unavailable ${config.url}:${config.port}`);
         process.exit(1);
       }
       const snapshot = await inquirer.prompt([{
@@ -133,7 +139,7 @@ module.exports = {
         console.log('info: process in progress');
         process.exit(1);
       }
-      console.log('error: service unavailable ');
+      console.log(`error: service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
     console.log(res.data.message);

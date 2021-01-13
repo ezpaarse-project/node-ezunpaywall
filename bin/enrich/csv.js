@@ -1,14 +1,16 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable camelcase */
 const fs = require('fs-extra');
 const Papa = require('papaparse');
 const get = require('lodash.get');
 const cliProgress = require('cli-progress');
+const logger = require('../../lib/logger');
 
 const bar = new cliProgress.SingleBar({
   format: 'progress [{bar}] {percentage}% | {value}/{total} bytes',
 });
 
-const { fetchEzUnpaywall } = require('./enricher');
+const { fetchEzUnpaywall } = require('./utils');
 
 let enricherAttributesCSV = [
   'best_oa_location.evidence',
@@ -56,6 +58,8 @@ const fetchAttributes = [];
 let headers = [];
 let separator = ',';
 let out;
+let lineRead = 0;
+let lineEnrich = 0;
 
 /**
  * parse the complexes attributes so that they can be used in the graphql query
@@ -117,7 +121,8 @@ const createFetchAttributes = () => {
  * checks if the attributes entered by the command are related to the unpaywall data model
  * @param {*} attributes array of attributesconst cliProgress = require('cli-progress');
  */
-const checkAttributesCSV = (attributes) => {
+const checkAttributesCSV = (attrs) => {
+  const attributes = attrs.split(',');
   if (!attributes?.length) {
     createFetchAttributes();
     return;
@@ -241,7 +246,7 @@ const writeHeaderCSV = async (header) => {
  * starts the enrichment process for files CSV
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
+const enrichmentFileCSV = async (outFile, separatorFile, readStream, verbose) => {
   const stat = await fs.stat(readStream.path);
   bar.start(stat.size, 0);
 
@@ -249,7 +254,17 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
   let loadedAfter;
 
   out = outFile;
+
+  // empty the file
+  const ifFileExist = await fs.pathExists(out);
+  if (ifFileExist) {
+    fs.unlink(out, (err) => {
+      if (err) throw err;
+    });
+  }
+
   separator = separatorFile;
+
   let tab = [];
   let head = true;
 
@@ -285,10 +300,13 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
           await parser.pause();
           const response = await fetchEzUnpaywall(tabWillBeEnriched, fetchAttributes);
           enricherTab(tabWillBeEnriched, response);
+          lineRead += 100;
+          lineEnrich += response.length;
           await writeInFileCSV(tabWillBeEnriched);
-
+          if (verbose) {
+            logger.info(`${response.length} lines enriched`);
+          }
           bar.update(loadedAfter - loadedBefore);
-
           await parser.resume();
         }
       },
@@ -299,10 +317,13 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
   if (tab.length !== 0) {
     bar.update(stat.size);
     const response = await fetchEzUnpaywall(tab, fetchAttributes);
+    lineRead += tab.length;
+    lineEnrich += response.length;
     enricherTab(tab, response);
     await writeInFileCSV(tab);
   }
   bar.stop();
+  console.log(`${lineEnrich}/${lineRead} lines enriched`);
 };
 
 module.exports = {
