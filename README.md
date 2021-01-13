@@ -47,7 +47,7 @@ Check if service is available.
 $ ezunpaywall ping
 ```
 ### ezu update
-Starts an unpaywall data update process. If you use "update" without parameter, it will download the last update published by unpaywall and insert its content. For automated this, it is possible to call this command via a cron (unpaywall publishes an update every Thursday UTC-7).
+Starts an unpaywall data update process. If you use command update without parameter, it will download the last update published by unpaywall and insert its content. For automated this, it is possible to call this command via a cron (unpaywall publishes an update every Thursday UTC-7).
 #### Parameters
 | Name | Description |
 | --- | --- |

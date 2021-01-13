@@ -9,6 +9,7 @@ module.exports = {
   config: async (args) => {
     if (args.file) {
       console.log(JSON.stringify(config, null, 2));
+      console.log(`from ${path.resolve(__dirname, '..', '..', '.ezunpaywallrc')}`)
       process.exit(0);
     }
     if (args.url) {
