@@ -7,6 +7,10 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
 module.exports = {
   config: async (args) => {
+    if (args.file) {
+      console.log(JSON.stringify(config, null, 2));
+      process.exit(0);
+    }
     if (args.url) {
       config.url = args.url;
     }
@@ -19,5 +23,7 @@ module.exports = {
     } catch (err) {
       console.log(err);
     }
+
+    console.log(JSON.stringify(config, null, 2));
   },
 };

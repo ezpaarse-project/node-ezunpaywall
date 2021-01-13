@@ -34,6 +34,7 @@ Update config to fetch ez-unpyawall.
 | --- | --- |
 | -u --url | ezunpaywall url |
 | -p --port | ezunpaywall port |
+| -f --file | display the configuration |
 #### Example
 ```bash
 $ ezunpaywall config -u http://localhost

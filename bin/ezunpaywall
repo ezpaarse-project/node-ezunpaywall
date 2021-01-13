@@ -23,6 +23,7 @@ program
   .command('config')
   .option('-u --url <url>', 'ezunpaywall url')
   .option('-p --port <port>', 'ezunpaywall port')
+  .option('-f --file', 'show the configuration')
   .description('make the config to fetch ezunpaywall')
   .action((args) => { config(args); });
 
