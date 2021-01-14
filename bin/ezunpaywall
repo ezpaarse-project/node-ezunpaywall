@@ -64,6 +64,7 @@ program
   .option('-o --out <out>', 'name of enriched file. By default, the output file is named: out.jsonl')
   .option('-v --verbose', 'logs how much lines are enriched')
   .description('enrich a json file with unpaywall attributes')
+  .description('Examples: ezu enrichJSON -f needToBeEnrich.jsonl -a is_oa,doi_url -o file-enriched.jsonl')
   .action((args) => { enrichJSON(args); });
 
 program
@@ -74,6 +75,7 @@ program
   .option('-o --out <out>', 'name of enriched file')
   .option('-v --verbose', 'logs how much lines are enriched')
   .description('enrich a csv file with unpaywall attributes')
+  .description('Examples: ezu enrichCSV -f needToBeEnrich.csv -a is_oa,doi_url -o file-enriched.csv')
   .action((args) => { enrichCSV(args); });
 
 program.parse(process.argv);
