@@ -162,25 +162,17 @@ const enricherTab = (tab, response) => {
       // if complex attribute (like best_oa_location.url)
       if (attr.includes('.')) {
         const str = attr.split('.');
+        // TODO test if is authors
         const authors = data[str[0]];
         // array attributes z_authors
         if (Array.isArray(authors)) {
           const [firstAuthor] = authors.filter((a) => a.sequence === 'first');
           if (firstAuthor) {
-            // TODO other syntax
-            el.first_authors = `${firstAuthor.family} ${firstAuthor.given}`;
+            el.first_authors = `${firstAuthor.family}, ${firstAuthor.given}`;
           }
           // the first ten other authors
-          let otherAuthors = '';
-          let i = 1;
-          while (i <= 10) {
-            if (!authors[i]?.family || !authors[i]?.given) {
-              break;
-            }
-            otherAuthors += `${authors[i]?.family} ${authors[i]?.given}, `;
-            i += 1;
-          }
-          el.additional_authors = otherAuthors;
+          const otherAuthors = authors.filter((author) => (author.family && author.given)).slice(0, 10).join(', ');
+          el.additional_authors = otherAuthors.map((author) => `${author.family}, ${author.given}`);
         } else {
           el[attr] = get(data, str, 0, str, 1);
         }
@@ -270,7 +262,7 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream, verbose) =>
 
   await new Promise((resolve) => {
     Papa.parse(readStream, {
-      delimiter: ';',
+      delimiter: ',',
       header: true,
       transformHeader: (header) => {
         headers.push(header.trim());

@@ -19,7 +19,7 @@ module.exports = {
       console.log(`error: service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
-    if (res?.data.data === 'pong') {
+    if (res?.data?.data === 'pong') {
       console.log(`service available ${config.url}:${config.port}`);
       process.exit(0);
     }

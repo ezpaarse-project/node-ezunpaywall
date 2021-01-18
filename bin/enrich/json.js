@@ -167,6 +167,7 @@ const enricherTab = (tab, response) => {
 const writeInFileJSON = async (tab) => {
   try {
     const stringTab = `${tab.map((el) => JSON.stringify(el)).join('\n')}\n`;
+    // TODO use writeStream
     await fs.appendFile(out, stringTab);
   } catch (err) {
     console.error(err);
@@ -185,9 +186,7 @@ const enrichmentFileJSON = async (outFile, readStream, verbose) => {
   // empty the file
   const ifFileExist = await fs.pathExists(out);
   if (ifFileExist) {
-    fs.unlink(out, (err) => {
-      if (err) throw err;
-    });
+    await fs.unlink(out);
   }
   const stat = await fs.stat(readStream.path);
   bar.start(stat.size, 0);

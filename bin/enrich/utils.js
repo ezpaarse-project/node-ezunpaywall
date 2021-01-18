@@ -32,8 +32,7 @@ const fetchEzUnpaywall = async (tab, fetchAttributes) => {
     console.log(`error: service unavailable ${config.url}:${config.port}`);
     process.exit(1);
   }
-  // TODO verif
-  return response.data.data.getDataUPW;
+  return response?.data?.data?.getDataUPW;
 };
 
 module.exports = {

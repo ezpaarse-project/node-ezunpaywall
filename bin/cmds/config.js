@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 
+// TODO permettre d'avoir une route dynamic ezu config use
 const configPath = path.resolve(__dirname, '..', '..', '.ezunpaywallrc');
 
 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
