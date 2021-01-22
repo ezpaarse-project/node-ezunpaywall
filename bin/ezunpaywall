@@ -2,15 +2,13 @@
 
 const program = require('commander');
 const pkg = require('../package.json');
+
 const { config } = require('./cmds/config');
+const { ping } = require('./cmds/ping');
 const { startProcess } = require('./cmds/updates');
 const { getReports } = require('./cmds/reports');
 const { getTask } = require('./cmds/status');
-const {
-  enrichJSON,
-  enrichCSV,
-} = require('./cmds/enrich');
-const { ping } = require('./cmds/ping');
+const { enrichJSON, enrichCSV } = require('./cmds/enrich');
 
 program.on('command:*', () => {
   console.error(`Invalid command: ${program.args.join(' ')}\nSee --help for a list of available commands.`);
@@ -25,12 +23,12 @@ program
   .option('-p --port <port>', 'ezunpaywall port')
   .option('-f --file', 'display the configuration')
   .description('make the config to fetch ezunpaywall')
-  .action((args) => { config(args); });
+  .action((args) => config(args));
 
 program
   .command('ping')
   .description('Check if service is available')
-  .action(() => { ping(); });
+  .action(() => ping());
 
 program
   .command('update')
