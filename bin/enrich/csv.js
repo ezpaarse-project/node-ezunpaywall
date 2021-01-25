@@ -6,11 +6,11 @@ const get = require('lodash.get');
 const cliProgress = require('cli-progress');
 const logger = require('../../lib/logger');
 
+const { fetchEzUnpaywall } = require('./utils');
+
 const bar = new cliProgress.SingleBar({
   format: 'progress [{bar}] {percentage}% | {value}/{total} bytes',
 });
-
-const { fetchEzUnpaywall } = require('./utils');
 
 let enricherAttributesCSV = [
   'best_oa_location.evidence',
@@ -242,9 +242,6 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream, verbose) =>
   const stat = await fs.stat(readStream.path);
   bar.start(stat.size, 0);
 
-  let loadedBefore = 0;
-  let loadedAfter;
-
   out = outFile;
 
   // empty the file
@@ -280,25 +277,19 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream, verbose) =>
 
         tab.push(results.data);
 
-        if (tab.length === 100) {
-          if (loadedBefore === 0) {
-            loadedAfter = results.meta.cursor;
-          } else {
-            loadedBefore = loadedAfter;
-            loadedAfter = results.meta.cursor;
-          }
+        if (tab.length === 1000) {
           const tabWillBeEnriched = tab;
           tab = [];
           await parser.pause();
           const response = await fetchEzUnpaywall(tabWillBeEnriched, fetchAttributes);
           enricherTab(tabWillBeEnriched, response);
-          lineRead += 100;
+          lineRead += 1000;
           lineEnrich += response.length;
           await writeInFileCSV(tabWillBeEnriched);
           if (verbose) {
             logger.info(`${response.length} lines enriched`);
           }
-          bar.update(loadedAfter - loadedBefore);
+          bar.update(results.meta.cursor);
           await parser.resume();
         }
       },
@@ -307,13 +298,13 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream, verbose) =>
   });
   // last insertion
   if (tab.length !== 0) {
-    bar.update(stat.size);
     const response = await fetchEzUnpaywall(tab, fetchAttributes);
     lineRead += tab.length;
     lineEnrich += response.length;
     enricherTab(tab, response);
     await writeInFileCSV(tab);
   }
+  bar.update(stat.size);
   bar.stop();
   console.log(`${lineEnrich}/${lineRead} lines enriched`);
 };
