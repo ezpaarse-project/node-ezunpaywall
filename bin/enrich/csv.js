@@ -236,7 +236,11 @@ const writeHeaderCSV = async (header) => {
  * starts the enrichment process for files CSV
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileCSV = async (outFile, separatorFile, readStream, verbose) => {
+const enrichmentFileCSV = async (outFile, separatorFile, readStream, verbose, attrs) => {
+  if (attrs) {
+    checkAttributesCSV();
+  }
+  createFetchAttributes();
   const stat = await fs.stat(readStream.path);
   bar.start(stat.size, 0);
 

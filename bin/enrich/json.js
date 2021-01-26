@@ -121,10 +121,6 @@ const createFetchAttributes = () => {
  */
 const checkAttributesJSON = (attrs) => {
   const attributes = attrs.split(',');
-  if (!attributes?.length) {
-    createFetchAttributes();
-    return;
-  }
   attributes.forEach((attr) => {
     if (!enricherAttributesJSON.includes(attr)) {
       console.log(`error: attribut ${attr} cannot be enriched on JSON file`);
@@ -132,7 +128,6 @@ const checkAttributesJSON = (attrs) => {
     }
   });
   enricherAttributesJSON = attributes;
-  createFetchAttributes();
 };
 
 /**
@@ -147,6 +142,7 @@ const enricherTab = (tab, response) => {
       results.set(el.doi, el);
     }
   });
+
   // enricher
   tab.forEach((el) => {
     if (!el.doi) {
@@ -177,11 +173,13 @@ const writeInFileJSON = async (tab) => {
  * starts the enrichment process for files JSON
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileJSON = async (outFile, readStream, verbose) => {
+const enrichmentFileJSON = async (outFile, readStream, verbose, attrs) => {
+  if (attrs) {
+    checkAttributesJSON();
+  }
+  createFetchAttributes();
   out = outFile;
-
   let loaded = 0;
-
   // empty the file
   const ifFileExist = await fs.pathExists(out);
   if (ifFileExist) {
@@ -203,10 +201,10 @@ const enrichmentFileJSON = async (outFile, readStream, verbose) => {
   // eslint-disable-next-line no-restricted-syntax
   for await (const line of rl) {
     tab.push(JSON.parse(line));
-    if (tab.length === 100) {
+    if (tab.length === 1000) {
       const response = await fetchEzUnpaywall(tab, fetchAttributes);
       enricherTab(tab, response);
-      lineRead += 100;
+      lineRead += 1000;
       lineEnrich += response.length;
       await writeInFileJSON(tab);
       if (verbose) {

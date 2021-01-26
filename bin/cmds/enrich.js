@@ -52,11 +52,7 @@ module.exports = {
     } catch (err) {
       console.log('error: impossible de read file');
     }
-
-    if (args.attributes) {
-      checkAttributesCSV(args.attributes);
-    }
-    enrichmentFileCSV(out, separator, readStream, args.verbose);
+    enrichmentFileCSV(out, separator, readStream, args.verbose, args.attributes);
   },
 
   enrichJSON: async (args) => {
@@ -91,10 +87,6 @@ module.exports = {
       console.log('error: impossible de read file');
     }
 
-    if (args.attributes) {
-      checkAttributesJSON(args.attributes);
-    }
-
-    enrichmentFileJSON(out, readStream, args.verbose);
+    enrichmentFileJSON(out, readStream, args.verbose, args.attributes);
   },
 };
