@@ -35,7 +35,7 @@ Update config to fetch ez-unpyawall.
 | -u --url | ezunpaywall url |
 | -p --port | ezunpaywall port |
 | -f --file | display the configuration |
-#### Example
+#### Examples
 ```bash
 $ ezunpaywall config -u http://localhost
 $ ezunpaywall config -p 8080
@@ -76,7 +76,7 @@ $ ezunpaywall update -sd 2020-04-27 -se 2020-07-01
 ### ezu task
 get status of processus in courses.
 
-#### Examples
+#### Example
 
 ```bash
 $ ezunpaywall task
