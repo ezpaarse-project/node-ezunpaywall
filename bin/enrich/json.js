@@ -167,8 +167,7 @@ const enricherTab = (tab, response) => {
 const writeInFileJSON = async (tab) => {
   try {
     const stringTab = `${tab.map((el) => JSON.stringify(el)).join('\n')}\n`;
-    // TODO use writeStream
-    await fs.appendFile(out, stringTab);
+    await fs.writeFileSync(out, stringTab, { flag: 'a' });
   } catch (err) {
     console.error(err);
   }

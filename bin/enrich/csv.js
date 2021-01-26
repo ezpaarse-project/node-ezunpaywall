@@ -196,8 +196,7 @@ const writeInFileCSV = async (tab) => {
       delimiter: separator,
       columns: headers,
     });
-    // TODO passé par un stream d'écriture writeFileStream
-    await fs.appendFile(out, `${val}\r\n`);
+    await fs.writeFileSync(out, `${val}\r\n`, { flag: 'a' });
   } catch (err) {
     console.error(err);
   }
@@ -226,8 +225,7 @@ const enricherHeaderCSV = (header) => {
  */
 const writeHeaderCSV = async (header) => {
   try {
-    // TODO passé par un stream d'écriture writeFileStream
-    await fs.appendFile(out, `${header.join(separator)}\r\n`);
+    await fs.writeFileSync(out, `${header.join(separator)}\r\n`, { flag: 'a' });
   } catch (err) {
     console.log('error: write stream bug');
     process.exit(1);
