@@ -1,16 +1,14 @@
-const fs = require('fs-extra');
-const path = require('path');
-const axios = require('../../lib/axios');
-
-const configPath = path.resolve(__dirname, '..', '..', '.ezunpaywallrc');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+const { connection, getConfig } = require('../../lib/axios');
 
 /**
  * fetch ez-unpaywall with array of dois and fetchAttributes
  * @param {*} tab array of line that we will enrich
  * @param {*} fetchAttributes attributes that we will enrich
  */
-const fetchEzUnpaywall = async (tab, fetchAttributes) => {
+const fetchEzUnpaywall = async (tab, fetchAttributes, customPath) => {
+  const axios = await connection(customPath);
+  const config = await getConfig(customPath);
+
   let dois = [];
   let response = [];
   // contain index of doi
@@ -29,7 +27,7 @@ const fetchEzUnpaywall = async (tab, fetchAttributes) => {
       },
     });
   } catch (err) {
-    console.log(`error: service unavailable ${config.url}:${config.port}`);
+    logger.error(`service unavailable ${config.url}:${config.port}`);
     process.exit(1);
   }
   return response?.data?.data?.getDataUPW;

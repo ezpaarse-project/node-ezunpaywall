@@ -120,13 +120,19 @@ const createFetchAttributes = () => {
  * @param {*} attr String of attributes
  */
 const checkAttributesJSON = (attrs) => {
-  const attributes = attrs.split(',');
-  attributes.forEach((attr) => {
-    if (!enricherAttributesJSON.includes(attr)) {
-      console.log(`error: attribut ${attr} cannot be enriched on JSON file`);
-      process.exit(1);
-    }
-  });
+  let attributes = attrs;
+  if (attrs.includes(',')) {
+    attributes = attrs.split(',');
+    attributes.forEach((attr) => {
+      if (!enricherAttributesJSON.includes(attr)) {
+        logger.error(`attribut ${attr} cannot be enriched on JSON file`);
+        process.exit(1);
+      }
+    });
+  } else if (!enricherAttributesJSON.includes(attributes)) {
+    logger.error(`attribut ${attributes} cannot be enriched on JSON file`);
+    process.exit(1);
+  }
   enricherAttributesJSON = attributes;
 };
 
@@ -173,9 +179,9 @@ const writeInFileJSON = async (tab) => {
  * starts the enrichment process for files JSON
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileJSON = async (outFile, readStream, verbose, attrs) => {
-  if (attrs) {
-    checkAttributesJSON();
+const enrichmentFileJSON = async (outFile, readStream, args) => {
+  if (args.attributes) {
+    checkAttributesJSON(args.attributes);
   }
   createFetchAttributes();
   out = outFile;
@@ -202,12 +208,12 @@ const enrichmentFileJSON = async (outFile, readStream, verbose, attrs) => {
   for await (const line of rl) {
     tab.push(JSON.parse(line));
     if (tab.length === 1000) {
-      const response = await fetchEzUnpaywall(tab, fetchAttributes);
+      const response = await fetchEzUnpaywall(tab, fetchAttributes, args.use);
       enricherTab(tab, response);
       lineRead += 1000;
       lineEnrich += response.length;
       await writeInFileJSON(tab);
-      if (verbose) {
+      if (args.verbose) {
         logger.info(`${response.length} lines enriched`);
       }
       bar.update(loaded);
@@ -216,7 +222,7 @@ const enrichmentFileJSON = async (outFile, readStream, verbose, attrs) => {
   }
   // last insertion
   if (tab.length !== 0) {
-    const response = await fetchEzUnpaywall(tab, fetchAttributes);
+    const response = await fetchEzUnpaywall(tab, fetchAttributes, args.use);
     lineRead += tab.length;
     lineEnrich += response.length;
     enricherTab(tab, response);
@@ -224,7 +230,7 @@ const enrichmentFileJSON = async (outFile, readStream, verbose, attrs) => {
     bar.update(loaded);
   }
   bar.stop();
-  console.log(`${lineEnrich}/${lineRead} lines enriched`);
+  logger.info(`${lineEnrich}/${lineRead} lines enriched`);
 };
 
 module.exports = {

@@ -1,13 +1,10 @@
-const fs = require('fs-extra');
-const path = require('path');
-
-const configPath = path.resolve(__dirname, '..', '..', '.ezunpaywallrc');
-
-const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-const axios = require('../../lib/axios');
+const { connection, getConfig } = require('../../lib/axios');
+const logger = require('../../lib/logger');
 
 module.exports = {
-  getTask: async () => {
+  getTask: async (args) => {
+    const axios = await connection(args.use);
+    const config = await getConfig(args.use);
     let res;
     try {
       res = await axios({
@@ -15,9 +12,9 @@ module.exports = {
         url: '/task',
       });
     } catch (err) {
-      console.log(`error: service unavailable ${config.url}:${config.port}`);
+      logger.error(`service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
-    console.log(res.data);
+    logger.info(JSON.stringify(res.data, null, 2));
   },
 };

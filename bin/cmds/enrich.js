@@ -1,9 +1,10 @@
 /* eslint-disable camelcase */
 const fs = require('fs-extra');
 const path = require('path');
+const logger = require('../../lib/logger');
 
-const { enrichmentFileCSV, checkAttributesCSV } = require('../enrich/csv');
-const { enrichmentFileJSON, checkAttributesJSON } = require('../enrich/json');
+const { enrichmentFileCSV } = require('../enrich/csv');
+const { enrichmentFileJSON } = require('../enrich/json');
 
 const getExtensionOfFile = (file) => {
   const basename = file.split(/[\\/]/).pop();
@@ -19,18 +20,18 @@ module.exports = {
     let out;
     let separator;
     if (!args.file) {
-      console.log('error: file expected');
+      logger.error('file expected');
       process.exit(1);
     }
     const file = path.resolve(args.file);
     const ifFileExist = await fs.pathExists(file);
     if (!ifFileExist) {
-      console.log('error: file not found');
+      logger.error('file not found');
       process.exit(1);
     }
     const typeOfFile = getExtensionOfFile(file);
     if (typeOfFile !== 'csv') {
-      console.log(`${typeOfFile} is not suported for enrichCSV. Required .csv`);
+      logger.error(`${typeOfFile} is not suported for enrichCSV. Required .csv`);
       process.exit(1);
     }
 
@@ -50,27 +51,27 @@ module.exports = {
     try {
       readStream = fs.createReadStream(file);
     } catch (err) {
-      console.log('error: impossible de read file');
+      logger.error('impossible de read file');
     }
-    enrichmentFileCSV(out, separator, readStream, args.verbose, args.attributes);
+    enrichmentFileCSV(out, separator, readStream, args);
   },
 
   enrichJSON: async (args) => {
     let out;
 
     if (!args.file) {
-      console.log('error: file expected');
+      logger.error('file expected');
       process.exit(1);
     }
     const file = path.resolve(args.file);
     const ifFileExist = await fs.pathExists(file);
     if (!ifFileExist) {
-      console.log('error: file not found');
+      logger.error('file not found');
       process.exit(1);
     }
     const typeOfFile = getExtensionOfFile(file);
     if (typeOfFile !== 'jsonl' && typeOfFile !== 'ndjson' && typeOfFile !== 'json') {
-      console.log(`${typeOfFile} is not suported for enrichJSON. What is require are .ndjson, .json, .jsonl`);
+      logger.error(`${typeOfFile} is not suported for enrichJSON. What is require are .ndjson, .json, .jsonl`);
       process.exit(1);
     }
 
@@ -84,9 +85,9 @@ module.exports = {
     try {
       readStream = fs.createReadStream(file);
     } catch (err) {
-      console.log('error: impossible de read file');
+      logger.error('error: impossible de read file');
     }
 
-    enrichmentFileJSON(out, readStream, args.verbose, args.attributes);
+    enrichmentFileJSON(out, readStream, args);
   },
 };

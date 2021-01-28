@@ -1,14 +1,10 @@
-const fs = require('fs-extra');
-const path = require('path');
-
-const axios = require('../../lib/axios');
-
-const configPath = path.resolve(__dirname, '..', '..', '.ezunpaywallrc');
-
-const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+const { connection, getConfig } = require('../../lib/axios');
+const logger = require('../../lib/logger');
 
 module.exports = {
-  ping: async () => {
+  ping: async (args) => {
+    const axios = await connection(args.use);
+    const config = await getConfig(args.use);
     let res;
     try {
       res = await axios({
@@ -16,11 +12,11 @@ module.exports = {
         url: '/ping',
       });
     } catch (err) {
-      console.log(`error: service unavailable ${config.url}:${config.port}`);
+      logger.error(`service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
     if (res?.data?.data === 'pong') {
-      console.log(`service available ${config.url}:${config.port}`);
+      logger.info(`service available ${config.url}:${config.port}`);
       process.exit(0);
     }
   },
