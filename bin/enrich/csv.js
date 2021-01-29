@@ -1,14 +1,16 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable camelcase */
 const fs = require('fs-extra');
 const Papa = require('papaparse');
 const get = require('lodash.get');
 const cliProgress = require('cli-progress');
+const logger = require('../../lib/logger');
+
+const { fetchEzUnpaywall } = require('./utils');
 
 const bar = new cliProgress.SingleBar({
   format: 'progress [{bar}] {percentage}% | {value}/{total} bytes',
 });
-
-const { fetchEzUnpaywall } = require('./enricher');
 
 let enricherAttributesCSV = [
   'best_oa_location.evidence',
@@ -56,6 +58,8 @@ const fetchAttributes = [];
 let headers = [];
 let separator = ',';
 let out;
+let lineRead = 0;
+let lineEnrich = 0;
 
 /**
  * parse the complexes attributes so that they can be used in the graphql query
@@ -117,14 +121,15 @@ const createFetchAttributes = () => {
  * checks if the attributes entered by the command are related to the unpaywall data model
  * @param {*} attributes array of attributesconst cliProgress = require('cli-progress');
  */
-const checkAttributesCSV = (attributes) => {
+const checkAttributesCSV = (attrs) => {
+  const attributes = attrs.split(',');
   if (!attributes?.length) {
     createFetchAttributes();
     return;
   }
   attributes.forEach((attr) => {
     if (!enricherAttributesCSV.includes(attr)) {
-      console.log(`error: attribut ${attr} cannot be enriched on CSV file`);
+      logger.error(`attribut ${attr} cannot be enriched on CSV file`);
       process.exit(1);
     }
   });
@@ -157,13 +162,15 @@ const enricherTab = (tab, response) => {
       // if complex attribute (like best_oa_location.url)
       if (attr.includes('.')) {
         const str = attr.split('.');
-        // array attributes z_authors
-        if (Array.isArray(data[str[0]])) {
-          const author = data[str[0]].filter((a) => a.sequence === 'first');
-          if (author[0]) {
-            // TODO other syntax
-            el.z_authors = `${author[0].family}, ${author[0].given}`;
+        const authors = data[str[0]];
+        // z_author is the only array attributes on unpaywall schema
+        if (Array.isArray(authors)) {
+          const [firstAuthor] = authors.filter((a) => a.sequence === 'first');
+          if (firstAuthor) {
+            el.first_authors = `${firstAuthor.family}, ${firstAuthor.given}`;
           }
+          // the first ten other authors
+          el.additional_authors = authors.slice(0, 10).map((a) => `${a.family} ${a.given}`).join(',');
         } else {
           el[attr] = get(data, str, 0, str, 1);
         }
@@ -187,8 +194,7 @@ const writeInFileCSV = async (tab) => {
       delimiter: separator,
       columns: headers,
     });
-    // TODO passé par un stream d'écriture writeFileStream
-    await fs.appendFile(out, `${val}\r\n`);
+    await fs.writeFile(out, `${val}\r\n`, { flag: 'a' });
   } catch (err) {
     console.error(err);
   }
@@ -205,7 +211,8 @@ const enricherHeaderCSV = (header) => {
   const found = res1.find((element) => element.includes('z_authors'));
   res1 = enricherAttributesCSV.filter((el) => !el.includes('z_authors'));
   if (found) {
-    res1.push('z_authors');
+    res1.push('first_authors');
+    res1.push('additional_authors');
   }
   return header.concat(res1);
 };
@@ -216,10 +223,9 @@ const enricherHeaderCSV = (header) => {
  */
 const writeHeaderCSV = async (header) => {
   try {
-    // TODO passé par un stream d'écriture writeFileStream
-    await fs.appendFile(out, `${header.join(separator)}\r\n`);
+    await fs.writeFile(out, `${header.join(separator)}\r\n`, { flag: 'a' });
   } catch (err) {
-    console.log('error: write stream bug');
+    logger.error('write stream bug');
     process.exit(1);
   }
 };
@@ -228,15 +234,26 @@ const writeHeaderCSV = async (header) => {
  * starts the enrichment process for files CSV
  * @param {*} readStream read the stream of the file you want to enrich
  */
-const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
+const enrichmentFileCSV = async (outFile, separatorFile, readStream, args) => {
+  if (args.attributes) {
+    checkAttributesCSV();
+  }
+  createFetchAttributes();
   const stat = await fs.stat(readStream.path);
   bar.start(stat.size, 0);
 
-  let loadedBefore = 0;
-  let loadedAfter;
-
   out = outFile;
+
+  // empty the file
+  const fileExist = await fs.pathExists(out);
+  if (fileExist) {
+    await fs.unlink(out, (err) => {
+      if (err) throw err;
+    });
+  }
+
   separator = separatorFile;
+
   let tab = [];
   let head = true;
 
@@ -260,22 +277,19 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
 
         tab.push(results.data);
 
-        if (tab.length === 100) {
-          if (loadedBefore === 0) {
-            loadedAfter = results.meta.cursor;
-          } else {
-            loadedBefore = loadedAfter;
-            loadedAfter = results.meta.cursor;
-          }
+        if (tab.length === 1000) {
           const tabWillBeEnriched = tab;
           tab = [];
           await parser.pause();
-          const response = await fetchEzUnpaywall(tabWillBeEnriched, fetchAttributes);
+          const response = await fetchEzUnpaywall(tabWillBeEnriched, fetchAttributes, args.use);
           enricherTab(tabWillBeEnriched, response);
+          lineRead += 1000;
+          lineEnrich += response.length;
           await writeInFileCSV(tabWillBeEnriched);
-
-          bar.update(loadedAfter - loadedBefore);
-
+          if (args.verbose) {
+            logger.info(`${response.length} lines enriched`);
+          }
+          bar.update(results.meta.cursor);
           await parser.resume();
         }
       },
@@ -284,12 +298,15 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream) => {
   });
   // last insertion
   if (tab.length !== 0) {
-    bar.update(stat.size);
-    const response = await fetchEzUnpaywall(tab, fetchAttributes);
+    const response = await fetchEzUnpaywall(tab, fetchAttributes, args.use);
+    lineRead += tab.length;
+    lineEnrich += response.length;
     enricherTab(tab, response);
     await writeInFileCSV(tab);
   }
+  bar.update(stat.size);
   bar.stop();
+  logger.info(`${lineEnrich}/${lineRead} lines enriched`);
 };
 
 module.exports = {
