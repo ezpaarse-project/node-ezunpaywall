@@ -1,11 +1,14 @@
-const axios = require('../../lib/axios');
+const { connection, getConfig } = require('../../lib/axios');
 
 /**
  * fetch ez-unpaywall with array of dois and fetchAttributes
  * @param {*} tab array of line that we will enrich
  * @param {*} fetchAttributes attributes that we will enrich
  */
-const fetchEzUnpaywall = async (tab, fetchAttributes) => {
+const fetchEzUnpaywall = async (tab, fetchAttributes, customPath) => {
+  const axios = await connection(customPath);
+  const config = await getConfig(customPath);
+
   let dois = [];
   let response = [];
   // contain index of doi
@@ -17,21 +20,17 @@ const fetchEzUnpaywall = async (tab, fetchAttributes) => {
       method: 'post',
       url: '/graphql',
       data: {
-        query: `query ($dois: [ID!]!) {getDatasUPW(dois: $dois) { doi, ${fetchAttributes.toString()} }}`,
+        query: `query ($dois: [ID!]!) {getDataUPW(dois: $dois) { doi, ${fetchAttributes.toString()} }}`,
         variables: {
           dois,
         },
       },
     });
   } catch (err) {
-    console.log(err);
-    if (!err.response) {
-      console.log('error: url server incorrect');
-    }
+    logger.error(`service unavailable ${config.url}:${config.port}`);
     process.exit(1);
   }
-  // TODO verif
-  return response.data.data.getDatasUPW;
+  return response?.data?.data?.getDataUPW;
 };
 
 module.exports = {
