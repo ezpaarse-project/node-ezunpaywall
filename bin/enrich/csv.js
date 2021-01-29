@@ -194,7 +194,7 @@ const writeInFileCSV = async (tab) => {
       delimiter: separator,
       columns: headers,
     });
-    await fs.writeFileSync(out, `${val}\r\n`, { flag: 'a' });
+    await fs.writeFile(out, `${val}\r\n`, { flag: 'a' });
   } catch (err) {
     console.error(err);
   }
@@ -223,7 +223,7 @@ const enricherHeaderCSV = (header) => {
  */
 const writeHeaderCSV = async (header) => {
   try {
-    await fs.writeFileSync(out, `${header.join(separator)}\r\n`, { flag: 'a' });
+    await fs.writeFile(out, `${header.join(separator)}\r\n`, { flag: 'a' });
   } catch (err) {
     logger.error('write stream bug');
     process.exit(1);
@@ -245,9 +245,9 @@ const enrichmentFileCSV = async (outFile, separatorFile, readStream, args) => {
   out = outFile;
 
   // empty the file
-  const ifFileExist = await fs.pathExists(out);
-  if (ifFileExist) {
-    fs.unlink(out, (err) => {
+  const fileExist = await fs.pathExists(out);
+  if (fileExist) {
+    await fs.unlink(out, (err) => {
       if (err) throw err;
     });
   }

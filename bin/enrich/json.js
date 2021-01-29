@@ -169,7 +169,7 @@ const enricherTab = (tab, response) => {
 const writeInFileJSON = async (tab) => {
   try {
     const stringTab = `${tab.map((el) => JSON.stringify(el)).join('\n')}\n`;
-    await fs.writeFileSync(out, stringTab, { flag: 'a' });
+    await fs.writeFile(out, stringTab, { flag: 'a' });
   } catch (err) {
     console.error(err);
   }
@@ -187,8 +187,8 @@ const enrichmentFileJSON = async (outFile, readStream, args) => {
   out = outFile;
   let loaded = 0;
   // empty the file
-  const ifFileExist = await fs.pathExists(out);
-  if (ifFileExist) {
+  const fileExist = await fs.pathExists(out);
+  if (fileExist) {
     await fs.unlink(out);
   }
   const stat = await fs.stat(readStream.path);

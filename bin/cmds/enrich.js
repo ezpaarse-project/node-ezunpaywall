@@ -64,8 +64,8 @@ module.exports = {
       process.exit(1);
     }
     const file = path.resolve(args.file);
-    const ifFileExist = await fs.pathExists(file);
-    if (!ifFileExist) {
+    const fileExist = await fs.pathExists(file);
+    if (!fileExist) {
       logger.error('file not found');
       process.exit(1);
     }
