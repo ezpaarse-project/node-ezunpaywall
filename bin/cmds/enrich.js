@@ -1,10 +1,9 @@
 /* eslint-disable camelcase */
 const fs = require('fs-extra');
 const path = require('path');
-const logger = require('../../lib/logger');
 
-const { enrichmentFileCSV } = require('../enrich/csv');
-const { enrichmentFileJSON } = require('../enrich/json');
+const logger = require('../../lib/logger');
+const { connection, getConfig } = require('../../lib/axios');
 
 const getExtensionOfFile = (file) => {
   const basename = file.split(/[\\/]/).pop();
@@ -53,10 +52,11 @@ module.exports = {
     } catch (err) {
       logger.error('impossible de read file');
     }
-    enrichmentFileCSV(out, separator, readStream, args);
   },
 
   enrichJSON: async (args) => {
+    const axios = await connection(args.use);
+    const config = await getConfig(args.use);
     let out;
 
     if (!args.file) {
@@ -81,13 +81,25 @@ module.exports = {
       out = `out.${typeOfFile}`;
     }
 
-    let readStream;
+    let res;
+
     try {
-      readStream = fs.createReadStream(file);
+      res = await axios({
+        method: 'POST',
+        url: `/enrich/json/?args=${args.attributes}`,
+        data: fs.createReadStream(args.file),
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        responseType: 'stream',
+      });
     } catch (err) {
-      logger.error('error: impossible de read file');
+      logger.error(`service unavailable ${config.url}:${config.port}`);
+      process.exit(1);
     }
 
-    enrichmentFileJSON(out, readStream, args);
+    const writer = fs.createWriteStream(out);
+
+    res.data.pipe(writer);
   },
 };
