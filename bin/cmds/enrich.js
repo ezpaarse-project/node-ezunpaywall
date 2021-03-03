@@ -16,6 +16,8 @@ const getExtensionOfFile = (file) => {
 
 module.exports = {
   enrichCSV: async (args) => {
+    const axios = await connection(args.use);
+    const config = await getConfig(args.use);
     let out;
     let separator;
     if (!args.file) {
@@ -46,12 +48,42 @@ module.exports = {
       out = 'out.csv';
     }
 
-    let readStream;
-    try {
-      readStream = fs.createReadStream(file);
-    } catch (err) {
-      logger.error('impossible de read file');
+    if (!args.attributes) {
+      args.attributes = '';
     }
+
+    let res1;
+
+    try {
+      res1 = await axios({
+        method: 'POST',
+        url: `/enrich/csv/?args=${args.attributes}&separator=${separator}`,
+        data: fs.createReadStream(args.file),
+        headers: {
+          'Content-Type': 'text/csv',
+        },
+        responseType: 'json',
+      });
+    } catch (err) {
+      logger.error(`service unavailable ${config.url}:${config.port}`);
+      process.exit(1);
+    }
+
+    let res2;
+    try {
+      res2 = await axios({
+        method: 'GET',
+        url: `/enrich/${res1.data.file}`,
+        responseType: 'stream',
+      });
+    } catch (err) {
+      logger.error(`service unavailable ${config.url}:${config.port}`);
+      process.exit(1);
+    }
+
+    const writer = fs.createWriteStream(out);
+
+    res2.data.pipe(writer);
   },
 
   enrichJSON: async (args) => {
@@ -81,16 +113,31 @@ module.exports = {
       out = `out.${typeOfFile}`;
     }
 
-    let res;
+    let res1;
 
     try {
-      res = await axios({
+      res1 = await axios({
         method: 'POST',
-        url: `/enrich/json/?args=${args.attributes}`,
+        url: '/enrich/json',
+        params: {
+          args: args.attributes,
+        },
         data: fs.createReadStream(args.file),
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
+        responseType: 'json',
+      });
+    } catch (err) {
+      logger.error(`service unavailable ${config.url}:${config.port}`);
+      process.exit(1);
+    }
+
+    let res2;
+    try {
+      res2 = await axios({
+        method: 'GET',
+        url: `/enrich/${res1.data.file}`,
         responseType: 'stream',
       });
     } catch (err) {
@@ -100,6 +147,6 @@ module.exports = {
 
     const writer = fs.createWriteStream(out);
 
-    res.data.pipe(writer);
+    res2.data.pipe(writer);
   },
 };
