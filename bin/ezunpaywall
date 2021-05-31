@@ -5,7 +5,7 @@ const pkg = require('../package.json');
 
 const { config } = require('./cmds/config');
 const { ping } = require('./cmds/ping');
-const { startProcess } = require('./cmds/updates');
+const { startProcess } = require('./cmds/update');
 const { getReports } = require('./cmds/reports');
 const { getTask } = require('./cmds/status');
 const { enrichJSON, enrichCSV } = require('./cmds/enrich');

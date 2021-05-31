@@ -1,106 +1,97 @@
+/* eslint-disable no-param-reassign */
 const inquirer = require('inquirer');
 const { connection, getConfig } = require('../../lib/axios');
-const logger = require('../../lib/logger');
 
 module.exports = {
   startProcess: async (args) => {
     const axios = await connection(args.use);
     const config = await getConfig(args.use);
     // check date and list
-    if (args.list && args.startDate) {
-      logger.error('option --startDate is impossible to use with --list');
-      process.exit(1);
-    }
-    if (args.list && args.endDate) {
-      logger.error('option --endDate is impossible to use with --list');
-      process.exit(1);
+    if (args.list) {
+      if (args.startDate) {
+        console.error('option --startDate is impossible to use with --list');
+        process.exit(1);
+      }
+      if (args.endDate) {
+        console.error('option --endDate is impossible to use with --list');
+        process.exit(1);
+      }
+      if (args.file) {
+        console.error('option --list is impossible to use with --file');
+        process.exit(1);
+      }
     }
 
     // check files and dates
-    if (args.file && args.startDate) {
-      logger.error('option --startDate is impossible to use with --file');
-      process.exit(1);
-    }
-    if (args.file && args.endDate) {
-      logger.error('option --endDate is impossible to use with --file');
-      process.exit(1);
-    }
-
-    // check file and list
-    if (args.file && args.list) {
-      logger.error('option --list is impossible to use with --file');
-      process.exit(1);
+    if (args.file) {
+      if (args.startDate) {
+        console.error('option --startDate is impossible to use with --file');
+        process.exit(1);
+      }
+      if (args.endDate) {
+        console.error('option --endDate is impossible to use with --file');
+        process.exit(1);
+      }
     }
 
     // check date and lines limiter
     if (args.offset && args.startDate) {
-      logger.error('option --offset is impossible to use with --startDate');
+      console.error('option --offset is impossible to use with --startDate');
       process.exit(1);
     }
     if (args.offset && args.endDate) {
-      logger.error('option --offset is impossible to use with --endDate');
+      console.error('option --offset is impossible to use with --endDate');
       process.exit(1);
     }
     if (args.limit && args.startDate) {
-      logger.error('option --endDate is impossible to use with --limit');
+      console.error('option --endDate is impossible to use with --limit');
       process.exit(1);
     }
     if (args.limit && args.endDate) {
-      logger.error('option --startDate is impossible to use with --limit');
+      console.error('option --startDate is impossible to use with --limit');
       process.exit(1);
     }
 
     // check if only endDate
     if (args.endDate && !args.startDate) {
-      logger.error('option --endDate is impossible to use without --startDate');
+      console.error('option --endDate is impossible to use without --startDate');
       process.exit(1);
     }
 
     // check format Date
-    const pattern = /^[0-9]*-[0-9]{2}-[0-9]{2}$/;
+    const pattern = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
     if (args.startDate && !pattern.test(args.startDate)) {
-      logger.error('startDate are in bad format, expected YYYY-mm-dd');
+      console.error('startDate are in bad format, expected YYYY-mm-dd');
       process.exit(1);
     }
     if (args.endDate && !pattern.test(args.endDate)) {
-      logger.error('endDate are in bad format, expected YYYY-mm-dd');
+      console.error('endDate are in bad format, expected YYYY-mm-dd');
       process.exit(1);
     }
     if (args.startDate && args.endDate) {
       if (new Date(args.endDate).getTime() < new Date(args.startDate).getTime()) {
-        logger.error('end date is lower than start date');
+        console.error('end date is lower than start date');
         process.exit(1);
       }
+    }
+    if (new Date(args.startDate).getTime() > Date.now()) {
+      console.error('startDate is in the futur');
+      process.exit(1);
     }
 
-    // check if file exist
-    if (args.file) {
-      try {
-        await axios({
-          method: 'GET',
-          url: `/download/${args.file}`,
-        });
-      } catch (err) {
-        if (err?.responses?.status === 404) {
-          logger.error(`file "${args.file}" doesn't exist`);
-          process.exit(1);
-        }
-        logger.error(`service unavailable ${config.url}:${config.port}`);
-        process.exit(1);
-      }
-    }
     let snapshots;
     let url = '';
     const query = {};
+
     if (args.list) {
       try {
         snapshots = await axios({
-          method: 'GET',
-          url: '/download',
+          method: 'POST',
+          url: '/update',
           params: query,
         });
       } catch (err) {
-        logger.error(`service unavailable ${config.url}:${config.port}`);
+        console.error(`service unavailable ${config.url}:${config.port}`);
         process.exit(1);
       }
       const snapshot = await inquirer.prompt([{
@@ -118,6 +109,7 @@ module.exports = {
       }]);
       args.file = snapshot.files;
     }
+
     if (args.file) url += `/${args.file}`;
     if (args.offset) query.offset = args.offset;
     if (args.limit) query.limit = args.limit;
@@ -132,12 +124,12 @@ module.exports = {
       });
     } catch (err) {
       if (err?.response?.status === 409) {
-        logger.info('process in progress');
+        console.log('process in progress');
         process.exit(1);
       }
-      logger.error(`service unavailable ${config.url}:${config.port}`);
+      console.error(`service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
-    logger.info(res.data.message);
+    console.log(res.data.message);
   },
 };

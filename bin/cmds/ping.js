@@ -1,5 +1,4 @@
 const { connection, getConfig } = require('../../lib/axios');
-const logger = require('../../lib/logger');
 
 module.exports = {
   ping: async (args) => {
@@ -12,11 +11,11 @@ module.exports = {
         url: '/ping',
       });
     } catch (err) {
-      logger.error(`service unavailable ${config.url}:${config.port}`);
+      console.error(`service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
     if (res?.data?.data === 'pong') {
-      logger.info(`service available ${config.url}:${config.port}`);
+      console.log(`service available ${config.url}:${config.port}`);
       process.exit(0);
     }
   },

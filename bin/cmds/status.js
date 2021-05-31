@@ -1,5 +1,4 @@
 const { connection, getConfig } = require('../../lib/axios');
-const logger = require('../../lib/logger');
 
 module.exports = {
   getTask: async (args) => {
@@ -12,9 +11,9 @@ module.exports = {
         url: '/task',
       });
     } catch (err) {
-      logger.error(`service unavailable ${config.url}:${config.port}`);
+      console.error(`service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
-    logger.info(JSON.stringify(res.data, null, 2));
+    console.log(JSON.stringify(res.data, null, 2));
   },
 };

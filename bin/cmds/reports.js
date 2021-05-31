@@ -1,5 +1,4 @@
 const inquirer = require('inquirer');
-const logger = require('../../lib/logger');
 
 const { connection, getConfig } = require('../../lib/axios');
 
@@ -9,25 +8,25 @@ module.exports = {
     const config = await getConfig(args.use);
     // check list and latest, file,
     if (args.list && args.latest) {
-      logger.error('option --latest is impossible to use with --list');
+      console.error('option --latest is impossible to use with --list');
       process.exit(1);
     }
     if (args.list && args.file) {
-      logger.error('option --file is impossible to use with --list');
+      console.error('option --file is impossible to use with --list');
       process.exit(1);
     }
     // check file and latest, status
     if (args.file && args.latest) {
-      logger.error('option --latest is impossible to use with --file');
+      console.error('option --latest is impossible to use with --file');
       process.exit(1);
     }
     if (args.file && args.status) {
-      logger.error('option --status is impossible to use with --file');
+      console.error('option --status is impossible to use with --file');
       process.exit(1);
     }
     if (args.status) {
       if (args.status !== 'error' && args.status !== 'success') {
-        logger.error('option --status only use <error> or <success>');
+        console.error('option --status only use <error> or <success>');
         process.exit(1);
       }
     }
@@ -47,11 +46,11 @@ module.exports = {
           params: query,
         });
       } catch (err) {
-        logger.error(`service unavailable ${config.url}:${config.port}`);
+        console.error(`service unavailable ${config.url}:${config.port}`);
         process.exit(1);
       }
       if (!reports?.data?.files?.length) {
-        logger.info('no reports available');
+        console.log('no reports available');
         process.exit(0);
       }
       const { files: report } = await inquirer.prompt([{
@@ -81,12 +80,12 @@ module.exports = {
       });
     } catch (err) {
       if (res1?.response?.status === 404) {
-        logger.error('file does not exist');
+        console.error('file does not exist');
         process.exit(1);
       }
-      logger.error(`service unavailable ${config.url}:${config.port}`);
+      console.error(`service unavailable ${config.url}:${config.port}`);
       process.exit(1);
     }
-    logger.info(JSON.stringify(res1.data, null, 2));
+    console.log(JSON.stringify(res1.data, null, 2));
   },
 };
