@@ -3,6 +3,20 @@ const inquirer = require('inquirer');
 const { connection } = require('../../lib/axios');
 const { getConfig } = require('../../lib/config');
 
+const getFiles = async (axios, config) => {
+  let res;
+  try {
+    res = await axios({
+      method: 'GET',
+      url: '/update/snapshot',
+    });
+  } catch (err) {
+    console.error(`service unavailable ${config.url}:${config.port}`);
+    process.exit(1);
+  }
+  return res?.data;
+};
+
 /**
  * Starts an unpaywall data update process
  * @param {Object} args commander arguments
@@ -90,33 +104,20 @@ const update = async (args) => {
     process.exit(1);
   }
 
-  let snapshots;
   let url = '';
   const query = {};
 
   if (args.list) {
-    try {
-      snapshots = await axios({
-        method: 'POST',
-        url: '/update',
-        params: query,
-        headers: {
-          api_key: config.apikey,
-        },
-      });
-    } catch (err) {
-      console.error(`service unavailable ${config.url}:${config.port}`);
-      process.exit(1);
-    }
+    const snapshots = await getFiles(axios, config);
     const snapshot = await inquirer.prompt([{
       type: 'list',
-      pageSize: 10,
+      pageSize: 5,
       name: 'files',
-      choices: snapshots.data.files,
+      choices: snapshots,
       message: 'files',
-      default: snapshots.data.files.slice(),
+      default: snapshots.slice(),
       source: (answersSoFar, input) => new Promise((resolve) => {
-        const result = snapshots.data.files
+        const result = snapshots.files
           .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
         resolve(result);
       }),

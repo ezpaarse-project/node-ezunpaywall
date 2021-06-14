@@ -7,6 +7,7 @@ const client = require('./client');
 chai.use(chaiHttp);
 
 const ezunpaywallURL = 'http://localhost:8080';
+const fakeUnpaywallURL = 'http://localhost:12000';
 
 const ping = async () => {
   // api ezunpaywall
@@ -17,8 +18,20 @@ const ping = async () => {
     } catch (err) {
       console.error(`ezunpaywall ping : ${err}`);
     }
-    await new Promise((resolve) => setTimeout(resolve(), 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
+  console.log('ping ezunpaywall: OK');
+  // wait fakeUnpaywall
+  let res2;
+  while (res2?.body?.data !== 'pong') {
+    try {
+      res2 = await chai.request(fakeUnpaywallURL).get('/ping');
+    } catch (err) {
+      console.error(`fakeUnpaywall ping : ${err}`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  console.log('ping fakeUnpaywall: OK');
   // wait elastic started
   let res3;
   while (res3?.statusCode !== 200) {
@@ -29,6 +42,7 @@ const ping = async () => {
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
+  console.log('ping elastic: OK');
 };
 
 module.exports = {
