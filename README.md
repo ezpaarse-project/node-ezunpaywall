@@ -3,6 +3,7 @@
 **Table of content**
 - [Prerequisites](#prerequisites)
 - [Installation](#Installation)
+- [Configuration](#Configuration)
 - [Global options](#Global-options)
 - [Command line usage](#Command-line-usage)
 - [Commands](#Commands)
@@ -15,7 +16,7 @@ The tools you need to let node-ezunpaywall run are :
 
 ```bash
 $ npm i -g .
-```
+ ```
 ## Global options
 | Name | Type | Description |
 | --- | --- | --- |
@@ -28,7 +29,7 @@ The module provides an `ezunpaywall` command (aliased `ezu`).
 ## Commands
 ### ezu config
 Update config to fetch ez-unpyawall.
-#### Parameters
+#### parameters
 | Name | Description |
 | --- | --- |
 | -g --get | display the configuration |
@@ -44,7 +45,7 @@ $ ezunpaywall config --port 8080
 ### ezu ping
 Check if service is available.
 
-#### Parameters
+#### parameters
 | Name | Description |
 | --- | --- |
 | -u --use | use a custom config |
@@ -66,24 +67,24 @@ Starts an unpaywall data update process. If you use command update without param
 | -u --use | use a custom config |
 #### Examples
 ```bash
-# insert the content of the selected file on list
+# insert all the content of the selected file on list
 $ ezunpaywall update -l
 # insert the content between line 1 000 and 400 000 of the selected file on list
 $ ezunpaywall update -l -sl 1000 -el 400000
-# insert the content of fils.json.gz
+# insert all the content of fils.json.gz
 $ ezunpaywall update -f ./file.jsonl.gz 
 # insert the content between line 1 000 and 400 000 of fils.json.gz
 $ ezunpaywall update -f ./file.jsonl.gz -sl 1000 -el 400000
-# Downloads and inserts updates from unpaywall between 2020-04-27 and now
+# Downloads and inserts all updates from unpaywall between 2020-04-27 and now
 $ ezunpaywall update -sd 2020-04-27
-# Downloads and inserts updates from unpaywall between 2020-04-27 and 2020-07-01 
+# Downloads and inserts all updates from unpaywall between 2020-04-27 and 2020-07-01 
 $ ezunpaywall update -sd 2020-04-27 -se 2020-07-01
 ```
 
 ### ezu task
 get status of processus in courses.
 
-#### Parameters
+#### parameters
 | Name | Description |
 | --- | --- |
 | -u --use | use a custom config |
@@ -110,7 +111,7 @@ $ ezunpaywall report -la
 $ ezunpaywall report -la -s success
 # display the latest error report
 $ ezunpaywall report -la -s error
-# display the list of reports
+# display the list of all reports
 $ ezunpaywall report -l
 # display the list of success reports
 $ ezunpaywall report -l -s success
@@ -144,7 +145,7 @@ by default, if no attributes is informed, we enriched with all attributes.
 | -f --file | file which must be enriched |
 | -a --attributes | attributes which must be enriched (separeted by comma). By default, all attributes are added |
 | -s --separator | separator of csv out file |
-| -o --out | name of enriched file. By default, the output file is named: out.csv |
+| -o --out | name of enriched file. By default, the output file is named: out.jsonl |
 | -v --verbose | logs how much lines are enriched |
 | -u --use | use a custom config |
 #### Examples
