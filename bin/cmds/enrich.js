@@ -4,22 +4,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const uuid = require('uuid');
 
-const { connection, getConfig } = require('../../lib/axios');
-
-/**
- * get the extention of a filename
- * @param {String} filename
- * @returns {String} extension
- */
-const getExtensionOfFile = (filename) => {
-  const basename = filename.split(/[\\/]/).pop();
-  const pos = basename.lastIndexOf('.');
-  if (basename === '' || pos < 1) {
-    return '';
-  }
-  return basename.slice(pos + 1);
-};
-
+const { connection } = require('../../lib/axios');
+const { getConfig } = require('../../lib/config');
 /**
  * start a csv file enrichment
  * @param {Object} args commander arguments
@@ -35,8 +21,6 @@ const getExtensionOfFile = (filename) => {
 const enrichCSV = async (args) => {
   const axios = await connection(args.use);
   const config = await getConfig(args.use);
-  let out;
-  let separator;
   if (!args.file) {
     console.error('file expected');
     process.exit(1);
@@ -47,27 +31,20 @@ const enrichCSV = async (args) => {
     console.error('file not found');
     process.exit(1);
   }
-  const typeOfFile = getExtensionOfFile(file);
-  if (typeOfFile !== 'csv') {
-    console.error(`${typeOfFile} is not suported for enrichCSV. Required .csv`);
+  const ext = path.extname(file).substring(1);
+  if (ext !== 'csv') {
+    console.error(`${ext} is not suported for enrichCSV. Required .csv`);
     process.exit(1);
   }
 
-  if (args.separator) {
-    separator = args.separator;
-  } else {
-    separator = ',';
-  }
+  const out = args.out || 'out.csv';
 
-  if (args.out) {
-    out = args.out;
-  } else {
-    out = 'out.csv';
-  }
-
-  if (!args.attributes) {
-    args.attributes = '';
-  }
+  const query = {
+    separator: ',',
+  };
+  if (args.separator) query.separator = args.separator;
+  if (args.attributes) query.args = args.attributes;
+  if (args.index) query.index = args.index;
 
   const id = uuid.v4();
   const stat = await fs.stat(args.file);
@@ -75,19 +52,17 @@ const enrichCSV = async (args) => {
     await axios({
       method: 'POST',
       url: `/enrich/csv/${id}`,
-      params: {
-        args: args.attributes,
-        separator,
-      },
+      params: query,
       data: fs.createReadStream(args.file),
       headers: {
         'Content-Type': 'text/csv',
         'Content-length': stat.size,
+        api_key: config.apikey,
       },
       responseType: 'json',
     });
   } catch (err) {
-    console.error(`/enrich/csv/${id} ${err}`);
+    console.error(`res1: ${id} ${err}`);
     process.exit(1);
   }
 
@@ -95,7 +70,7 @@ const enrichCSV = async (args) => {
   while (!res2?.data?.state?.done) {
     res2 = await axios({
       method: 'GET',
-      url: `/enrich/state/${id}`,
+      url: `/enrich/state/${id}.json`,
       responseType: 'json',
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -109,7 +84,7 @@ const enrichCSV = async (args) => {
       responseType: 'stream',
     });
   } catch (err) {
-    console.error(`/enrich/${id}.csv - ${err}`);
+    console.error(`res3: ${id} - ${err}`);
     process.exit(1);
   }
 
@@ -131,7 +106,6 @@ const enrichCSV = async (args) => {
 const enrichJSON = async (args) => {
   const axios = await connection(args.use);
   const config = await getConfig(args.use);
-  let out;
 
   if (!args.file) {
     console.error('file expected');
@@ -143,17 +117,16 @@ const enrichJSON = async (args) => {
     console.error('file not found');
     process.exit(1);
   }
-  const typeOfFile = getExtensionOfFile(file);
-  if (typeOfFile !== 'jsonl' && typeOfFile !== 'ndjson' && typeOfFile !== 'json') {
-    console.error(`${typeOfFile} is not suported for enrichJSON. What is require are .ndjson, .json, .jsonl`);
+  const ext = path.extname(file).substring(1);
+  if (ext !== 'jsonl' && ext !== 'ndjson' && ext !== 'json') {
+    console.error(`${ext} is not suported for enrichJSON. What is require are .ndjson, .json, .jsonl`);
     process.exit(1);
   }
 
-  if (args.out) {
-    out = args.out;
-  } else {
-    out = `out.${typeOfFile}`;
-  }
+  const out = args.out || 'out.jsonl';
+  const query = {};
+  if (args.attributes) query.args = args.attributes;
+  if (args.index) query.index = args.index;
 
   const id = uuid.v4();
   const stat = await fs.stat(args.file);
@@ -161,13 +134,12 @@ const enrichJSON = async (args) => {
     await axios({
       method: 'POST',
       url: `/enrich/json/${id}`,
-      params: {
-        args: args.attributes,
-      },
+      params: query,
       data: fs.createReadStream(args.file),
       headers: {
         'Content-Type': 'application/json',
         'Content-length': stat.size,
+        api_key: config.apikey,
       },
       responseType: 'json',
     });
@@ -180,7 +152,7 @@ const enrichJSON = async (args) => {
   while (!res2?.data?.state?.done) {
     res2 = await axios({
       method: 'GET',
-      url: `/enrich/state/${id}`,
+      url: `/enrich/state/${id}.json`,
       responseType: 'json',
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));

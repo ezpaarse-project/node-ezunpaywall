@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 const inquirer = require('inquirer');
-const { connection, getConfig } = require('../../lib/axios');
+const { connection } = require('../../lib/axios');
+const { getConfig } = require('../../lib/config');
 
 /**
  * Starts an unpaywall data update process
@@ -99,6 +100,9 @@ const update = async (args) => {
         method: 'POST',
         url: '/update',
         params: query,
+        headers: {
+          api_key: config.apikey,
+        },
       });
     } catch (err) {
       console.error(`service unavailable ${config.url}:${config.port}`);
@@ -125,12 +129,16 @@ const update = async (args) => {
   if (args.limit) query.limit = args.limit;
   if (args.startDate) query.startDate = args.startDate;
   if (args.endDate) query.endDate = args.endDate;
+  if (args.index) query.index = args.index;
   let res;
   try {
     res = await axios({
       method: 'post',
       url: `/update${url}`,
       params: query,
+      headers: {
+        api_key: config.apikey,
+      },
     });
   } catch (err) {
     if (err?.response?.status === 409) {

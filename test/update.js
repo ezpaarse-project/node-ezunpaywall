@@ -28,14 +28,14 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
   describe('Do a classic insertion of a file already installed', () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
       await addSnapshot('fake1.jsonl.gz');
     });
 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update -f fake1.jsonl.gz`);
+        res = await exec(`${ezu} update -f fake1.jsonl.gz -i unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -50,7 +50,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
         await new Promise((resolve) => setTimeout(resolve, 50));
         isUpdate = await checkIfInUpdate();
       }
-      const count = await countDocuments('unpaywall');
+      const count = await countDocuments('unpaywall-test');
       expect(count).to.equal(50);
     });
 
@@ -62,14 +62,14 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
   describe('Do a classic insertion of a file already installed with parameter limit=10', () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
       await addSnapshot('fake1.jsonl.gz');
     });
 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update -f fake1.jsonl.gz --limit 10`);
+        res = await exec(`${ezu} update -f fake1.jsonl.gz --limit 10 -i unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -84,7 +84,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
         await new Promise((resolve) => setTimeout(resolve, 50));
         isUpdate = await checkIfInUpdate();
       }
-      const count = await countDocuments('unpaywall');
+      const count = await countDocuments('unpaywall-test');
       expect(count).to.equal(10);
     });
 
@@ -100,14 +100,14 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
   describe('Do a classic insertion of a file already installed offset=40', () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
       await addSnapshot('fake1.jsonl.gz');
     });
 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update -f fake1.jsonl.gz --offset 40`);
+        res = await exec(`${ezu} update -f fake1.jsonl.gz --offset 40 -i unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -122,7 +122,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
         await new Promise((resolve) => setTimeout(resolve, 50));
         isUpdate = await checkIfInUpdate();
       }
-      const count = await countDocuments('unpaywall');
+      const count = await countDocuments('unpaywall-test');
       expect(count).to.equal(10);
     });
 
@@ -144,13 +144,13 @@ describe('Test: weekly update', async () => {
   describe('Do a classic weekly update', () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
     });
 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update`);
+        res = await exec(`${ezu} update -i unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -165,7 +165,7 @@ describe('Test: weekly update', async () => {
         await new Promise((resolve) => setTimeout(resolve, 50));
         isUpdate = await checkIfInUpdate();
       }
-      const count = await countDocuments('unpaywall');
+      const count = await countDocuments('unpaywall-test');
       expect(count).to.equal(50);
     });
 
@@ -202,13 +202,13 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Do a download and insert between ${date2} and ${dateNow}`, async () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
     });
 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update --startDate ${date2}`);
+        res = await exec(`${ezu} update --startDate ${date2} -i unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -223,7 +223,7 @@ describe('Test: download and insert file from unpaywall between a period', async
         await new Promise((resolve) => setTimeout(resolve, 50));
         isUpdate = await checkIfInUpdate();
       }
-      const count = await countDocuments('unpaywall');
+      const count = await countDocuments('unpaywall-test');
       expect(count).to.equal(150);
     });
 
@@ -235,13 +235,13 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Do a download and insert between ${date3} and ${date2}`, () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
     });
 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update --startDate ${date3} --endDate ${date2}`);
+        res = await exec(`${ezu} update --startDate ${date3} --endDate ${date2} -i unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -257,7 +257,7 @@ describe('Test: download and insert file from unpaywall between a period', async
         await new Promise((resolve) => setTimeout(resolve, 50));
         isUpdate = await checkIfInUpdate();
       }
-      const count = await countDocuments('unpaywall');
+      const count = await countDocuments('unpaywall-test');
       expect(count).to.equal(2100);
     });
 
@@ -269,7 +269,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Don't download and insert between ${date5} and ${date4} because there is no file between these dates in ezunpaywall`, () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
     });
 
     it('Should return the process start', async () => {
@@ -291,7 +291,7 @@ describe('Test: download and insert file from unpaywall between a period', async
         await new Promise((resolve) => setTimeout(resolve, 50));
         isUpdate = await checkIfInUpdate();
       }
-      const count = await countDocuments('unpaywall');
+      const count = await countDocuments('unpaywall-test');
       expect(count).to.equal(0);
     });
 
@@ -303,7 +303,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Don't do a download and insert with endDate=${date1} only`, () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
     });
 
     it('Should return a error message', async () => {
@@ -323,7 +323,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe('Don\'t do a download and insert with startDate in the wrong format', () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
     });
 
     it('Should return a error message', async () => {
@@ -361,7 +361,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Don't download and insert between ${date2} and ${date3} because startDate=${date2} is superior than endDate=${date3}`, () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
     });
 
     it('Should return a error message', async () => {
@@ -381,7 +381,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Don't download and insert with startDate=${tomorrow} because there can be no futuristic file`, () => {
     before(async () => {
       await resetAll();
-      await createIndex('unpaywall', indexUnpawall);
+      await createIndex('unpaywall-test', indexUnpawall);
     });
 
     it('Should return a error message', async () => {

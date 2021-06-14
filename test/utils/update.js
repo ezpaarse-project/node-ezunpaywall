@@ -4,7 +4,7 @@ const chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);
 
-const client = require('../../lib/client');
+const client = require('./client');
 const indexUnpawall = require('../sources/index/unpaywall.json');
 
 const ezunpaywallURL = 'http://localhost:8080';
@@ -146,7 +146,7 @@ const getState = async () => {
  * reset the test environment
  */
 const resetAll = async () => {
-  await deleteIndex('unpaywall', indexUnpawall);
+  await deleteIndex('unpaywall-test', indexUnpawall);
   await deleteSnapshot('fake1.jsonl.gz');
   await deleteSnapshot('fake2.jsonl.gz');
   await deleteSnapshot('fake3.jsonl.gz');

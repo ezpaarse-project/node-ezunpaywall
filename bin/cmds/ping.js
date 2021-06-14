@@ -1,4 +1,5 @@
-const { connection, getConfig } = require('../../lib/axios');
+const { connection } = require('../../lib/axios');
+const { getConfig } = require('../../lib/config');
 
 /**
  * check if service is available
@@ -8,9 +9,8 @@ const { connection, getConfig } = require('../../lib/axios');
 const ping = async (args) => {
   const axios = await connection(args.use);
   const config = await getConfig(args.use);
-  let res;
   try {
-    res = await axios({
+    await axios({
       method: 'GET',
       url: '/ping',
     });
@@ -18,10 +18,8 @@ const ping = async (args) => {
     console.error(`service unavailable ${config.url}:${config.port}`);
     process.exit(1);
   }
-  if (res?.data?.data === 'pong') {
-    console.log(`service available ${config.url}:${config.port}`);
-    process.exit(0);
-  }
+  console.log(`service available ${config.url}:${config.port}`);
+  process.exit(0);
 };
 
 module.exports = {

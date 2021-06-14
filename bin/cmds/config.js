@@ -28,9 +28,10 @@ const setConfig = async () => {
  * @param -s --set - initialize the configuration file in $HOME/.config
  * @param --url <url> - ezunpaywall url
  * @param --port <port> - ezunpaywall port
+ * @param --apikey <apikey> - admin apikey
  * @param -l --list - list of attributes required for configuration
  */
-const config = async (args) => {
+const manageConfig = async (args) => {
   if (args.list) {
     console.log('--url <url> ezunpaywall url');
     console.log('--port <port> ezunpaywall port');
@@ -45,7 +46,7 @@ const config = async (args) => {
     process.exit(0);
   }
 
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
   if (args.get) {
     console.log(JSON.stringify(config, null, 2));
     console.log(`from ${configPath}`);
@@ -68,6 +69,9 @@ const config = async (args) => {
     }
     config.port = args.port;
   }
+  if (args.apikey) {
+    config.apikey = args.apikey;
+  }
 
   try {
     await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
@@ -81,5 +85,5 @@ const config = async (args) => {
 };
 
 module.exports = {
-  config,
+  manageConfig,
 };

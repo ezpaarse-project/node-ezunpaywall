@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 
-const { connection, getConfig } = require('../../lib/axios');
+const { connection } = require('../../lib/axios');
+const { getConfig } = require('../../lib/config');
 
 /**
  * get the content of report

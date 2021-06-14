@@ -1,4 +1,5 @@
-const { connection, getConfig } = require('../../lib/axios');
+const { connection } = require('../../lib/axios');
+const { getConfig } = require('../../lib/config');
 
 /**
  * Indicates if an update process is running

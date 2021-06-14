@@ -3,7 +3,7 @@
 const program = require('commander');
 const pkg = require('../package.json');
 
-const { config } = require('./cmds/config');
+const { manageConfig } = require('./cmds/config');
 const { ping } = require('./cmds/ping');
 const { update } = require('./cmds/update');
 const { getReport } = require('./cmds/reports');
@@ -24,8 +24,9 @@ program
   .option('-s --set', 'initialize the configuration file in $HOME/.config')
   .option('--url <url>', 'ezunpaywall url')
   .option('--port <port>', 'ezunpaywall port')
+  .option('--apikey <apikey>', 'admin apikey')
   .option('-l --list', 'list of attributes required for configuration')
-  .action((args) => config(args));
+  .action((args) => manageConfig(args));
 
 program
   .command('ping')
@@ -42,6 +43,7 @@ program
   .option('-ed --endDate <endDate>', 'end date to download and insert updates from unpaywall')
   .option('-of --offset <offset>', 'line where processing will start')
   .option('-li --limit <limit>', 'line where processing will end')
+  .option('-i --index <index>', 'name of the index to which the data is inserted')
   .option('-u --use <use>', 'use a custom config')
   .action((args) => update(args));
 
@@ -70,6 +72,7 @@ program
   .option('-o --out <out>', 'name of enriched file. By default, the output file is named: out.jsonl')
   .option('-v --verbose', 'logs how much lines are enriched')
   .option('-u --use <use>', 'use a custom config')
+  .option('-i --index <index>', 'name of the index from which the data will be retrieved')
   .action((args) => enrichJSON(args));
 
 program
@@ -82,6 +85,7 @@ program
   .option('-o --out <out>', 'name of enriched file')
   .option('-v --verbose', 'logs how much lines are enriched')
   .option('-u --use <use>', 'use a custom config')
+  .option('-i --index <index>', 'name of the index from which the data will be retrieved')
   .action((args) => enrichCSV(args));
 
 program.parse(process.argv);
