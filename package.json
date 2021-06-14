@@ -8,13 +8,11 @@
     "ezu": "./bin/ezunpaywall"
   },
   "scripts": {
-    "precommit": "npm run lint",
-    "test": "mocha --timeout 20000"
+    "precommit": "npm run lint"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@elastic/elasticsearch": "^7.9.0",
     "axios": "^0.20.0",
     "cli-progress": "^3.8.2",
     "commander": "^6.1.0",
@@ -23,16 +21,12 @@
     "lodash.get": "^4.4.2",
     "papaparse": "^5.3.0",
     "readline": "^1.3.0",
-    "uuid": "^8.3.2",
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "chai": "^4.3.4",
-    "chai-http": "^4.3.0",
     "eslint": "^7.9.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
-    "husky": "^4.3.0",
-    "mocha": "^8.4.0"
+    "husky": "^4.3.0"
   }
 }
