@@ -3,6 +3,12 @@ const inquirer = require('inquirer');
 const { connection } = require('../../lib/axios');
 const { getConfig } = require('../../lib/config');
 
+/**
+ * get list of snapshot installed in ezunpaywall
+ * @param {object} axios - axios
+ * @param {object} config - config
+ * @returns {array<string>} array of name of snapshot
+ */
 const getFiles = async (axios, config) => {
   let res;
   try {
@@ -143,7 +149,7 @@ const update = async (args) => {
     });
   } catch (err) {
     if (err?.response?.status === 409) {
-      console.log('process in progress');
+      console.log('update in progress');
       process.exit(1);
     }
     console.error(`service unavailable ${config.url}:${config.port}`);

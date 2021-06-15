@@ -63,6 +63,7 @@ Starts an unpaywall data update process. If you use command update without param
 | -ed --endDate | end date to download and insert updates from unpaywall |
 | -of --offset | line where processing will start |
 | -li --limit | line where processing will end |
+| -i --index  | name of the index to which the data is inserted |
 | -u --use | use a custom config |
 #### Examples
 ```bash
@@ -127,6 +128,7 @@ By default, if no attributes is informed, we enriched with all attributes.
 | -a --attributes | attributes which must be enriched (separeted by comma). By default, all attributes are added |
 | -o --out | name of enriched file. By default, the output file is named: out.jsonl |
 | -v --verbose | logs how much lines are enriched |
+| -i --index  | name of the index from which the data will be retrieved |
 | -u --use | use a custom config |
 #### Examples
 ```bash
@@ -146,6 +148,7 @@ by default, if no attributes is informed, we enriched with all attributes.
 | -s --separator | separator of csv out file |
 | -o --out | name of enriched file. By default, the output file is named: out.csv |
 | -v --verbose | logs how much lines are enriched |
+| -i --index  | name of the index from which the data will be retrieved |
 | -u --use | use a custom config |
 #### Examples
 ```bash

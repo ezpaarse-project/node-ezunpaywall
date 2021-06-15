@@ -6,7 +6,7 @@ const pkg = require('../package.json');
 const { manageConfig } = require('./cmds/config');
 const { ping } = require('./cmds/ping');
 const { update } = require('./cmds/update');
-const { getReport } = require('./cmds/reports');
+const { report } = require('./cmds/reports');
 const { getStatus } = require('./cmds/status');
 const { enrichJSON, enrichCSV } = require('./cmds/enrich');
 
@@ -61,7 +61,7 @@ program
   .option('-la --latest [latest]', 'boolean')
   .option('-s --status <status>', 'status of report, success and error only accepted')
   .option('-u --use <use>', 'use a custom config')
-  .action((args) => getReport(args));
+  .action((args) => report(args));
 
 program
   .command('enrichJSON')
