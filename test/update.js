@@ -35,7 +35,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update -f fake1.jsonl.gz -i unpaywall-test`);
+        res = await exec(`${ezu} update -f fake1.jsonl.gz -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -96,7 +96,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update -f fake1.jsonl.gz --limit 10 -i unpaywall-test`);
+        res = await exec(`${ezu} update -f fake1.jsonl.gz --limit 10 -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -161,7 +161,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update -f fake1.jsonl.gz --offset 40 -i unpaywall-test`);
+        res = await exec(`${ezu} update -f fake1.jsonl.gz --offset 40 -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -231,7 +231,7 @@ describe('Test: weekly update', async () => {
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update -i unpaywall-test`);
+        res = await exec(`${ezu} update -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -326,7 +326,7 @@ describe('Test: download and insert file from unpaywall between a period', async
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update --startDate ${date2} -i unpaywall-test`);
+        res = await exec(`${ezu} update --startDate ${date2} -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -409,7 +409,7 @@ describe('Test: download and insert file from unpaywall between a period', async
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update --startDate ${date3} --endDate ${date2} -i unpaywall-test`);
+        res = await exec(`${ezu} update --startDate ${date3} --endDate ${date2} -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }

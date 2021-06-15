@@ -6,6 +6,7 @@
 - [Global options](#Global-options)
 - [Command line usage](#Command-line-usage)
 - [Commands](#Commands)
+- [Test](#Test)
 ## Prerequisites
 
 The tools you need to let node-ezunpaywall run are :
@@ -161,3 +162,14 @@ $ ezunpaywall enricher -f ./pathOfFile.csv -a "{ is_oa, best_oa_location { licen
 ```
 
 To see all available unpaywall attributes, [click here](https://github.com/ezpaarse-project/ez-unpaywall/tree/master#object-structure).
+
+## Test
+
+If you want to test all the commands, please install [ezunpaywall](https://github.com/ezpaarse-project/ez-unpaywall) and run it in [test mode](https://github.com/ezpaarse-project/ez-unpaywall#start)
+
+
+Once ezunpaywall has been launched in test mode, you can run at the root of the node-ezunpaywall repository
+
+```bash
+$ npm run test
+```
