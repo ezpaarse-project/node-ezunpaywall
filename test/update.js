@@ -236,7 +236,7 @@ describe('Test: weekly update', async () => {
         console.log(err);
       }
       expect(res?.stderr).equal('');
-      expect(res?.stdout.trim()).equal('weekly update has begun, list of task has been created on elastic');
+      expect(res?.stdout.trim()).equal('weekly update started');
     });
 
     it('Should insert 50 data', async () => {
