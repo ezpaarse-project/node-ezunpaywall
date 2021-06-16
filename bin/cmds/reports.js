@@ -4,6 +4,26 @@ const { connection } = require('../../lib/axios');
 const { getConfig } = require('../../lib/config');
 
 /**
+ * get list of report in ezunpaywall
+ * @param {object} axios - axios
+ * @param {object} config - config
+ * @returns {array<string>} array of name of report
+ */
+const getReports = async (axios, config) => {
+  let res;
+  try {
+    res = await axios({
+      method: 'GET',
+      url: '/update/snapshot',
+    });
+  } catch (err) {
+    console.error(`service unavailable ${config.url}:${config.port}`);
+    process.exit(1);
+  }
+  return res?.data;
+};
+
+/**
  * get the content of report
  * @param {*} args commander arguments
  * @param -f --file <file> - report file installed on ezunpaywall
@@ -12,7 +32,7 @@ const { getConfig } = require('../../lib/config');
  * @param -s --status <status> - status of report, success and error only accepted
  * @param -u --use <use> - use a custom config
  */
-const getReport = async (args) => {
+const report = async (args) => {
   const axios = await connection(args.use);
   const config = await getConfig(args.use);
   // check list and latest, file,
@@ -40,7 +60,6 @@ const getReport = async (args) => {
     }
   }
 
-  let reports;
   let res1;
   let url = '';
   let query = {};
@@ -48,34 +67,25 @@ const getReport = async (args) => {
   if (args.status) query.status = args.status;
   // if -l --list
   if (args.list) {
-    try {
-      reports = await axios({
-        method: 'GET',
-        url: '/reports',
-        params: query,
-      });
-    } catch (err) {
-      console.error(`service unavailable ${config.url}:${config.port}`);
-      process.exit(1);
-    }
-    if (!reports?.data?.files?.length) {
+    const reports = await getReports(axios, config);
+    if (!reports?.length) {
       console.log('no reports available');
       process.exit(0);
     }
-    const { files: report } = await inquirer.prompt([{
+    const oneReport = await inquirer.prompt([{
       type: 'list',
-      pageSize: 10,
+      pageSize: 5,
       name: 'files',
-      choices: reports.data.files,
+      choices: reports,
       message: 'files',
-      default: reports.data.files.slice(),
+      default: reports.slice(),
       source: (answersSoFar, input) => new Promise((resolve) => {
         const result = reports?.data
           .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
         resolve(result);
       }),
     }]);
-    args.file = report;
+    args.file = oneReport.files;
   }
 
   if (args.file) url += `/${args.file}`;
@@ -84,7 +94,7 @@ const getReport = async (args) => {
   try {
     res1 = await axios({
       method: 'get',
-      url: `/reports${url}`,
+      url: `/update/report${url}`,
       params: query,
     });
   } catch (err) {
@@ -95,9 +105,9 @@ const getReport = async (args) => {
     console.error(`service unavailable ${config.url}:${config.port}`);
     process.exit(1);
   }
-  console.log(JSON.stringify(res1.data, null, 2));
+  console.log(JSON.stringify(res1.data?.report, null, 2));
 };
 
 module.exports = {
-  getReport,
+  report,
 };

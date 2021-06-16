@@ -19,7 +19,12 @@ const getStatus = async (args) => {
     console.error(`service unavailable ${config.url}:${config.port}`);
     process.exit(1);
   }
-  console.log(JSON.stringify(res.data, null, 2));
+  const status = res?.data?.inUpdate;
+  if (!status) {
+    console.log('no update is in progress');
+  } else {
+    console.log('an update is being done');
+  }
 };
 
 module.exports = {

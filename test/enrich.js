@@ -38,7 +38,7 @@ describe('Test: enrichment with a csv file (command ezu)', async () => {
     await addSnapshot('fake1.jsonl.gz');
 
     try {
-      await exec(`${ezu} update -f fake1.jsonl.gz -i unpaywall-test`);
+      await exec(`${ezu} update -f fake1.jsonl.gz -I unpaywall-test`);
     } catch (err) {
       console.log(err);
     }
@@ -58,7 +58,7 @@ describe('Test: enrichment with a csv file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.csv');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.csv');
       try {
-        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -i unpaywall-test`);
+        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -80,7 +80,7 @@ describe('Test: enrichment with a csv file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file2.csv');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.csv');
       try {
-        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -i unpaywall-test`);
+        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -104,7 +104,7 @@ describe('Test: enrichment with a csv file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.csv');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.csv');
       try {
-        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -a "{is_oa}" -i unpaywall-test`);
+        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -a "{is_oa}" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -126,7 +126,7 @@ describe('Test: enrichment with a csv file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.csv');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.csv');
       try {
-        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -a "{ best_oa_location { license } }" -i unpaywall-test`);
+        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -a "{ best_oa_location { license } }" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -148,7 +148,7 @@ describe('Test: enrichment with a csv file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.csv');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.csv');
       try {
-        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -a "{ z_authors { given } }" -i unpaywall-test`);
+        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -a "{ z_authors { given } }" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -170,7 +170,7 @@ describe('Test: enrichment with a csv file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.csv');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.csv');
       try {
-        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -a "{ is_oa, best_oa_location { license }, z_authors{ family } }" -i unpaywall-test`);
+        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -a "{ is_oa, best_oa_location { license }, z_authors{ family } }" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -194,7 +194,7 @@ describe('Test: enrichment with a csv file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.csv');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.csv');
       try {
-        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -s ";" -i unpaywall-test`);
+        await exec(`${ezu} enrichCSV -f ${filepath} -o ${out} -s ";" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -228,7 +228,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
     await addSnapshot('fake1.jsonl.gz');
 
     try {
-      await exec(`${ezu} update -f fake1.jsonl.gz -i unpaywall-test`);
+      await exec(`${ezu} update -f fake1.jsonl.gz -I unpaywall-test`);
     } catch (err) {
       console.log(err);
     }
@@ -248,7 +248,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.jsonl');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.jsonl');
       try {
-        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -i unpaywall-test`);
+        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -270,7 +270,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file2.jsonl');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.jsonl');
       try {
-        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -i unpaywall-test`);
+        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -292,7 +292,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.jsonl');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.jsonl');
       try {
-        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -a "{ is_oa }" -i unpaywall-test`);
+        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -a "{ is_oa }" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -314,7 +314,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.jsonl');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.jsonl');
       try {
-        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -a "{ best_oa_location { license } }" -i unpaywall-test`);
+        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -a "{ best_oa_location { license } }" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -336,7 +336,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.jsonl');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.jsonl');
       try {
-        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -a "{ z_authors { family } }" -i unpaywall-test`);
+        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -a "{ z_authors { family } }" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -358,7 +358,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(enrichDir, 'mustBeEnrich', 'file1.jsonl');
       const out = path.resolve(enrichDir, 'enriched', 'enriched.jsonl');
       try {
-        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -a "{ is_oa, best_oa_location { license }, z_authors{ family } }" -i unpaywall-test`);
+        await exec(`${ezu} enrichJSON -f ${filepath} -o ${out} -a "{ is_oa, best_oa_location { license }, z_authors{ family } }" -I unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
