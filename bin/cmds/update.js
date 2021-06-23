@@ -25,14 +25,16 @@ const getFiles = async (ezunpaywall) => {
 
 /**
  * Starts an unpaywall data update process
- * @param {Object} args commander arguments
- * @param -f --file <file> - snapshot\'s file installed on ezunpaywall
- * @param -l --list - list of snapshot installed on ezunpaywall
- * @param -sd --startDate <starteDate> - start date to download and insert updates from unpaywall
- * @param -ed --endDate <endDate> - end date to download and insert updates from unpaywall
- * @param -of --offset <offset> - line where processing will start
- * @param -li --limit <limit> - line where processing will end
- * @param -u --use <use> - use a custom config
+ *
+ * @param {string} args.file -f --file <file> - snapshot's file installed on ezunpaywall
+ * @param {boolean} args.list -l --list - list of snapshot installed on ezunpaywall
+ * @param {string} args.startDate -sd --startDate <starteDate> - start date to download and insert
+ * updates from unpaywall
+ * @param {string} args.endDate -ed --endDate <endDate> - end date to download
+ * and insert updates from unpaywall
+ * @param {string} args.offset -of --offset <offset> - line where processing will start
+ * @param {string} args.limit -li --limit <limit> - line where processing will end
+ * @param {string} args.use -u --use <use> - pathfile of custom config
  */
 const update = async (args) => {
   const config = await getConfig(args.use);

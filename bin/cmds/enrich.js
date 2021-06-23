@@ -8,14 +8,14 @@ const uuid = require('uuid');
 const { getConfig } = require('../../lib/config');
 /**
  * start a csv file enrichment
+ *
  * @param {string} args.file -f --file <file> - file which must be enriched
  * @param {string} args.attributes -a --attributes <attributes> - attributes which must be enriched
  * in graphql format. By default, all attributes are added
- *
  * @param {string} args.separator -s --separator <separator> - separator of csv out file
  * @param {string} args.out -o --out <out> - name of enriched file
  * @param {boolean} args.verbose -v --verbose - logs how much lines are enriched
- * @param {boolean} args.use -u --use <use> - use a custom config
+ * @param {boolean} args.use -u --use <use> - pathfile of custom config
  */
 const enrichCSV = async (args) => {
   const config = await getConfig(args.use);
@@ -109,7 +109,7 @@ const enrichCSV = async (args) => {
  *
  * @param {string} args.out -o --out <out> - name of enriched file
  * @param {boolean} args.verbose -v --verbose - logs how much lines are enriched
- * @param {boolean} args.use -u --use <use> - use a custom config
+ * @param {boolean} args.use -u --use <use> - pathfile of custom config
  */
 const enrichJSON = async (args) => {
   const config = await getConfig(args.use);

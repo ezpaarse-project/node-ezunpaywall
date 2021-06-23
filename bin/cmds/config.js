@@ -31,6 +31,7 @@ const setConfig = async () => {
 
 /**
  * config management command to establish the connection between the command and ezunpaywall
+ *
  * @param {boolean} args.get -g --get - display the configuration
  * @param {boolean} args.set -s --set - initialize the configuration file in $HOME/.config
  * @param {string} args.ezunpaywallURL --ezunpaywallURL <ezunpaywallURL> - ezunpaywall url

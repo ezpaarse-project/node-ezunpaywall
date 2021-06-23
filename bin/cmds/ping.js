@@ -5,8 +5,8 @@ const { getConfig } = require('../../lib/config');
 
 /**
  * check if service is available
- * @param {*} args commander arguments
- * @param -u --use <use> - use a custom config
+ *
+ * @param {boolean} args.use -u --use - pathfile of custom config
  */
 const ping = async (args) => {
   const config = await getConfig(args.use);

@@ -4,8 +4,8 @@ const { getConfig } = require('../../lib/config');
 
 /**
  * Indicates if an update process is running
- * @param {Object} args commander arguments
- * @param -u --use <use> - use a custom config
+ *
+ * @param {boolean} args.use -u --use - pathfile of custom config
  */
 const getStatus = async (args) => {
   const config = await getConfig(args.use);
