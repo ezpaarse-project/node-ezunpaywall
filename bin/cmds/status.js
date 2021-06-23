@@ -1,19 +1,22 @@
-const { connection } = require('../../lib/axios');
+const axios = require('axios');
+
 const { getConfig } = require('../../lib/config');
 
 /**
  * Indicates if an update process is running
- * @param {Object} args commander arguments
- * @param -u --use <use> - use a custom config
+ *
+ * @param {boolean} args.use -u --use - pathfile of custom config
  */
 const getStatus = async (args) => {
-  const axios = await connection(args.use);
   const config = await getConfig(args.use);
+
+  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
+
   let res;
   try {
     res = await axios({
       method: 'get',
-      url: '/update/status',
+      url: `${ezunpaywall}/update/status`,
     });
   } catch (err) {
     console.error(`service unavailable ${config.url}:${config.port}`);
