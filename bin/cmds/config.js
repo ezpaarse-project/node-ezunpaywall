@@ -74,8 +74,8 @@ const manageConfig = async (args) => {
 
   if (args.ezunpaywallURL) {
     const regexURL = /^(http|https):\/\/[^ "]+$/;
-    const valideURL = regexURL.test(args.url);
-    if (valideURL) {
+    const isValidURL = regexURL.test(args.url);
+    if (isValidURL) {
       config.ezunpaywallURL = args.ezunpaywallURL;
     } else {
       console.error(`'${args.ezunpaywallURL}' is not a valide URL`);
@@ -85,8 +85,8 @@ const manageConfig = async (args) => {
 
   if (args.ezmetaURL) {
     const regexURL = /^(http|https):\/\/[^ "]+$/;
-    const valideURL = regexURL.test(args.url);
-    if (valideURL) {
+    const isValidURL = regexURL.test(args.url);
+    if (isValidURL) {
       config.ezmetaURL = args.ezmetaURL;
     } else {
       console.error(`'${args.ezmetaURL}' is not a valide URL`);
