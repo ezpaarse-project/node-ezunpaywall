@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
+const axios = require('axios');
 const inquirer = require('inquirer');
-const { connection } = require('../../lib/axios');
 const { getConfig } = require('../../lib/config');
 
 /**
@@ -9,15 +9,15 @@ const { getConfig } = require('../../lib/config');
  * @param {object} config - config
  * @returns {array<string>} array of name of snapshot
  */
-const getFiles = async (axios, config) => {
+const getFiles = async (ezunpaywall) => {
   let res;
   try {
     res = await axios({
       method: 'GET',
-      url: '/update/snapshot',
+      url: `${ezunpaywall}/update/snapshot`,
     });
   } catch (err) {
-    console.error(`service unavailable ${config.url}:${config.port}`);
+    console.error(`service unavailable ${ezunpaywall}`);
     process.exit(1);
   }
   return res?.data;
@@ -35,9 +35,10 @@ const getFiles = async (axios, config) => {
  * @param -u --use <use> - use a custom config
  */
 const update = async (args) => {
-  const axios = await connection(args.use);
   const config = await getConfig(args.use);
-  // check date and list
+
+  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
+
   if (args.list) {
     if (args.startDate) {
       console.error('option --startDate is impossible to use with --list');
@@ -114,7 +115,7 @@ const update = async (args) => {
   const query = {};
 
   if (args.list) {
-    const snapshots = await getFiles(axios, config);
+    const snapshots = await getFiles(ezunpaywall);
     const snapshot = await inquirer.prompt([{
       type: 'list',
       pageSize: 5,
@@ -141,7 +142,7 @@ const update = async (args) => {
   try {
     res = await axios({
       method: 'post',
-      url: `/update${url}`,
+      url: `${ezunpaywall}/update${url}`,
       params: query,
       headers: {
         api_key: config.apikey,

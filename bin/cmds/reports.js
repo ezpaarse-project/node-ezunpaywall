@@ -1,25 +1,26 @@
 const inquirer = require('inquirer');
+const axios = require('axios');
 
-const { connection } = require('../../lib/axios');
 const { getConfig } = require('../../lib/config');
 
 /**
  * get list of report in ezunpaywall
- * @param {object} axios - axios
- * @param {object} config - config
+ * @param {Stringng} ezunpaywall - ezunpaywallURL
  * @returns {array<string>} array of name of report
  */
-const getReports = async (axios, config) => {
+const getReports = async (ezunpaywall) => {
   let res;
+
   try {
     res = await axios({
       method: 'GET',
-      url: '/update/snapshot',
+      url: `${ezunpaywall}/update/snapshot`,
     });
   } catch (err) {
-    console.error(`service unavailable ${config.url}:${config.port}`);
+    console.error(`service unavailable ${ezunpaywall}`);
     process.exit(1);
   }
+
   return res?.data;
 };
 
@@ -33,8 +34,10 @@ const getReports = async (axios, config) => {
  * @param -u --use <use> - use a custom config
  */
 const report = async (args) => {
-  const axios = await connection(args.use);
   const config = await getConfig(args.use);
+
+  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
+
   // check list and latest, file,
   if (args.list && args.latest) {
     console.error('option --latest is impossible to use with --list');
@@ -44,6 +47,7 @@ const report = async (args) => {
     console.error('option --file is impossible to use with --list');
     process.exit(1);
   }
+
   // check file and latest, status
   if (args.file && args.latest) {
     console.error('option --latest is impossible to use with --file');
@@ -63,11 +67,12 @@ const report = async (args) => {
   let res1;
   let url = '';
   let query = {};
+
   if (!args.status && !args.latest) query = null;
   if (args.status) query.status = args.status;
-  // if -l --list
+
   if (args.list) {
-    const reports = await getReports(axios, config);
+    const reports = await getReports(ezunpaywall);
     if (!reports?.length) {
       console.log('no reports available');
       process.exit(0);
@@ -90,11 +95,11 @@ const report = async (args) => {
 
   if (args.file) url += `/${args.file}`;
   if (args.latest) query.latest = args.latest;
-  // if -f --file -l --latest
+
   try {
     res1 = await axios({
       method: 'get',
-      url: `/update/report${url}`,
+      url: `${ezunpaywall}/update/report${url}`,
       params: query,
     });
   } catch (err) {
