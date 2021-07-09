@@ -20,7 +20,7 @@ const { getConfig } = require('../../lib/config');
 const enrichCSV = async (args) => {
   const config = await getConfig(args.use);
 
-  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
+  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
 
   if (!args.file) {
     console.error('file expected');
@@ -58,7 +58,7 @@ const enrichCSV = async (args) => {
   try {
     await axios({
       method: 'POST',
-      url: `${ezunpaywall}/enrich/csv/${id}`,
+      url: `${ezunpaywallURL}/enrich/csv/${id}`,
       params: query,
       data: fs.createReadStream(args.file),
       headers: {
@@ -78,7 +78,7 @@ const enrichCSV = async (args) => {
   while (!res2?.data?.state?.done) {
     res2 = await axios({
       method: 'GET',
-      url: `${ezunpaywall}/enrich/state/${id}.json`,
+      url: `${ezunpaywallURL}/enrich/state/${id}.json`,
       responseType: 'json',
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -89,7 +89,7 @@ const enrichCSV = async (args) => {
   try {
     res3 = await axios({
       method: 'GET',
-      url: `${ezunpaywall}/enrich/${id}.csv`,
+      url: `${ezunpaywallURL}/enrich/${id}.csv`,
       responseType: 'stream',
     });
   } catch (err) {
@@ -114,7 +114,7 @@ const enrichCSV = async (args) => {
 const enrichJSON = async (args) => {
   const config = await getConfig(args.use);
 
-  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
+  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
 
   if (!args.file) {
     console.error('file expected');
@@ -145,7 +145,7 @@ const enrichJSON = async (args) => {
   try {
     await axios({
       method: 'POST',
-      url: `${ezunpaywall}/enrich/json/${id}`,
+      url: `${ezunpaywallURL}/enrich/json/${id}`,
       params: query,
       data: fs.createReadStream(args.file),
       headers: {
@@ -165,7 +165,7 @@ const enrichJSON = async (args) => {
   while (!res2?.data?.state?.done) {
     res2 = await axios({
       method: 'GET',
-      url: `${ezunpaywall}/enrich/state/${id}.json`,
+      url: `${ezunpaywallURL}/enrich/state/${id}.json`,
       responseType: 'json',
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -176,7 +176,7 @@ const enrichJSON = async (args) => {
   try {
     res3 = await axios({
       method: 'GET',
-      url: `${ezunpaywall}/enrich/${id}.jsonl`,
+      url: `${ezunpaywallURL}/enrich/${id}.jsonl`,
       responseType: 'stream',
     });
   } catch (err) {

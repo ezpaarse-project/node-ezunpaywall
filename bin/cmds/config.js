@@ -10,12 +10,18 @@ const setConfig = async () => {
   const pathConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
 
   const config = {
-    ezunpaywallURL: 'http://localhost',
-    ezunpaywallPort: 8080,
-    ezmetaURL: 'http://localhost',
-    ezmetaPort: 9200,
-    ezmetaUser: 'elastic',
-    ezmetaPassword: 'changeme',
+    ezunpaywall: {
+      protocol: 'http',
+      host: 'localhost',
+      port: '8080',
+    },
+    ezmeta: {
+      protocol: 'http',
+      host: 'localhost',
+      port: '8080',
+      user: 'elastic',
+      password: 'changeme',
+    },
     apikey: 'admin',
   };
 
@@ -43,12 +49,14 @@ const setConfig = async () => {
  */
 const manageConfig = async (args) => {
   if (args.list) {
-    console.log('--ezunpaywallURL <ezunpaywallURL> ezunpaywall url');
+    console.log('--ezunpaywallProtocol <ezunpaywallProtocol> ezunpaywall protocol');
+    console.log('--ezunpaywallHost <ezunpaywallHost> ezunpaywall host');
     console.log('--ezunpaywallPort <ezunpaywallPort> ezunpaywall port');
+    console.log('--ezmetaHost <ezmetaHost> ezmeta host');
     console.log('--ezmetaURL <ezmetaURL> ezmeta url');
     console.log('--ezmetaPort <ezmetaPort> ezmeta port');
-    console.log('--ezmetaUser <ezmetaUser> ezmeta port');
-    console.log('--ezmetaPassword <ezmetaPassword> ezmeta port');
+    console.log('--ezmetaUser <ezmetaUser> ezmeta user');
+    console.log('--ezmetaPassword <ezmetaPassword> ezmeta password');
     console.log('-k --apikey <apikey> admin apikey');
     process.exit(0);
   }
@@ -72,50 +80,36 @@ const manageConfig = async (args) => {
     process.exit(0);
   }
 
-  if (args.ezunpaywallURL) {
-    const regexURL = /^(http|https):\/\/[^ "]+$/;
-    const isValidURL = regexURL.test(args.url);
-    if (isValidURL) {
-      config.ezunpaywallURL = args.ezunpaywallURL;
-    } else {
-      console.error(`'${args.ezunpaywallURL}' is not a valide URL`);
-      process.exit(1);
-    }
+  if (args.ezunpaywallProtocol) {
+    config.ezunpaywall.protocol = args.ezunpaywallProtocol;
   }
 
-  if (args.ezmetaURL) {
-    const regexURL = /^(http|https):\/\/[^ "]+$/;
-    const isValidURL = regexURL.test(args.url);
-    if (isValidURL) {
-      config.ezmetaURL = args.ezmetaURL;
-    } else {
-      console.error(`'${args.ezmetaURL}' is not a valide URL`);
-      process.exit(1);
-    }
+  if (args.ezunpaywallHost) {
+    config.ezunpaywall.host = args.ezunpaywallHost;
   }
 
   if (args.ezunpaywallPort) {
-    if (Number.isNaN(args.ezunpaywallPort)) {
-      console.error(`${args.ezunpaywallPort} is not a number`);
-      process.exit(1);
-    }
-    config.ezunpaywallPort = args.ezunpaywallPort;
+    config.ezunpaywall.port = args.ezunpaywallPort;
+  }
+
+  if (args.ezmetaProtocol) {
+    config.ezmeta.protocol = args.ezmetaProtocol;
+  }
+
+  if (args.ezmetaHost) {
+    config.ezmeta.host = args.ezmetaHost;
   }
 
   if (args.ezmetaPort) {
-    if (Number.isNaN(args.ezmetaPort)) {
-      console.error(`${args.ezmetaPort} is not a number`);
-      process.exit(1);
-    }
-    config.ezmetaPort = args.ezmetaPort;
+    config.ezmeta.port = args.ezmetaPort;
   }
 
   if (args.ezmetaUser) {
-    config.ezmetaUser = args.ezmetaUser;
+    config.ezmeta.user = args.ezmetaUser;
   }
 
   if (args.ezmetaPassword) {
-    config.ezmetaPassword = args.ezmetaPassword;
+    config.ezmeta.password = args.ezmetaPassword;
   }
 
   if (args.apikey) {

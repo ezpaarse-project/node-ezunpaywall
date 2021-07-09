@@ -39,7 +39,7 @@ const getFiles = async (ezunpaywall) => {
 const update = async (args) => {
   const config = await getConfig(args.use);
 
-  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
+  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
 
   if (args.list) {
     if (args.startDate) {
@@ -117,7 +117,7 @@ const update = async (args) => {
   const query = {};
 
   if (args.list) {
-    const snapshots = await getFiles(ezunpaywall);
+    const snapshots = await getFiles(ezunpaywallURL);
     const snapshot = await inquirer.prompt([{
       type: 'list',
       pageSize: 5,
@@ -144,7 +144,7 @@ const update = async (args) => {
   try {
     res = await axios({
       method: 'post',
-      url: `${ezunpaywall}/update${url}`,
+      url: `${ezunpaywallURL}/update${url}`,
       params: query,
       headers: {
         api_key: config.apikey,
