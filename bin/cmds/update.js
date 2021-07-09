@@ -17,7 +17,6 @@ const getFiles = async (ezunpaywall) => {
       url: `${ezunpaywall}/update/snapshot`,
     });
   } catch (err) {
-    console.log(err);
     if (err?.response?.status === 409) {
       console.error('update in progress');
       process.exit(1);
