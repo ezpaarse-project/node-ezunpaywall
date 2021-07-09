@@ -11,16 +11,16 @@ const { getConfig } = require('../../lib/config');
 const ping = async (args) => {
   const config = await getConfig(args.use);
 
-  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
-  const ezmeta = `${config.ezmetaURL}:${config.ezmetaPort}`;
+  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
+  const ezmetaURL = `${config.ezmeta.protocol}://${config.ezmeta.host}:${config.ezmeta.port}`;
 
   try {
     await axios({
       method: 'GET',
-      url: `${ezunpaywall}/ping`,
+      url: `${ezunpaywallURL}/ping`,
     });
   } catch (err) {
-    console.error(`service unavailable ${ezunpaywall}`);
+    console.error(`service unavailable ${ezunpaywallURL}`);
     process.exit(1);
   }
 
@@ -28,10 +28,10 @@ const ping = async (args) => {
 
   const client = new Client({
     node: {
-      url: new URL(ezmeta),
+      url: new URL(ezmetaURL),
       auth: {
-        username: config.ezmetaUser,
-        password: config.ezmetaPassword,
+        username: config.ezmeta.user,
+        password: config.ezmeta.password,
       },
     },
   });
@@ -41,12 +41,12 @@ const ping = async (args) => {
   try {
     ezmetaping = await client.ping();
   } catch (err) {
-    console.error(`service unavailable ${ezmeta}`);
+    console.error(`service unavailable ${ezmetaURL}`);
     process.exit(1);
   }
 
-  if (!ezmetaping?.statusCode !== 200) {
-    console.error(`service unavailable ${ezmeta}`);
+  if (ezmetaping?.statusCode !== 200) {
+    console.error(`service unavailable ${ezmetaURL}`);
     process.exit(1);
   }
 

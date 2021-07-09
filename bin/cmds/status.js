@@ -10,13 +10,13 @@ const { getConfig } = require('../../lib/config');
 const getStatus = async (args) => {
   const config = await getConfig(args.use);
 
-  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
+  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
 
   let res;
   try {
     res = await axios({
       method: 'get',
-      url: `${ezunpaywall}/update/status`,
+      url: `${ezunpaywallURL}/update/status`,
     });
   } catch (err) {
     console.error(`service unavailable ${config.url}:${config.port}`);

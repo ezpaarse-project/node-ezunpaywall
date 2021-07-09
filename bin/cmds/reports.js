@@ -37,7 +37,7 @@ const getReports = async (ezunpaywall) => {
 const report = async (args) => {
   const config = await getConfig(args.use);
 
-  const ezunpaywall = `${config.ezunpaywallURL}:${config.ezunpaywallPort}`;
+  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
 
   // check list and latest, file,
   if (args.list && args.latest) {
@@ -73,7 +73,7 @@ const report = async (args) => {
   if (args.status) query.status = args.status;
 
   if (args.list) {
-    const reports = await getReports(ezunpaywall);
+    const reports = await getReports(ezunpaywallURL);
     if (!reports?.length) {
       console.log('no reports available');
       process.exit(0);
@@ -100,7 +100,7 @@ const report = async (args) => {
   try {
     res1 = await axios({
       method: 'get',
-      url: `${ezunpaywall}/update/report${url}`,
+      url: `${ezunpaywallURL}/update/report${url}`,
       params: query,
     });
   } catch (err) {
