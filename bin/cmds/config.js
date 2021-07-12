@@ -18,7 +18,7 @@ const setConfig = async () => {
     ezmeta: {
       protocol: 'http',
       host: 'localhost',
-      port: '8080',
+      port: '9200',
       user: 'elastic',
       password: 'changeme',
     },
@@ -31,8 +31,8 @@ const setConfig = async () => {
     console.error(err);
   }
 
-  console.log(`configuration has been initialized in ${pathConfig}`);
   console.log(JSON.stringify(config, null, 2));
+  console.log(`configuration has been initialized in ${pathConfig}`);
 };
 
 /**
@@ -57,7 +57,7 @@ const manageConfig = async (args) => {
     console.log('--ezmetaPort <ezmetaPort> ezmeta port');
     console.log('--ezmetaUser <ezmetaUser> ezmeta user');
     console.log('--ezmetaPassword <ezmetaPassword> ezmeta password');
-    console.log('-k --apikey <apikey> admin apikey');
+    console.log('--apikey <apikey> admin apikey');
     process.exit(0);
   }
 

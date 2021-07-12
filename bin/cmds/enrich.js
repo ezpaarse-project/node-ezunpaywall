@@ -1,9 +1,9 @@
-/* eslint-disable no-await-in-loop */
 /* eslint-disable camelcase */
-const axios = require('axios');
 const fs = require('fs-extra');
 const path = require('path');
 const uuid = require('uuid');
+
+const { connection } = require('../../lib/ezunpaywall');
 
 const { getConfig } = require('../../lib/config');
 /**
@@ -19,8 +19,7 @@ const { getConfig } = require('../../lib/config');
  */
 const enrichCSV = async (args) => {
   const config = await getConfig(args.use);
-
-  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
+  const ezunpaywall = await connection();
 
   if (!args.file) {
     console.error('file expected');
@@ -56,9 +55,9 @@ const enrichCSV = async (args) => {
   const stat = await fs.stat(args.file);
 
   try {
-    await axios({
+    await ezunpaywall({
       method: 'POST',
-      url: `${ezunpaywallURL}/enrich/csv/${id}`,
+      url: `/enrich/csv/${id}`,
       params: query,
       data: fs.createReadStream(args.file),
       headers: {
@@ -76,9 +75,9 @@ const enrichCSV = async (args) => {
   let res2;
 
   while (!res2?.data?.state?.done) {
-    res2 = await axios({
+    res2 = await ezunpaywall({
       method: 'GET',
-      url: `${ezunpaywallURL}/enrich/state/${id}.json`,
+      url: `/enrich/state/${id}.json`,
       responseType: 'json',
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -87,9 +86,9 @@ const enrichCSV = async (args) => {
   let res3;
 
   try {
-    res3 = await axios({
+    res3 = await ezunpaywall({
       method: 'GET',
-      url: `${ezunpaywallURL}/enrich/${id}.csv`,
+      url: `/enrich/${id}.csv`,
       responseType: 'stream',
     });
   } catch (err) {
@@ -113,8 +112,7 @@ const enrichCSV = async (args) => {
  */
 const enrichJSON = async (args) => {
   const config = await getConfig(args.use);
-
-  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
+  const ezunpaywall = await connection();
 
   if (!args.file) {
     console.error('file expected');
@@ -143,9 +141,9 @@ const enrichJSON = async (args) => {
   const stat = await fs.stat(args.file);
 
   try {
-    await axios({
+    await ezunpaywall({
       method: 'POST',
-      url: `${ezunpaywallURL}/enrich/json/${id}`,
+      url: `/enrich/json/${id}`,
       params: query,
       data: fs.createReadStream(args.file),
       headers: {
@@ -156,16 +154,16 @@ const enrichJSON = async (args) => {
       responseType: 'json',
     });
   } catch (err) {
-    console.error(`/enrich/json - ${err}`);
+    console.error(`${ezunpaywall.defaults.baseURL}/enrich/json - ${err}`);
     process.exit(1);
   }
 
   let res2;
 
   while (!res2?.data?.state?.done) {
-    res2 = await axios({
+    res2 = await ezunpaywall({
       method: 'GET',
-      url: `${ezunpaywallURL}/enrich/state/${id}.json`,
+      url: `/enrich/state/${id}.json`,
       responseType: 'json',
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -174,13 +172,13 @@ const enrichJSON = async (args) => {
   let res3;
 
   try {
-    res3 = await axios({
+    res3 = await ezunpaywall({
       method: 'GET',
-      url: `${ezunpaywallURL}/enrich/${id}.jsonl`,
+      url: `/enrich/${id}.jsonl`,
       responseType: 'stream',
     });
   } catch (err) {
-    console.error(`/enrich/${id}.jsonl - ${err}`);
+    console.error(`${ezunpaywall.defaults.baseURL}/enrich/${id}.jsonl - ${err}`);
     process.exit(1);
   }
 

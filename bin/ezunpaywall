@@ -30,7 +30,7 @@ program
   .option('--ezmetaPort <ezmetaPort>', 'ezmeta port')
   .option('--ezmetaUser <ezmetaUser>', 'ezmeta user')
   .option('--ezmetaPassword <ezmetaPassword>', 'ezmeta password')
-  .option('-k -apikey <apikey>', 'admin apikey')
+  .option('--apikey <apikey>', 'admin apikey')
   .option('-L --list', 'list of attributes required for configuration')
   .action((args) => manageConfig(args));
 
@@ -48,6 +48,7 @@ program
   .option('-e --endDate <endDate>', 'end date to download and insert updates from unpaywall')
   .option('-o --offset <offset>', 'line where processing will start')
   .option('-l --limit <limit>', 'line where processing will end')
+  .option('--status', 'get the status of the process in course')
   .option('-L --list', 'list of snapshot installed on ezunpaywall')
   .option('-I --index <index>', 'name of the index to which the data is inserted')
   .option('-U --use <use>', 'use a custom config')

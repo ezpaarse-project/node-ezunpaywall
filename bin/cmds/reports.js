@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const axios = require('axios');
+const { connection } = require('../../lib/ezunpaywall');
 
 const { getConfig } = require('../../lib/config');
 
@@ -10,14 +10,13 @@ const { getConfig } = require('../../lib/config');
  */
 const getReports = async (ezunpaywall) => {
   let res;
-
   try {
-    res = await axios({
+    res = await ezunpaywall({
       method: 'GET',
-      url: `${ezunpaywall}/update/snapshot`,
+      url: '/update/snapshot',
     });
   } catch (err) {
-    console.error(`service unavailable ${ezunpaywall}`);
+    console.error(`service unavailable ${ezunpaywall.defaults.baseURL}`);
     process.exit(1);
   }
 
@@ -36,8 +35,7 @@ const getReports = async (ezunpaywall) => {
  */
 const report = async (args) => {
   const config = await getConfig(args.use);
-
-  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
+  const ezunpaywall = await connection();
 
   // check list and latest, file,
   if (args.list && args.latest) {
@@ -73,7 +71,7 @@ const report = async (args) => {
   if (args.status) query.status = args.status;
 
   if (args.list) {
-    const reports = await getReports(ezunpaywallURL);
+    const reports = await getReports(ezunpaywall);
     if (!reports?.length) {
       console.log('no reports available');
       process.exit(0);
@@ -98,9 +96,9 @@ const report = async (args) => {
   if (args.latest) query.latest = args.latest;
 
   try {
-    res1 = await axios({
+    res1 = await ezunpaywall({
       method: 'get',
-      url: `${ezunpaywallURL}/update/report${url}`,
+      url: `/update/report${url}`,
       params: query,
     });
   } catch (err) {

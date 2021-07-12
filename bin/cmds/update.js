@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
-const axios = require('axios');
 const inquirer = require('inquirer');
+const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
 
 /**
@@ -9,19 +9,21 @@ const { getConfig } = require('../../lib/config');
  * @param {object} config - config
  * @returns {array<string>} array of name of snapshot
  */
-const getFiles = async (ezunpaywall) => {
+const getFiles = async () => {
+  const ezunpaywall = await connection();
+
   let res;
   try {
-    res = await axios({
+    res = await ezunpaywall({
       method: 'GET',
-      url: `${ezunpaywall}/update/snapshot`,
+      url: '/update/snapshot',
     });
   } catch (err) {
     if (err?.response?.status === 409) {
       console.error('update in progress');
       process.exit(1);
     }
-    console.error(`service unavailable ${ezunpaywall}`);
+    console.error(`service unavailable at ${ezunpaywall.defaults.baseURL}`);
     process.exit(1);
   }
   return res?.data;
@@ -42,8 +44,7 @@ const getFiles = async (ezunpaywall) => {
  */
 const update = async (args) => {
   const config = await getConfig(args.use);
-
-  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
+  const ezunpaywall = await connection();
 
   if (args.list) {
     if (args.startDate) {
@@ -117,11 +118,26 @@ const update = async (args) => {
     process.exit(1);
   }
 
+  let res;
+
+  if (args.status) {
+    res = await ezunpaywall({
+      method: 'get',
+      url: '/update/state',
+      headers: {
+        api_key: config.apikey,
+      },
+    });
+    console.log(JSON.stringify(res?.data, null, 2));
+    console.log('latest state');
+    process.exit(0);
+  }
+
   let url = '';
   const query = {};
 
   if (args.list) {
-    const snapshots = await getFiles(ezunpaywallURL);
+    const snapshots = await getFiles();
     const snapshot = await inquirer.prompt([{
       type: 'list',
       pageSize: 5,
@@ -144,11 +160,10 @@ const update = async (args) => {
   if (args.startDate) query.startDate = args.startDate;
   if (args.endDate) query.endDate = args.endDate;
   if (args.index) query.index = args.index;
-  let res;
   try {
-    res = await axios({
+    res = await ezunpaywall({
       method: 'post',
-      url: `${ezunpaywallURL}/update${url}`,
+      url: `/update${url}`,
       params: query,
       headers: {
         api_key: config.apikey,
@@ -159,7 +174,7 @@ const update = async (args) => {
       console.log('update in progress');
       process.exit(1);
     }
-    console.error(`service unavailable ${config.url}:${config.port}`);
+    console.error(`service unavailable ${ezunpaywall.defaults.baseURL}`);
     process.exit(1);
   }
   console.log(res.data.message);
