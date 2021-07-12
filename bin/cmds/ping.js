@@ -1,9 +1,9 @@
-const axios = require('axios');
-
 const { Client } = require('@elastic/elasticsearch');
 const { URL } = require('url');
+
 const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
+const { logger } = require('../../lib/logger');
 
 /**
  * check if service is available
@@ -22,11 +22,11 @@ const ping = async (args) => {
       url: '/ping',
     });
   } catch (err) {
-    console.error(`service unavailable ${ezunpaywall.defaults.baseURL}`);
+    logger.error(`${ezunpaywall.defaults.baseURL}/ping - ${err}`);
     process.exit(1);
   }
 
-  console.log('ping ezunpaywall: OK');
+  logger.info('ping ezunpaywall: OK');
 
   const client = new Client({
     node: {
@@ -43,16 +43,16 @@ const ping = async (args) => {
   try {
     ezmetaping = await client.ping();
   } catch (err) {
-    console.error(`service unavailable ${ezmetaURL}`);
+    logger.error(`${ezmetaURL}/ping`);
     process.exit(1);
   }
 
   if (ezmetaping?.statusCode !== 200) {
-    console.error(`service unavailable ${ezmetaURL}`);
+    logger.error(`${ezmetaURL} - ${ezmetaping?.statusCode}`);
     process.exit(1);
   }
 
-  console.log('ping ezmeta: OK');
+  logger.info('ping ezmeta: OK');
   process.exit(0);
 };
 

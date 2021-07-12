@@ -4,8 +4,9 @@ const path = require('path');
 const uuid = require('uuid');
 
 const { connection } = require('../../lib/ezunpaywall');
-
 const { getConfig } = require('../../lib/config');
+const { logger } = require('../../lib/logger');
+
 /**
  * start a csv file enrichment
  *
@@ -22,7 +23,7 @@ const enrichCSV = async (args) => {
   const ezunpaywall = await connection();
 
   if (!args.file) {
-    console.error('file expected');
+    logger.error('file expected');
     process.exit(1);
   }
 
@@ -30,14 +31,14 @@ const enrichCSV = async (args) => {
   const fileExist = await fs.pathExists(file);
 
   if (!fileExist) {
-    console.error('file not found');
+    logger.error('file not found');
     process.exit(1);
   }
 
   const ext = path.extname(file).substring(1);
 
   if (ext !== 'csv') {
-    console.error(`${ext} is not suported for enrichCSV. Required .csv`);
+    logger.error(`${ext} is not suported for enrichCSV. Required .csv`);
     process.exit(1);
   }
 
@@ -68,7 +69,7 @@ const enrichCSV = async (args) => {
       responseType: 'json',
     });
   } catch (err) {
-    console.error(`res1: ${id} ${err}`);
+    logger.error(`${ezunpaywall.default.baseURL}/enrich/csv/${id} - ${err}`);
     process.exit(1);
   }
 
@@ -115,7 +116,7 @@ const enrichJSON = async (args) => {
   const ezunpaywall = await connection();
 
   if (!args.file) {
-    console.error('file expected');
+    logger.error('file expected');
     process.exit(1);
   }
 
@@ -123,12 +124,12 @@ const enrichJSON = async (args) => {
   const fileExist = await fs.pathExists(file);
 
   if (!fileExist) {
-    console.error('file not found');
+    logger.error('file not found');
     process.exit(1);
   }
   const ext = path.extname(file).substring(1);
   if (ext !== 'jsonl' && ext !== 'ndjson' && ext !== 'json') {
-    console.error(`${ext} is not suported for enrichJSON. What is require are .ndjson, .json, .jsonl`);
+    logger.error(`${ext} is not suported for enrichJSON. What is require are .ndjson, .json, .jsonl`);
     process.exit(1);
   }
 
@@ -154,7 +155,7 @@ const enrichJSON = async (args) => {
       responseType: 'json',
     });
   } catch (err) {
-    console.error(`${ezunpaywall.defaults.baseURL}/enrich/json - ${err}`);
+    logger.error(`${ezunpaywall.defaults.baseURL}/enrich/json - ${err}`);
     process.exit(1);
   }
 
@@ -178,7 +179,7 @@ const enrichJSON = async (args) => {
       responseType: 'stream',
     });
   } catch (err) {
-    console.error(`${ezunpaywall.defaults.baseURL}/enrich/${id}.jsonl - ${err}`);
+    logger.error(`${ezunpaywall.defaults.baseURL}/enrich/${id}.jsonl - ${err}`);
     process.exit(1);
   }
 

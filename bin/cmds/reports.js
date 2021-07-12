@@ -1,7 +1,8 @@
 const inquirer = require('inquirer');
-const { connection } = require('../../lib/ezunpaywall');
 
+const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
+const { logger } = require('../../lib/logger');
 
 /**
  * get list of report in ezunpaywall
@@ -16,7 +17,7 @@ const getReports = async (ezunpaywall) => {
       url: '/update/snapshot',
     });
   } catch (err) {
-    console.error(`service unavailable ${ezunpaywall.defaults.baseURL}`);
+    logger.error(`${ezunpaywall.defaults.baseURL}/update/snapshot - ${err}`);
     process.exit(1);
   }
 
@@ -39,26 +40,26 @@ const report = async (args) => {
 
   // check list and latest, file,
   if (args.list && args.latest) {
-    console.error('option --latest is impossible to use with --list');
+    logger.error('option --latest is impossible to use with --list');
     process.exit(1);
   }
   if (args.list && args.file) {
-    console.error('option --file is impossible to use with --list');
+    logger.error('option --file is impossible to use with --list');
     process.exit(1);
   }
 
   // check file and latest, status
   if (args.file && args.latest) {
-    console.error('option --latest is impossible to use with --file');
+    logger.error('option --latest is impossible to use with --file');
     process.exit(1);
   }
   if (args.file && args.status) {
-    console.error('option --status is impossible to use with --file');
+    logger.error('option --status is impossible to use with --file');
     process.exit(1);
   }
   if (args.status) {
     if (args.status !== 'error' && args.status !== 'success') {
-      console.error('option --status only use <error> or <success>');
+      logger.error('option --status only use <error> or <success>');
       process.exit(1);
     }
   }
@@ -73,7 +74,7 @@ const report = async (args) => {
   if (args.list) {
     const reports = await getReports(ezunpaywall);
     if (!reports?.length) {
-      console.log('no reports available');
+      logger.info('no reports available');
       process.exit(0);
     }
     const oneReport = await inquirer.prompt([{
@@ -102,14 +103,11 @@ const report = async (args) => {
       params: query,
     });
   } catch (err) {
-    if (res1?.response?.status === 404) {
-      console.error('file does not exist');
-      process.exit(1);
-    }
-    console.error(`service unavailable ${config.url}:${config.port}`);
+    logger.error(`${ezunpaywall.defaults.baseURL}/update/report${url} - ${res1?.response?.status}`);
     process.exit(1);
   }
-  console.log(JSON.stringify(res1.data?.report, null, 2));
+  logger.info(JSON.stringify(res1.data?.report, null, 2));
+  process.exit(0);
 };
 
 module.exports = {

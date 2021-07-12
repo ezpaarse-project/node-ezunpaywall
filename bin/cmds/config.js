@@ -2,6 +2,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 
+const { logger } = require('../../lib/logger');
+
 /**
  * create a config file in /$HOME/.config/.ezunpaywallrc
  * which contains the information to request on ezunpaywall
@@ -31,8 +33,8 @@ const setConfig = async () => {
     console.error(err);
   }
 
-  console.log(JSON.stringify(config, null, 2));
-  console.log(`configuration has been initialized in ${pathConfig}`);
+  logger.info(JSON.stringify(config, null, 2));
+  logger.info(`configuration has been initialized in ${pathConfig}`);
 };
 
 /**
@@ -49,15 +51,16 @@ const setConfig = async () => {
  */
 const manageConfig = async (args) => {
   if (args.list) {
-    console.log('--ezunpaywallProtocol <ezunpaywallProtocol> ezunpaywall protocol');
-    console.log('--ezunpaywallHost <ezunpaywallHost> ezunpaywall host');
-    console.log('--ezunpaywallPort <ezunpaywallPort> ezunpaywall port');
-    console.log('--ezmetaHost <ezmetaHost> ezmeta host');
-    console.log('--ezmetaURL <ezmetaURL> ezmeta url');
-    console.log('--ezmetaPort <ezmetaPort> ezmeta port');
-    console.log('--ezmetaUser <ezmetaUser> ezmeta user');
-    console.log('--ezmetaPassword <ezmetaPassword> ezmeta password');
-    console.log('--apikey <apikey> admin apikey');
+    console.log(`
+      --ezunpaywallProtocol <ezunpaywallProtocol> ezunpaywall protocol
+      --ezunpaywallHost <ezunpaywallHost> ezunpaywall host
+      --ezunpaywallPort <ezunpaywallPort> ezunpaywall port
+      --ezmetaHost <ezmetaHost> ezmeta host
+      --ezmetaURL <ezmetaURL> ezmeta url
+      --ezmetaPort <ezmetaPort> ezmeta port
+      --ezmetaUser <ezmetaUser> ezmeta user
+      --ezmetaPassword <ezmetaPassword> ezmeta password
+      --apikey <apikey> admin apikey`.trim().replace(/^\s*/gm, ''));
     process.exit(0);
   }
 
@@ -76,7 +79,7 @@ const manageConfig = async (args) => {
 
   if (args.get) {
     console.log(JSON.stringify(config, null, 2));
-    console.log(`from ${configPath}`);
+    logger.info(`from ${configPath}`);
     process.exit(0);
   }
 
@@ -123,7 +126,7 @@ const manageConfig = async (args) => {
   }
 
   console.log(JSON.stringify(config, null, 2));
-  console.log(`from ${configPath}`);
+  logger.info(`from ${configPath}`);
   process.exit(0);
 };
 
