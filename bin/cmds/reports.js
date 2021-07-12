@@ -106,7 +106,7 @@ const report = async (args) => {
     logger.error(`${ezunpaywall.defaults.baseURL}/update/report${url} - ${res1?.response?.status}`);
     process.exit(1);
   }
-  logger.info(JSON.stringify(res1.data?.report, null, 2));
+  console.log(JSON.stringify(res1.data?.report, null, 2));
   process.exit(0);
 };
 

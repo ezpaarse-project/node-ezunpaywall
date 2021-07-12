@@ -9,7 +9,7 @@ const { logger } = require('../../lib/logger');
  */
 const getStatus = async (args) => {
   const config = await getConfig(args.use);
-  const ezunpaywall = connection();
+  const ezunpaywall = await connection();
 
   let res;
   try {

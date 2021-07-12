@@ -15,11 +15,7 @@ const customConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
 
 describe('Test: command config', async () => {
   before(async () => {
-    try {
-      await exec(`${ezu} config --set`);
-    } catch (err) {
-      console.log(err);
-    }
+    await exec(`${ezu} config --set`);
   });
 
   describe('get the custom config', async () => {
@@ -28,11 +24,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should display custom config', async () => {
-      try {
-        await exec(`${ezu} config`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -62,11 +54,7 @@ describe('Test: command config', async () => {
       await reset();
     });
     it('Should update ezunpaywallProtocol on custom config', async () => {
-      try {
-        await exec(`${ezu} config --ezunpaywallProtocol https`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --ezunpaywallProtocol https`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -91,11 +79,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update ezunpaywallHost on custom config', async () => {
-      try {
-        await exec(`${ezu} config --ezunpaywallHost localhost.test`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --ezunpaywallHost localhost.test`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -120,11 +104,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update ezunpaywallPort on custom config', async () => {
-      try {
-        await exec(`${ezu} config --ezunpaywallPort 3000`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --ezunpaywallPort 3000`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -149,11 +129,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update ezmetaProtocol on custom config', async () => {
-      try {
-        await exec(`${ezu} config --ezmetaProtocol https`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --ezmetaProtocol https`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -178,11 +154,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update ezmetaHost on custom config', async () => {
-      try {
-        await exec(`${ezu} config --ezmetaHost localhost.test`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --ezmetaHost localhost.test`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -207,11 +179,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update ezmetaPort on custom config', async () => {
-      try {
-        await exec(`${ezu} config --ezmetaPort 9201`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --ezmetaPort 9201`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -236,11 +204,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update ezmetaUser on custom config', async () => {
-      try {
-        await exec(`${ezu} config --ezmetaUser UserTest`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --ezmetaUser UserTest`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -265,11 +229,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update ezmetaPassword on custom config', async () => {
-      try {
-        await exec(`${ezu} config --ezmetaPassword password`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --ezmetaPassword password`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -294,11 +254,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update apikey on custom config', async () => {
-      try {
-        await exec(`${ezu} config --apikey keykey`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --apikey keykey`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -323,11 +279,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should set default config on custom config', async () => {
-      try {
-        await exec(`${ezu} config --set`);
-      } catch (err) {
-        console.log(err);
-      }
+      await exec(`${ezu} config --set`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));

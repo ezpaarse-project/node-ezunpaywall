@@ -10,20 +10,18 @@ const {
 
 const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
 
+const greenColor = ['\u001b[32m', '\u001b[39m'];
+const info = `${greenColor[0]}info${greenColor[1]}`;
+
 describe('Test: command ping', async () => {
   before(async () => {
     await ping();
   });
 
   it('Should display ping ezunpaywall and ping ezmeta', async () => {
-    let res;
-    try {
-      res = await exec(`${ezu} ping`);
-    } catch (err) {
-      console.log(err);
-    }
+    const res = await exec(`${ezu} ping`);
 
-    expect(res?.stdout.trim()).to.be.equal(`ping ezunpaywall: OK
-ping ezmeta: OK`);
+    expect(res?.stdout.trim()).to.be.equal(`${info}: ping ezunpaywall: OK
+${info}: ping ezmeta: OK`);
   });
 });

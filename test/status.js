@@ -10,19 +10,16 @@ const {
 
 const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
 
+const greenColor = ['\u001b[32m', '\u001b[39m'];
+const info = `${greenColor[0]}info${greenColor[1]}`;
+
 describe('Test: command status', async () => {
   before(async () => {
     await ping();
   });
 
   it('Should display no update in progress', async () => {
-    let res;
-    try {
-      res = await exec(`${ezu} status`);
-    } catch (err) {
-      console.log(err);
-    }
-
-    expect(res?.stdout.trim()).to.be.equal('no update is in progress');
+    const res = await exec(`${ezu} status`);
+    expect(res?.stdout.trim()).to.be.equal(`${info}: no update is in progress`);
   });
 });

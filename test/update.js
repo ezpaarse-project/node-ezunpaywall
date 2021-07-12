@@ -20,6 +20,12 @@ const {
 
 const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
 
+const greenColor = ['\u001b[32m', '\u001b[39m'];
+const info = `${greenColor[0]}info${greenColor[1]}`;
+
+const redColor = ['\x1B[31m', '\x1B[39m'];
+const error = `${redColor[0]}error${redColor[1]}`;
+
 describe('Test: insert the content of a file already installed on ezunpaywall', async () => {
   before(async () => {
     await ping();
@@ -40,7 +46,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
         console.log(err);
       }
       expect(res?.stderr).equal('');
-      expect(res?.stdout.trim()).equal('start upsert with fake1.jsonl.gz');
+      expect(res?.stdout.trim()).equal(`${info}: start upsert with fake1.jsonl.gz`);
     });
 
     it('Should insert 50 data', async () => {
@@ -101,7 +107,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
         console.log(err);
       }
       expect(res?.stderr).equal('');
-      expect(res?.stdout.trim()).equal('start upsert with fake1.jsonl.gz');
+      expect(res?.stdout.trim()).equal(`${info}: start upsert with fake1.jsonl.gz`);
     });
 
     it('Should insert 10 data', async () => {
@@ -166,7 +172,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
         console.log(err);
       }
       expect(res?.stderr).equal('');
-      expect(res?.stdout.trim()).equal('start upsert with fake1.jsonl.gz');
+      expect(res?.stdout.trim()).equal(`${info}: start upsert with fake1.jsonl.gz`);
     });
 
     it('Should insert 10 data', async () => {
@@ -236,7 +242,7 @@ describe('Test: weekly update', async () => {
         console.log(err);
       }
       expect(res?.stderr).equal('');
-      expect(res?.stdout.trim()).equal('weekly update started');
+      expect(res?.stdout.trim()).equal(`${info}: weekly update started`);
     });
 
     it('Should insert 50 data', async () => {
@@ -324,14 +330,9 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      let res;
-      try {
-        res = await exec(`${ezu} update --startDate ${date2} -I unpaywall-test`);
-      } catch (err) {
-        console.log(err);
-      }
+      const res = await exec(`${ezu} update --startDate ${date2} -I unpaywall-test`);
       expect(res?.stderr).equal('');
-      expect(res?.stdout.trim()).equal(`insert snapshot beetween ${date2} and ${dateNow} has begun, list of task has been created on elastic`);
+      expect(res?.stdout.trim()).equal(`${info}: insert snapshot beetween ${date2} and ${dateNow} has begun, list of task has been created on elastic`);
     });
 
     it('Should insert 150 data', async () => {
@@ -347,12 +348,7 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should get report with all informations from the insertion', async () => {
       // wait for the update to finish
-      let res;
-      try {
-        res = await exec(`${ezu} report -la`);
-      } catch (err) {
-        console.log(err);
-      }
+      const res = await exec(`${ezu} report -la`);
       expect(res?.stderr).equal('');
 
       const report = JSON.parse(res?.stdout.trim());
@@ -407,15 +403,10 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      let res;
-      try {
-        res = await exec(`${ezu} update --startDate ${date3} --endDate ${date2} -I unpaywall-test`);
-      } catch (err) {
-        console.log(err);
-      }
+      const res = await exec(`${ezu} update --startDate ${date3} --endDate ${date2} -I unpaywall-test`);
 
       expect(res?.stderr).equal('');
-      expect(res?.stdout.trim()).equal(`insert snapshot beetween ${date3} and ${date2} has begun, list of task has been created on elastic`);
+      expect(res?.stdout.trim()).equal(`${info}: insert snapshot beetween ${date3} and ${date2} has begun, list of task has been created on elastic`);
     });
 
     it('Should insert 2100 data', async () => {
@@ -431,12 +422,8 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should get report with all informations from the insertion', async () => {
       // wait for the update to finish
-      let res;
-      try {
-        res = await exec(`${ezu} report -la`);
-      } catch (err) {
-        console.log(err);
-      }
+      const res = await exec(`${ezu} report -la`);
+
       expect(res?.stderr).equal('');
 
       const report = JSON.parse(res?.stdout.trim());
@@ -491,15 +478,10 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      let res;
-      try {
-        res = await exec(`${ezu} update --startDate ${date5} --endDate ${date4}`);
-      } catch (err) {
-        console.log(err);
-      }
+      const res = await exec(`${ezu} update --startDate ${date5} --endDate ${date4}`);
 
       expect(res?.stderr).equal('');
-      expect(res?.stdout.trim()).equal(`insert snapshot beetween ${date5} and ${date4} has begun, list of task has been created on elastic`);
+      expect(res?.stdout.trim()).equal(`${info}: insert snapshot beetween ${date5} and ${date4} has begun, list of task has been created on elastic`);
     });
 
     it('Should insert nothing', async () => {
@@ -527,9 +509,8 @@ describe('Test: download and insert file from unpaywall between a period', async
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update --endDate ${date1}`);
-      } catch (res) {
-        expect(res?.stderr.trim()).equal('option --endDate is impossible to use without --startDate');
-        expect(res?.stdout).equal('');
+      } catch (err) {
+        expect(err?.stdout.trim()).equal(`${error}: option --endDate is impossible to use without --startDate`);
       }
     });
 
@@ -547,27 +528,24 @@ describe('Test: download and insert file from unpaywall between a period', async
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update --startDate LookAtMyDab`);
-      } catch (res) {
-        expect(res?.stderr.trim()).equal('startDate are in bad format, expected YYYY-mm-dd');
-        expect(res?.stdout).equal('');
+      } catch (err) {
+        expect(err?.stdout.trim()).equal(`${error}: startDate are in bad format, expected YYYY-mm-dd`);
       }
     });
 
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update --startDate 01-01-2000`);
-      } catch (res) {
-        expect(res?.stderr.trim()).equal('startDate are in bad format, expected YYYY-mm-dd');
-        expect(res?.stdout).equal('');
+      } catch (err) {
+        expect(err?.stdout.trim()).equal(`${error}: startDate are in bad format, expected YYYY-mm-dd`);
       }
     });
 
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update --startDate 2000-50-50`);
-      } catch (res) {
-        expect(res?.stderr.trim()).equal('startDate are in bad format, expected YYYY-mm-dd');
-        expect(res?.stdout).equal('');
+      } catch (err) {
+        expect(err?.stdout.trim()).equal(`${error}: startDate are in bad format, expected YYYY-mm-dd`);
       }
     });
 
@@ -585,9 +563,8 @@ describe('Test: download and insert file from unpaywall between a period', async
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update --startDate ${date2} --endDate ${date3}`);
-      } catch (res) {
-        expect(res?.stderr.trim()).equal('end date is lower than start date');
-        expect(res?.stdout).equal('');
+      } catch (err) {
+        expect(err?.stdout.trim()).equal(`${error}: end date is lower than start date`);
       }
     });
 
@@ -605,9 +582,8 @@ describe('Test: download and insert file from unpaywall between a period', async
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update --startDate ${tomorrow}`);
-      } catch (res) {
-        expect(res?.stderr.trim()).equal('startDate is in the futur');
-        expect(res?.stdout).equal('');
+      } catch (err) {
+        expect(err?.stdout.trim()).equal(`${error}: startDate is in the futur`);
       }
     });
 
