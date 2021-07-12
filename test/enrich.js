@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 require('chai');
 const { expect } = require('chai');
 const path = require('path');
@@ -30,7 +29,7 @@ const enrichDir = path.resolve(__dirname, 'sources');
 
 const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
 
-describe('Test: enrichment with a csv file (command ezu)', async () => {
+describe('Test: command enrich', async () => {
   before(async () => {
     await ping();
     await resetAll();
