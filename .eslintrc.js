@@ -12,6 +12,7 @@ module.exports = {
     ecmaVersion: 12,
   },
   rules: {
+    'no-await-in-loop': 0,
     'no-console': 0,
   },
 };
