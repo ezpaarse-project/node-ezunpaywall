@@ -6,7 +6,9 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const os = require('os');
 
-const { reset } = require('./utils/config');
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
+const { reset } = require('./lib/config');
 
 const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
 
@@ -15,7 +17,7 @@ const customConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
 
 describe('Test: command config', async () => {
   before(async () => {
-    await exec(`${ezu} config --set`);
+    await exec(`${ezu} config --set default`);
   });
 
   describe('get the custom config', async () => {
@@ -53,8 +55,8 @@ describe('Test: command config', async () => {
     beforeEach(async () => {
       await reset();
     });
-    it('Should update ezunpaywallProtocol on custom config', async () => {
-      await exec(`${ezu} config --ezunpaywallProtocol https`);
+    it('Should update ezunpaywall.protocol on custom config', async () => {
+      await exec(`${ezu} config --set ezunpaywall.protocol https`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -78,8 +80,8 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezunpaywallHost on custom config', async () => {
-      await exec(`${ezu} config --ezunpaywallHost localhost.test`);
+    it('Should update ezunpaywall.host on custom config', async () => {
+      await exec(`${ezu} config --set ezunpaywall.host localhost.test`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -103,8 +105,8 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezunpaywallPort on custom config', async () => {
-      await exec(`${ezu} config --ezunpaywallPort 3000`);
+    it('Should update ezunpaywal.port on custom config', async () => {
+      await exec(`${ezu} config --set ezunpaywall.port 3000`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -128,8 +130,8 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezmetaProtocol on custom config', async () => {
-      await exec(`${ezu} config --ezmetaProtocol https`);
+    it('Should update ezmeta.protocol on custom config', async () => {
+      await exec(`${ezu} config --set ezmeta.protocol https`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -153,8 +155,8 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezmetaHost on custom config', async () => {
-      await exec(`${ezu} config --ezmetaHost localhost.test`);
+    it('Should update ezmeta.host on custom config', async () => {
+      await exec(`${ezu} config --set ezmeta.host localhost.test`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -178,8 +180,8 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezmetaPort on custom config', async () => {
-      await exec(`${ezu} config --ezmetaPort 9201`);
+    it('Should update ezmeta.port on custom config', async () => {
+      await exec(`${ezu} config --set ezmeta.port 9201`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -203,8 +205,8 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezmetaUser on custom config', async () => {
-      await exec(`${ezu} config --ezmetaUser UserTest`);
+    it('Should update ezmeta.user on custom config', async () => {
+      await exec(`${ezu} config --set ezmeta.user UserTest`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -228,8 +230,8 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezmetaPassword on custom config', async () => {
-      await exec(`${ezu} config --ezmetaPassword password`);
+    it('Should update ezmeta.password on custom config', async () => {
+      await exec(`${ezu} config --set ezmeta.password password`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -254,7 +256,7 @@ describe('Test: command config', async () => {
     });
 
     it('Should update apikey on custom config', async () => {
-      await exec(`${ezu} config --apikey keykey`);
+      await exec(`${ezu} config --set apikey keykey`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -279,16 +281,16 @@ describe('Test: command config', async () => {
     });
 
     it('Should set default config on custom config', async () => {
-      await exec(`${ezu} config --set`);
+      await exec(`${ezu} config --set default`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
 
       const config2 = {
         ezunpaywall: {
-          protocol: 'http',
+          protocol: 'https',
           host: 'localhost',
-          port: '8080',
+          port: '443',
         },
         ezmeta: {
           protocol: 'http',

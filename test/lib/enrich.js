@@ -3,7 +3,9 @@ const chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);
 
-const ezunpaywallURL = 'http://localhost:8080';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
+const ezunpaywallURL = 'https://localhost';
 
 /**
  * get state of enrich process
@@ -12,7 +14,7 @@ const ezunpaywallURL = 'http://localhost:8080';
 const getState = async () => {
   let res;
   try {
-    res = await chai.request(ezunpaywallURL).get('/enrich/state');
+    res = await chai.request(ezunpaywallURL).get('/api/enrich/state');
   } catch (err) {
     console.error(`getState : ${err}`);
   }
