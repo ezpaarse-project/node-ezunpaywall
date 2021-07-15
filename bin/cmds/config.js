@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
+const set = require('lodash.set');
+const has = require('lodash.has');
 
 const { logger } = require('../../lib/logger');
 
@@ -13,9 +15,9 @@ const setConfig = async () => {
 
   const config = {
     ezunpaywall: {
-      protocol: 'http',
+      protocol: 'https',
       host: 'localhost',
-      port: '8080',
+      port: '443',
     },
     ezmeta: {
       protocol: 'http',
@@ -65,17 +67,11 @@ const manageConfig = async (args) => {
   }
 
   const configPath = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
+  const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
   if (!await fs.pathExists(configPath)) {
     await setConfig();
   }
-
-  if (args.set) {
-    await setConfig();
-    process.exit(0);
-  }
-
-  const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
   if (args.get) {
     console.log(JSON.stringify(config, null, 2));
@@ -83,46 +79,25 @@ const manageConfig = async (args) => {
     process.exit(0);
   }
 
-  if (args.ezunpaywallProtocol) {
-    config.ezunpaywall.protocol = args.ezunpaywallProtocol;
+  if (args.set === 'default') {
+    await setConfig();
+    process.exit(0);
   }
 
-  if (args.ezunpaywallHost) {
-    config.ezunpaywall.host = args.ezunpaywallHost;
-  }
-
-  if (args.ezunpaywallPort) {
-    config.ezunpaywall.port = args.ezunpaywallPort;
-  }
-
-  if (args.ezmetaProtocol) {
-    config.ezmeta.protocol = args.ezmetaProtocol;
-  }
-
-  if (args.ezmetaHost) {
-    config.ezmeta.host = args.ezmetaHost;
-  }
-
-  if (args.ezmetaPort) {
-    config.ezmeta.port = args.ezmetaPort;
-  }
-
-  if (args.ezmetaUser) {
-    config.ezmeta.user = args.ezmetaUser;
-  }
-
-  if (args.ezmetaPassword) {
-    config.ezmeta.password = args.ezmetaPassword;
-  }
-
-  if (args.apikey) {
-    config.apikey = args.apikey;
+  if (args.set) {
+    if (has(config, args.set)) {
+      set(config, args.set, ...args.args);
+    } else {
+      logger.error(`${args.set} doesn't exist on config`);
+      process.exit(1);
+    }
   }
 
   try {
     await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
   } catch (err) {
     console.error(err);
+    process.exit(1);
   }
 
   console.log(JSON.stringify(config, null, 2));

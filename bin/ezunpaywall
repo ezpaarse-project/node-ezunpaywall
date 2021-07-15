@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+process.removeAllListeners('warning');
+
 const program = require('commander');
 const pkg = require('../package.json');
 
@@ -20,17 +22,9 @@ program.version(pkg.version);
 program
   .command('config')
   .description('config management command to establish the connection between the command and ezunpaywall')
+  .description('Example: ezu config --set ezunpaywall.host localhost')
   .option('-g --get', 'display the configuration')
-  .option('-s --set', 'initialize the configuration file in $HOME/.config')
-  .option('--ezunpaywallProtocol <ezunpaywallProtocol>', 'ezunpaywall protocol')
-  .option('--ezunpaywallHost <ezunpaywallHost>', 'ezunpaywall Host')
-  .option('--ezunpaywallPort <ezunpaywallPort>', 'ezunpaywall port')
-  .option('--ezmetaProtocol <ezmetaProtocol>', 'ezmeta protocol')
-  .option('--ezmetaHost <ezmetaHost>', 'ezmeta Host')
-  .option('--ezmetaPort <ezmetaPort>', 'ezmeta port')
-  .option('--ezmetaUser <ezmetaUser>', 'ezmeta user')
-  .option('--ezmetaPassword <ezmetaPassword>', 'ezmeta password')
-  .option('--apikey <apikey>', 'admin apikey')
+  .option('-s --set <key> [value]', 'update config')
   .option('-L --list', 'list of attributes required for configuration')
   .action((args) => manageConfig(args));
 
