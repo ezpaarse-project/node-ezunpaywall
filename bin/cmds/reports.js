@@ -4,6 +4,8 @@ const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
 const { logger } = require('../../lib/logger');
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 /**
  * get list of report in ezunpaywall
  * @param {Stringng} ezunpaywall - ezunpaywallURL
@@ -14,10 +16,10 @@ const getReports = async (ezunpaywall) => {
   try {
     res = await ezunpaywall({
       method: 'GET',
-      url: '/update/snapshot',
+      url: '/api/update/report',
     });
   } catch (err) {
-    logger.error(`${ezunpaywall.defaults.baseURL}/update/snapshot - ${err}`);
+    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/update/snapshot - ${err}`);
     process.exit(1);
   }
 
@@ -99,11 +101,11 @@ const report = async (args) => {
   try {
     res1 = await ezunpaywall({
       method: 'get',
-      url: `/update/report${url}`,
+      url: `/api/update/report${url}`,
       params: query,
     });
   } catch (err) {
-    logger.error(`${ezunpaywall.defaults.baseURL}/update/report${url} - ${res1?.response?.status}`);
+    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/update/report${url} - ${err} ${err?.response?.status}`);
     process.exit(1);
   }
   console.log(JSON.stringify(res1.data?.report, null, 2));

@@ -7,6 +7,8 @@ const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
 const { logger } = require('../../lib/logger');
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 /**
  * start a csv file enrichment
  *
@@ -58,47 +60,49 @@ const enrichCSV = async (args) => {
   try {
     await ezunpaywall({
       method: 'POST',
-      url: `/enrich/csv/${id}`,
+      url: `/api/enrich/csv/${id}`,
       params: query,
       data: fs.createReadStream(args.file),
       headers: {
         'Content-Type': 'text/csv',
         'Content-length': stat.size,
-        api_key: config.apikey,
+        'X-API-KEY': config.apikey,
       },
       responseType: 'json',
     });
   } catch (err) {
-    logger.error(`${ezunpaywall.default.baseURL}/enrich/csv/${id} - ${err}`);
+    logger.error(`POST ${ezunpaywall.default.baseURL}/api/enrich/csv/${id} - ${err}`);
     process.exit(1);
   }
 
-  let res2;
+  let state;
 
-  while (!res2?.data?.state?.done) {
-    res2 = await ezunpaywall({
+  do {
+    state = await ezunpaywall({
       method: 'GET',
-      url: `/enrich/state/${id}.json`,
+      url: `/api/enrich/state/${id}.json`,
       responseType: 'json',
     });
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
 
-  let res3;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  } while (!state?.data?.state?.done);
+
+  let enrichedFile;
 
   try {
-    res3 = await ezunpaywall({
+    enrichedFile = await ezunpaywall({
       method: 'GET',
-      url: `/enrich/${id}.csv`,
+      url: `/api/enrich/enriched/${id}.csv`,
       responseType: 'stream',
     });
   } catch (err) {
-    console.error(`res3: ${id} - ${err}`);
+    console.error(`GET ${ezunpaywall.default.baseURL}/api/enrich/enriched/${id}.csv - ${err}`);
     process.exit(1);
   }
 
+  // TODO await this and use process.exit(0) after that
   const writer = fs.createWriteStream(out);
-  res3.data.pipe(writer);
+  enrichedFile.data.pipe(writer);
 };
 
 /**
@@ -144,18 +148,18 @@ const enrichJSON = async (args) => {
   try {
     await ezunpaywall({
       method: 'POST',
-      url: `/enrich/json/${id}`,
+      url: `/api/enrich/json/${id}`,
       params: query,
       data: fs.createReadStream(args.file),
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-ndjson',
         'Content-length': stat.size,
-        api_key: config.apikey,
+        'X-API-KEY': config.apikey,
       },
       responseType: 'json',
     });
   } catch (err) {
-    logger.error(`${ezunpaywall.defaults.baseURL}/enrich/json - ${err}`);
+    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/enrich/json/${id} - ${err}`);
     process.exit(1);
   }
 
@@ -164,7 +168,7 @@ const enrichJSON = async (args) => {
   while (!res2?.data?.state?.done) {
     res2 = await ezunpaywall({
       method: 'GET',
-      url: `/enrich/state/${id}.json`,
+      url: `/api/enrich/state/${id}.json`,
       responseType: 'json',
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -175,11 +179,11 @@ const enrichJSON = async (args) => {
   try {
     res3 = await ezunpaywall({
       method: 'GET',
-      url: `/enrich/${id}.jsonl`,
+      url: `/api/enrich/enriched/${id}.jsonl`,
       responseType: 'stream',
     });
   } catch (err) {
-    logger.error(`${ezunpaywall.defaults.baseURL}/enrich/${id}.jsonl - ${err}`);
+    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/enrich/enriched/${id}.jsonl - ${err}`);
     process.exit(1);
   }
 

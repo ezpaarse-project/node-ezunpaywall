@@ -5,6 +5,8 @@ const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
 const { logger } = require('../../lib/logger');
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 /**
  * check if service is available
  *
@@ -19,14 +21,38 @@ const ping = async (args) => {
   try {
     await ezunpaywall({
       method: 'GET',
-      url: '/ping',
+      url: '/api/graphql',
     });
   } catch (err) {
-    logger.error(`${ezunpaywall.defaults.baseURL}/ping - ${err}`);
+    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/graphql - ${err}`);
     process.exit(1);
   }
 
-  logger.info('ping ezunpaywall: OK');
+  logger.info('ping graphql service: OK');
+
+  try {
+    await ezunpaywall({
+      method: 'GET',
+      url: '/api/update',
+    });
+  } catch (err) {
+    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/update - ${err}`);
+    process.exit(1);
+  }
+
+  logger.info('ping update service: OK');
+
+  try {
+    await ezunpaywall({
+      method: 'GET',
+      url: '/api/enrich',
+    });
+  } catch (err) {
+    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/enrich - ${err}`);
+    process.exit(1);
+  }
+
+  logger.info('ping enrich service: OK');
 
   const client = new Client({
     node: {
@@ -52,7 +78,7 @@ const ping = async (args) => {
     process.exit(1);
   }
 
-  logger.info('ping ezmeta: OK');
+  logger.info('ezmeta: OK');
   process.exit(0);
 };
 

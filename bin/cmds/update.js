@@ -4,27 +4,25 @@ const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
 const { logger } = require('../../lib/logger');
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 /**
  * get list of snapshot installed in ezunpaywall
  * @param {object} axios - axios
  * @param {object} config - config
  * @returns {array<string>} array of name of snapshot
  */
-const getFiles = async () => {
+const getSnapshots = async () => {
   const ezunpaywall = await connection();
 
   let res;
   try {
     res = await ezunpaywall({
       method: 'GET',
-      url: '/update/snapshot',
+      url: '/api/update/snapshot',
     });
   } catch (err) {
-    if (err?.response?.status === 409) {
-      logger.error('update in progress');
-      process.exit(1);
-    }
-    logger.error(`service unavailable at ${ezunpaywall.defaults.baseURL}`);
+    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/update/snapshot - ${err}`);
     process.exit(1);
   }
   return res?.data;
@@ -124,7 +122,7 @@ const update = async (args) => {
   if (args.status) {
     res = await ezunpaywall({
       method: 'get',
-      url: '/update/state',
+      url: '/api/update/state',
       headers: {
         api_key: config.apikey,
       },
@@ -138,7 +136,7 @@ const update = async (args) => {
   const query = {};
 
   if (args.list) {
-    const snapshots = await getFiles();
+    const snapshots = await getSnapshots();
     const snapshot = await inquirer.prompt([{
       type: 'list',
       pageSize: 5,
@@ -164,18 +162,18 @@ const update = async (args) => {
   try {
     res = await ezunpaywall({
       method: 'post',
-      url: `/update${url}`,
+      url: `/api/update/job${url}`,
       params: query,
       headers: {
-        api_key: config.apikey,
+        'X-API-KEY': config.apikey,
       },
     });
   } catch (err) {
     if (err?.response?.status === 409) {
-      logger.warn(`${ezunpaywall.defaults.baseURL}/update${url} - update in progress 409`);
+      logger.warn(`POST ${ezunpaywall.defaults.baseURL}/api/update/job${url} - update in progress 409`);
       process.exit(1);
     }
-    logger.error(`${ezunpaywall.defaults.baseURL}/update${url} - ${err}`);
+    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/update/job${url} - ${err}`);
     process.exit(1);
   }
   logger.info(res.data.message);

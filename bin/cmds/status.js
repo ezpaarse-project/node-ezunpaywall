@@ -2,6 +2,8 @@ const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
 const { logger } = require('../../lib/logger');
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 /**
  * Indicates if an update process is running
  *
@@ -15,10 +17,10 @@ const getStatus = async (args) => {
   try {
     res = await ezunpaywall({
       method: 'get',
-      url: '/update/status',
+      url: '/api/update/status',
     });
   } catch (err) {
-    logger.error(`${ezunpaywall.defaults.baseURL}/update/status - ${err}`);
+    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/update/status - ${err}`);
     process.exit(1);
   }
   const status = res?.data?.inUpdate;
