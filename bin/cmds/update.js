@@ -23,7 +23,7 @@ const getSnapshots = async () => {
     logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/update/snapshot - ${err}`);
     process.exit(1);
   }
-  return res?.data;
+  return res?.data || [];
 };
 
 /**
@@ -132,23 +132,27 @@ const update = async (args) => {
 
   const data = {};
 
-  // if (args.list) {
-  //   const snapshots = await getSnapshots();
-  //   const snapshot = await inquirer.prompt([{
-  //     type: 'list',
-  //     pageSize: 5,
-  //     name: 'files',
-  //     choices: snapshots,
-  //     message: 'files',
-  //     default: snapshots.slice(),
-  //     source: (answersSoFar, input) => new Promise((resolve) => {
-  //       const result = snapshots.files
-  //         .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
-  //       resolve(result);
-  //     }),
-  //   }]);
-  //   args.file = snapshot.files;
-  // }
+  if (args.list) {
+    const snapshots = await getSnapshots();
+    if (!snapshots.length) {
+      logger.info('No snapshots on ezunpaywall');
+      process.exit(0);
+    }
+    const snapshot = await inquirer.prompt([{
+      type: 'list',
+      pageSize: 5,
+      name: 'files',
+      choices: snapshots,
+      message: 'files',
+      default: snapshots.slice(),
+      source: (answersSoFar, input) => new Promise((resolve) => {
+        const result = snapshots.files
+          .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
+        resolve(result);
+      }),
+    }]);
+    args.file = snapshot.files;
+  }
 
   if (args.file) data.filename = args.file;
   if (args.offset) data.offset = args.offset;
