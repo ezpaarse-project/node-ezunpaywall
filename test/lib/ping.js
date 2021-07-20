@@ -5,7 +5,7 @@ const { client } = require('./elastic');
 
 chai.use(chaiHttp);
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 
 const ezunpaywallURL = 'https://localhost';
 const fakeUnpaywallURL = 'http://localhost:12000';

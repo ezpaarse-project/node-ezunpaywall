@@ -7,7 +7,7 @@ const readline = require('readline');
 
 chai.use(chaiHttp);
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 
 const { Client } = require('@elastic/elasticsearch');
 const { URL } = require('url');

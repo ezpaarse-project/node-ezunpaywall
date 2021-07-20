@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-
-process.removeAllListeners('warning');
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 const program = require('commander');
 const pkg = require('../package.json');

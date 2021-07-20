@@ -5,8 +5,6 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const indexUnpawall = require('./sources/index/unpaywall.json');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
 const {
   ping,
 } = require('./lib/ping');
@@ -49,7 +47,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
       } catch (err) {
         console.log(err);
       }
-      expect(res?.stdout.trim()).equal(`${info}: start upsert with fake1.jsonl.gz`);
+      expect(res?.stdout.trim()).equal(`${info}: update with fake1.jsonl.gz`);
     });
 
     it('Should insert 50 data', async () => {
@@ -106,7 +104,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
       } catch (err) {
         console.log(err);
       }
-      expect(res?.stdout.trim()).equal(`${info}: start upsert with fake1.jsonl.gz`);
+      expect(res?.stdout.trim()).equal(`${info}: update with fake1.jsonl.gz`);
     });
 
     it('Should insert 10 data', async () => {
@@ -163,7 +161,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
       } catch (err) {
         console.log(err);
       }
-      expect(res?.stdout.trim()).equal(`${info}: start upsert with fake1.jsonl.gz`);
+      expect(res?.stdout.trim()).equal(`${info}: update with fake1.jsonl.gz`);
     });
 
     it('Should insert 10 data', async () => {
@@ -306,7 +304,7 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should return the process start', async () => {
       const res = await exec(`${ezu} update --startDate ${date2} --index unpaywall-test`);
-      expect(res?.stdout.trim()).equal(`${info}: insert snapshot beetween ${date2} and ${dateNow} has begun, list of task has been created on elastic`);
+      expect(res?.stdout.trim()).equal(`${info}: dowload and insert snapshot from unpaywall from ${date2} and ${dateNow}`);
     });
 
     it('Should insert 150 data', async () => {
@@ -379,7 +377,7 @@ describe('Test: download and insert file from unpaywall between a period', async
     it('Should return the process start', async () => {
       const res = await exec(`${ezu} update --startDate ${date3} --endDate ${date2} --index unpaywall-test`);
 
-      expect(res?.stdout.trim()).equal(`${info}: insert snapshot beetween ${date3} and ${date2} has begun, list of task has been created on elastic`);
+      expect(res?.stdout.trim()).equal(`${info}: dowload and insert snapshot from unpaywall from ${date3} and ${date2}`);
     });
 
     it('Should insert 2100 data', async () => {
@@ -451,7 +449,7 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should return the process start', async () => {
       const res = await exec(`${ezu} update --startDate ${date5} --endDate ${date4}`);
-      expect(res?.stdout.trim()).equal(`${info}: insert snapshot beetween ${date5} and ${date4} has begun, list of task has been created on elastic`);
+      expect(res?.stdout.trim()).equal(`${info}: dowload and insert snapshot from unpaywall from ${date5} and ${date4}`);
     });
 
     it('Should insert nothing', async () => {

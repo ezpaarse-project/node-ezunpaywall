@@ -5,8 +5,6 @@ const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
 const { logger } = require('../../lib/logger');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
 /**
  * check if service is available
  *

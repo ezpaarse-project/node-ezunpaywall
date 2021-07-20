@@ -2,8 +2,6 @@ const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
 const { logger } = require('../../lib/logger');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
 /**
  * Indicates if an update process is running
  *

@@ -4,8 +4,6 @@ const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
 const { logger } = require('../../lib/logger');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
 /**
  * get list of snapshot installed in ezunpaywall
  * @param {object} axios - axios
@@ -132,48 +130,48 @@ const update = async (args) => {
     process.exit(0);
   }
 
-  let url = '';
-  const query = {};
+  const data = {};
 
-  if (args.list) {
-    const snapshots = await getSnapshots();
-    const snapshot = await inquirer.prompt([{
-      type: 'list',
-      pageSize: 5,
-      name: 'files',
-      choices: snapshots,
-      message: 'files',
-      default: snapshots.slice(),
-      source: (answersSoFar, input) => new Promise((resolve) => {
-        const result = snapshots.files
-          .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
-        resolve(result);
-      }),
-    }]);
-    args.file = snapshot.files;
-  }
+  // if (args.list) {
+  //   const snapshots = await getSnapshots();
+  //   const snapshot = await inquirer.prompt([{
+  //     type: 'list',
+  //     pageSize: 5,
+  //     name: 'files',
+  //     choices: snapshots,
+  //     message: 'files',
+  //     default: snapshots.slice(),
+  //     source: (answersSoFar, input) => new Promise((resolve) => {
+  //       const result = snapshots.files
+  //         .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
+  //       resolve(result);
+  //     }),
+  //   }]);
+  //   args.file = snapshot.files;
+  // }
 
-  if (args.file) url += `/${args.file}`;
-  if (args.offset) query.offset = args.offset;
-  if (args.limit) query.limit = args.limit;
-  if (args.startDate) query.startDate = args.startDate;
-  if (args.endDate) query.endDate = args.endDate;
-  if (args.index) query.index = args.index;
+  if (args.file) data.filename = args.file;
+  if (args.offset) data.offset = args.offset;
+  if (args.limit) data.limit = args.limit;
+  if (args.startDate) data.startDate = args.startDate;
+  if (args.endDate) data.endDate = args.endDate;
+  if (args.index) data.index = args.index;
+
   try {
     res = await ezunpaywall({
       method: 'post',
-      url: `/api/update/job${url}`,
-      params: query,
+      url: '/api/update/job',
+      data,
       headers: {
         'X-API-KEY': config.apikey,
       },
     });
   } catch (err) {
     if (err?.response?.status === 409) {
-      logger.warn(`POST ${ezunpaywall.defaults.baseURL}/api/update/job${url} - update in progress 409`);
+      logger.warn(`POST ${ezunpaywall.defaults.baseURL}/api/update/job - update in progress 409`);
       process.exit(1);
     }
-    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/update/job${url} - ${err}`);
+    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/update/job - ${err}`);
     process.exit(1);
   }
   logger.info(res.data.message);

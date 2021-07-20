@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
 
 const ezunpaywallURL = 'https://localhost';
 

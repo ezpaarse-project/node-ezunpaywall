@@ -4,8 +4,6 @@ const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
 const { logger } = require('../../lib/logger');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
 /**
  * get list of report in ezunpaywall
  * @param {Stringng} ezunpaywall - ezunpaywallURL

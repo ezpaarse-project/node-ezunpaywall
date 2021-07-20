@@ -6,8 +6,6 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const os = require('os');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
 const { reset } = require('./lib/config');
 
 const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
