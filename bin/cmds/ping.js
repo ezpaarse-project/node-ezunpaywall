@@ -3,7 +3,7 @@ const { URL } = require('url');
 
 const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
-const { logger } = require('../../lib/logger');
+const logger = require('../../lib/logger');
 
 /**
  * check if service is available
@@ -25,7 +25,6 @@ const ping = async (args) => {
     logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/graphql - ${err}`);
     process.exit(1);
   }
-
   logger.info('ping graphql service: OK');
 
   try {

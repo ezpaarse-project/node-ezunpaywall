@@ -1,6 +1,6 @@
 const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
-const { logger } = require('../../lib/logger');
+const logger = require('../../lib/logger');
 
 /**
  * Indicates if an update process is running

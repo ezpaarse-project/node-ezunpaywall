@@ -2,7 +2,7 @@
 const inquirer = require('inquirer');
 const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
-const { logger } = require('../../lib/logger');
+const logger = require('../../lib/logger');
 
 /**
  * get list of snapshot installed in ezunpaywall
@@ -117,14 +117,69 @@ const update = async (args) => {
 
   let res;
 
+  if (!args.force) {
+    let latestSnapshotFromUnpaywall;
+
+    try {
+      latestSnapshotFromUnpaywall = await ezunpaywall({
+        method: 'get',
+        url: '/api/update/unpaywall/snapshot',
+        params: {
+          latest: true,
+        },
+        headers: {
+          api_key: config.apikey,
+        },
+      });
+      latestSnapshotFromUnpaywall = latestSnapshotFromUnpaywall?.data;
+    } catch (err) {
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/unpaywall/snapshot`);
+      logger.error(err);
+      process.exit(1);
+    }
+
+    let report;
+    try {
+      report = await ezunpaywall({
+        method: 'get',
+        url: '/api/update/report',
+        params: {
+          latest: true,
+        },
+        headers: {
+          api_key: config.apikey,
+        },
+      });
+      report = report?.data?.report;
+    } catch (err) {
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/state`);
+      logger.error(err);
+      process.exit(1);
+    }
+
+    const task = report.steps.find((x) => x.task === 'insert');
+
+    if (latestSnapshotFromUnpaywall.filename === task.file && !report.error) {
+      logger.info(`No new update available from unpaywall, the last one has already been inserted at "${report.endAt}" with [${task.file}]`);
+      logger.info('You can reload it with args --force');
+      process.exit(0);
+    }
+  }
+
   if (args.status) {
-    res = await ezunpaywall({
-      method: 'get',
-      url: '/api/update/state',
-      headers: {
-        api_key: config.apikey,
-      },
-    });
+    try {
+      res = await ezunpaywall({
+        method: 'get',
+        url: '/api/update/state',
+        headers: {
+          api_key: config.apikey,
+        },
+      });
+    } catch (err) {
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/state`);
+      logger.error(err);
+      process.exit(1);
+    }
     console.log(JSON.stringify(res?.data, null, 2));
     logger.info('latest state');
     process.exit(0);

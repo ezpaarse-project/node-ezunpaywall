@@ -33,24 +33,20 @@ Update config to fetch ez-unpyawall.
 | Name | Description |
 | --- | --- |
 | -g --get | display the configuration |
-| -s --set | initialize the configuration file in $HOME/.config |
-| --ezunpaywallURL | ezunpaywall url |
-| --ezunpaywallPort | ezunpaywall port |
-| --ezmetaURL | ezmeta url |
-| --ezmetaPort | ezmeta port |
-| --ezmetaUser | ezmeta url |
-| --ezmetaPassword | ezmeta password |
+| -s --set | set a value to a config key in $HOME/.config |
 | -k --apikey | admin apikey |
 | -l --list | list of attributes required for configuration |
 #### Examples
 ```bash
-$ ezunpaywall config --ezunpaywallURL http://localhost
-$ ezunpaywall config --ezunpaywallPort 8080
-$ ezunpaywall config --ezmetaURL http://localhost
-$ ezunpaywall config --ezmetaPort 9200
-$ ezunpaywall config --ezmetaUser elastic
-$ ezunpaywall config --ezmetaPassword changeme
-$ ezunpaywall config --apikey admin
+$ ezunpaywall config --set ezunpaywall.protocol https
+$ ezunpaywall config --set ezunpaywall.host localhost
+$ ezunpaywall config --set ezunpaywall.port 443
+$ ezunpaywall config --set ezmeta.protocol http
+$ ezunpaywall config --set ezmeta.host localhost
+$ ezunpaywall config --set ezmeta.port 9200
+$ ezunpaywall config --set ezmeta.user elastic
+$ ezunpaywall config --set ezmeta.password changeme
+$ ezunpaywall config --set apikey admin
 ```
 ### ezu ping
 Check if service is available.

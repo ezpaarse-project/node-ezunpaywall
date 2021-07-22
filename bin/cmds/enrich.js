@@ -5,7 +5,7 @@ const FormData = require('form-data');
 
 const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
-const { logger } = require('../../lib/logger');
+const logger = require('../../lib/logger');
 
 /**
  * start a csv file enrichment
@@ -87,8 +87,8 @@ const enrichCSV = async (args) => {
       responseType: 'json',
     });
   } catch (err) {
-    console.log(err.response);
-    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/enrich/job - ${err}`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/job`);
+    logger.error(err);
     process.exit(1);
   }
 
@@ -112,7 +112,8 @@ const enrichCSV = async (args) => {
       responseType: 'stream',
     });
   } catch (err) {
-    console.error(`GET ${ezunpaywall.defaults.baseURL}/api/enrich/enriched/${id}.csv - ${err}`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}`);
+    logger.error(err);
     process.exit(1);
   }
 
@@ -198,8 +199,8 @@ const enrichJSON = async (args) => {
       responseType: 'json',
     });
   } catch (err) {
-    console.log(err.response.data);
-    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/enrich/job - ${err}`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/job`);
+    logger.error(err);
     process.exit(1);
   }
 

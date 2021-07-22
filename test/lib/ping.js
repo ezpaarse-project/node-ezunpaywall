@@ -1,11 +1,10 @@
 /* eslint-disable no-await-in-loop */
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const logger = require('../../lib/logger');
 const { client } = require('./elastic');
 
 chai.use(chaiHttp);
-
-
 
 const ezunpaywallURL = 'https://localhost';
 const fakeUnpaywallURL = 'http://localhost:12000';
@@ -18,7 +17,8 @@ const ping = async () => {
     try {
       res = await chai.request(ezunpaywallURL).get('/api/graphql/');
     } catch (err) {
-      console.error(`graphql service ping : ${err}`);
+      logger.err(`Cannot ping ${ezunpaywallURL}/api/graphql/`);
+      logger.err(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -30,7 +30,8 @@ const ping = async () => {
     try {
       res = await chai.request(ezunpaywallURL).get('/api/update/');
     } catch (err) {
-      console.error(`update service ping : ${err}`);
+      logger.err(`Cannot ping ${ezunpaywallURL}/api/update/`);
+      logger.err(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -42,7 +43,8 @@ const ping = async () => {
     try {
       res = await chai.request(ezunpaywallURL).get('/api/enrich/');
     } catch (err) {
-      console.error(`enrich service ping : ${err}`);
+      logger.err(`Cannot ping ${ezunpaywallURL}/api/enrich/`);
+      logger.err(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -54,11 +56,11 @@ const ping = async () => {
     try {
       res = await chai.request(fakeUnpaywallURL).get('/');
     } catch (err) {
-      console.error(`fakeUnpaywall ping : ${err}`);
+      logger.err(`Cannot ping ${fakeUnpaywallURL}/`);
+      logger.err(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  console.log('ping fakeUnpaywall: OK');
 
   res = '';
 
@@ -67,7 +69,8 @@ const ping = async () => {
     try {
       res = await client.ping();
     } catch (err) {
-      console.error(`elastic ping : ${err}`);
+      logger.err('Cannot ping elatic');
+      logger.err(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }

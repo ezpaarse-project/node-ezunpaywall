@@ -7,10 +7,9 @@ const readline = require('readline');
 
 chai.use(chaiHttp);
 
-
-
 const { Client } = require('@elastic/elasticsearch');
 const { URL } = require('url');
+const logger = require('../../lib/logger');
 
 const client = new Client({
   node: {
@@ -34,7 +33,8 @@ const checkIfIndexExist = async (name) => {
       index: name,
     });
   } catch (err) {
-    console.error(`indices.exists in checkIfIndexExist: ${err}`);
+    logger.error(`Cannot verify if ${name} index exist`);
+    logger.error(err);
   }
   return res.body;
 };
@@ -51,7 +51,8 @@ const deleteIndex = async (name) => {
         index: name,
       });
     } catch (err) {
-      console.error(`deleteIndex: ${err}`);
+      logger.error(`Cannot delete index ${name} exist`);
+      logger.error(err);
     }
   }
 };
@@ -70,7 +71,8 @@ const createIndex = async (name, index) => {
         body: index,
       });
     } catch (err) {
-      console.error(`indices.create in createIndex: ${err}`);
+      logger.error(`Cannot create index ${name} exist`);
+      logger.error(err);
     }
   }
 };
@@ -89,7 +91,8 @@ const countDocuments = async (name) => {
         index: name,
       });
     } catch (err) {
-      console.error(`countDocuments: ${err}`);
+      logger.error(`Cannot count documents on ${name} index`);
+      logger.error(err);
     }
   }
   return data.body.count ? data.body.count : 0;
@@ -101,7 +104,8 @@ const insertDataUnpaywall = async () => {
   try {
     readStream = await fs.createReadStream(filepath);
   } catch (err) {
-    console.error(`fs.createReadStream in insertDataUnpaywall: ${err}`);
+    logger.error(`Cannot readstream ${filepath}`);
+    logger.error(err);
   }
 
   const rl = readline.createInterface({
@@ -120,7 +124,8 @@ const insertDataUnpaywall = async () => {
   try {
     await client.bulk({ refresh: true, body });
   } catch (err) {
-    console.error(`insertUPW: ${err}`);
+    logger.error('Cannot bulk');
+    logger.error(err);
   }
 };
 

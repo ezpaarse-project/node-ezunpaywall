@@ -2,7 +2,7 @@ const inquirer = require('inquirer');
 
 const { connection } = require('../../lib/ezunpaywall');
 const { getConfig } = require('../../lib/config');
-const { logger } = require('../../lib/logger');
+const logger = require('../../lib/logger');
 
 /**
  * get list of report in ezunpaywall

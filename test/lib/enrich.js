@@ -1,5 +1,6 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const logger = require('../../lib/logger');
 
 chai.use(chaiHttp);
 
@@ -16,7 +17,8 @@ const getState = async () => {
   try {
     res = await chai.request(ezunpaywallURL).get('/api/enrich/state');
   } catch (err) {
-    console.error(`getState : ${err}`);
+    logger.error(`Cannot request ${ezunpaywallURL}/api/enrich/state `);
+    logger.error(err);
   }
   return res?.body?.state;
 };

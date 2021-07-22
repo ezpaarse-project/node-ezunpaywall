@@ -4,7 +4,7 @@ const os = require('os');
 const set = require('lodash.set');
 const has = require('lodash.has');
 
-const { logger } = require('../../lib/logger');
+const logger = require('../../lib/logger');
 
 /**
  * create a config file in /$HOME/.config/.ezunpaywallrc
@@ -32,7 +32,8 @@ const setConfig = async () => {
   try {
     await fs.writeFile(pathConfig, JSON.stringify(config, null, 2), 'utf8');
   } catch (err) {
-    console.error(err);
+    logger.error(`Cannot write ${JSON.stringify(config, null, 2)} in ${pathConfig}`);
+    logger.error(err);
   }
 
   logger.info(JSON.stringify(config, null, 2));
@@ -96,7 +97,8 @@ const manageConfig = async (args) => {
   try {
     await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
   } catch (err) {
-    console.error(err);
+    logger.error(`Cannot write ${JSON.stringify(config, null, 2)} in ${config}`);
+    logger.error(err);
     process.exit(1);
   }
 
