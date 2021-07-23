@@ -10,229 +10,112 @@ const logger = require('../../lib/logger');
 /**
  * start a csv file enrichment
  *
- * @param {string} args.file -f --file <file> - file which must be enriched
- * @param {string} args.attributes -a --attributes <attributes> - attributes which must be enriched
+ * @param {string} options.file --file <file> - file which must be enriched
+ * @param {string} options.attributes --attributes <attributes> - attributes which must be enriched
  * in graphql format. By default, all attributes are added
- * @param {string} args.separator -s --separator <separator> - separator of csv out file
- * @param {string} args.out -o --out <out> - name of enriched file
- * @param {boolean} args.verbose -v --verbose - logs how much lines are enriched
- * @param {boolean} args.use -u --use <use> - pathfile of custom config
+ * @param {string} options.separator --separator <separator> - separator of csv out file
+ * @param {string} options.out --out <out> - name of enriched file
+ * @param {boolean} options.verbose -v --verbose - logs how much lines are enriched
+ * @param {boolean} options.use --use <use> - pathfile of custom config
  */
-const enrichCSV = async (args) => {
-  const config = await getConfig(args.use);
+const enrich = async (command, options) => {
+  const config = await getConfig(options.use);
   const ezunpaywall = await connection();
 
-  if (!args.file) {
-    logger.error('file expected');
-    process.exit(1);
+  const extAccepted = ['csv', 'jsonl'];
+
+  if (command === 'job') {
+    if (!options.file) {
+      logger.error('file expected');
+      process.exit(1);
+    }
+
+    const type = path.extname(options.file).substring(1);
+
+    if (!extAccepted.includes(type)) {
+      logger.error(`${type} is not suported for enrich. Required csv or jsonl`);
+      process.exit(1);
+    }
+
+    const out = options.out || `out.${type}`;
+
+    const data = {
+      type,
+      separator: ',',
+    };
+
+    if (options.separator) data.separator = options.separator;
+    if (options.attributes) data.args = options.attributes;
+    if (options.index) data.index = options.index;
+
+    console.log(options.attributes);
+
+    const stat = await fs.stat(options.file);
+
+    const formData = new FormData();
+    formData.append('file', fs.createReadStream(options.file));
+
+    let res1;
+    try {
+      res1 = await ezunpaywall({
+        method: 'POST',
+        url: '/api/enrich/upload',
+        data: formData,
+        headers: formData.getHeaders(),
+        responseType: 'json',
+      });
+    } catch (err) {
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/upload - ${err}`);
+      process.exit(1);
+    }
+
+    const id = res1?.data?.id;
+    data.id = id;
+
+    try {
+      await ezunpaywall({
+        method: 'POST',
+        url: '/api/enrich/job',
+        data,
+        headers: {
+          'Content-length': stat.size,
+          'X-API-KEY': config.ezunpaywall.apikey,
+        },
+        responseType: 'json',
+      });
+    } catch (err) {
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/job`);
+      logger.error(err);
+      process.exit(1);
+    }
+
+    let res2;
+
+    do {
+      res2 = await ezunpaywall({
+        method: 'GET',
+        url: `/api/enrich/state/${id}.json`,
+        responseType: 'json',
+      });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } while (!res2?.data?.state?.done);
+
+    let enrichedFile;
+
+    try {
+      enrichedFile = await ezunpaywall({
+        method: 'GET',
+        url: `/api/enrich/enriched/${id}.${type}`,
+        responseType: 'stream',
+      });
+    } catch (err) {
+      logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/enrich/enriched/${id}.${type} - ${err}`);
+      process.exit(1);
+    }
+
+    const writer = fs.createWriteStream(out);
+    enrichedFile.data.pipe(writer);
   }
-
-  const file = path.resolve(args.file);
-  const fileExist = await fs.pathExists(file);
-
-  if (!fileExist) {
-    logger.error('file not found');
-    process.exit(1);
-  }
-
-  const ext = path.extname(file).substring(1);
-  if (ext !== 'csv') {
-    logger.error(`${ext} is not suported for enrichCSV. Required .csv`);
-    process.exit(1);
-  }
-
-  const out = args.out || 'out.csv';
-
-  const data = {
-    type: 'csv',
-    separator: ',',
-  };
-
-  if (args.separator) data.separator = args.separator;
-  if (args.attributes) data.args = args.attributes;
-  if (args.index) data.index = args.index;
-
-  const stat = await fs.stat(args.file);
-
-  const formData = new FormData();
-  formData.append('file', fs.createReadStream(args.file));
-
-  let res1;
-
-  try {
-    res1 = await ezunpaywall({
-      method: 'POST',
-      url: '/api/enrich/upload',
-      data: formData,
-      headers: formData.getHeaders(),
-      responseType: 'json',
-    });
-  } catch (err) {
-    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/enrich/upload - ${err}`);
-    process.exit(1);
-  }
-
-  const id = res1?.data?.id;
-  data.id = id;
-
-  try {
-    await ezunpaywall({
-      method: 'POST',
-      url: '/api/enrich/job',
-      data,
-      headers: {
-        'Content-length': stat.size,
-        'X-API-KEY': config.apikey,
-      },
-      responseType: 'json',
-    });
-  } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/job`);
-    logger.error(err);
-    process.exit(1);
-  }
-
-  let res2;
-
-  do {
-    res2 = await ezunpaywall({
-      method: 'GET',
-      url: `/api/enrich/state/${id}.json`,
-      responseType: 'json',
-    });
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  } while (!res2?.data?.state?.done);
-
-  let enrichedFile;
-
-  try {
-    enrichedFile = await ezunpaywall({
-      method: 'GET',
-      url: `/api/enrich/enriched/${id}.csv`,
-      responseType: 'stream',
-    });
-  } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}`);
-    logger.error(err);
-    process.exit(1);
-  }
-
-  // TODO await this and use process.exit(0) after that
-  const writer = fs.createWriteStream(out);
-  enrichedFile.data.pipe(writer);
 };
 
-/**
- * start a jsonl file enrichment
- * @param {string} args.file -f --file <file> - file which must be enriched
- * @param {string} args.attributes -a --attributes <attributes> - attributes which must be enriched
- * in graphql format. By default, all attributes are added
- *
- * @param {string} args.out -o --out <out> - name of enriched file
- * @param {boolean} args.verbose -v --verbose - logs how much lines are enriched
- * @param {boolean} args.use -u --use <use> - pathfile of custom config
- */
-const enrichJSON = async (args) => {
-  const config = await getConfig(args.use);
-  const ezunpaywall = await connection();
-
-  if (!args.file) {
-    logger.error('file expected');
-    process.exit(1);
-  }
-
-  const file = path.resolve(args.file);
-  const fileExist = await fs.pathExists(file);
-
-  if (!fileExist) {
-    logger.error('file not found');
-    process.exit(1);
-  }
-
-  const ext = path.extname(file).substring(1);
-  if (ext !== 'jsonl' && ext !== 'ndjson' && ext !== 'json') {
-    logger.error(`${ext} is not suported for enrichJSON. What is require are .ndjson, .json, .jsonl`);
-    process.exit(1);
-  }
-
-  const out = args.out || 'out.jsonl';
-
-  const data = {
-    type: 'jsonl',
-  };
-
-  if (args.attributes) data.args = args.attributes;
-  if (args.index) data.index = args.index;
-
-  const stat = await fs.stat(args.file);
-
-  const formData = new FormData();
-  formData.append('file', fs.createReadStream(args.file));
-
-  let res1;
-
-  try {
-    res1 = await ezunpaywall({
-      method: 'POST',
-      url: '/api/enrich/upload',
-      data: formData,
-      headers: formData.getHeaders(),
-      responseType: 'json',
-    });
-  } catch (err) {
-    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/enrich/upload - ${err}`);
-    process.exit(1);
-  }
-
-  const id = res1?.data?.id;
-  data.id = id;
-
-  try {
-    await ezunpaywall({
-      method: 'POST',
-      url: '/api/enrich/job',
-      data,
-      headers: {
-        'Content-length': stat.size,
-        'X-API-KEY': config.apikey,
-      },
-      responseType: 'json',
-    });
-  } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/job`);
-    logger.error(err);
-    process.exit(1);
-  }
-
-  let res2;
-
-  do {
-    res2 = await ezunpaywall({
-      method: 'GET',
-      url: `/api/enrich/state/${id}.json`,
-      responseType: 'json',
-    });
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  } while (!res2?.data?.state?.done);
-
-  let enrichedFile;
-
-  try {
-    enrichedFile = await ezunpaywall({
-      method: 'GET',
-      url: `/api/enrich/enriched/${id}.jsonl`,
-      responseType: 'stream',
-    });
-  } catch (err) {
-    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/enrich/enriched/${id}.jsonl - ${err}`);
-    process.exit(1);
-  }
-
-  const writer = fs.createWriteStream(out);
-  enrichedFile.data.pipe(writer);
-};
-
-module.exports = {
-  enrichCSV,
-  enrichJSON,
-};
+module.exports = enrich;

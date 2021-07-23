@@ -6,13 +6,10 @@ const logger = require('../../lib/logger');
 
 /**
  * get list of snapshot installed in ezunpaywall
- * @param {object} axios - axios
- * @param {object} config - config
  * @returns {array<string>} array of name of snapshot
  */
 const getSnapshots = async () => {
   const ezunpaywall = await connection();
-
   let res;
   try {
     res = await ezunpaywall({
@@ -20,222 +17,270 @@ const getSnapshots = async () => {
       url: '/api/update/snapshot',
     });
   } catch (err) {
-    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/update/snapshot - ${err}`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/snapshot`);
+    logger.error(err);
     process.exit(1);
   }
   return res?.data || [];
 };
 
 /**
+ * get list of states in ezunpaywall
+ * @returns {array<string>} array of name of snapshot
+ */
+const getState = async (file, latest) => {
+  const ezunpaywall = await connection();
+  let res;
+  try {
+    res = await ezunpaywall({
+      method: 'GET',
+      params: {
+        latest: !!latest,
+      },
+      url: `/api/update/state${file ? `/${file}` : ''}`,
+    });
+  } catch (err) {
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/state`);
+    logger.error(err);
+    process.exit(1);
+  }
+  return res?.data || [];
+};
+
+/**
+ * get list of report in ezunpaywall
+ * @returns {array<string>} array of name of snapshot
+ */
+const getReport = async (file, latest) => {
+  const ezunpaywall = await connection();
+  let res;
+  try {
+    res = await ezunpaywall({
+      method: 'GET',
+      params: {
+        latest: !!latest,
+      },
+      url: `/api/update/report${file ? `/${file}` : ''}`,
+    });
+  } catch (err) {
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/report`);
+    logger.error(err);
+    process.exit(1);
+  }
+  return res?.data?.report || [];
+};
+
+/**
  * Starts an unpaywall data update process
  *
- * @param {string} args.file -f --file <file> - snapshot's file installed on ezunpaywall
- * @param {boolean} args.list -l --list - list of snapshot installed on ezunpaywall
- * @param {string} args.startDate -sd --startDate <starteDate> - start date to download and insert
+ * @param {string} options.file --file <file> - snapshot's file installed on ezunpaywall
+ * @param {boolean} options.list -L --list - list of snapshot installed on ezunpaywall
+ * @param {string} options.startDate --startDate <starteDate> - start date to download and insert
  * updates from unpaywall
- * @param {string} args.endDate -ed --endDate <endDate> - end date to download
+ * @param {string} options.endDate -ed --endDate <endDate> - end date to download
  * and insert updates from unpaywall
- * @param {string} args.offset -of --offset <offset> - line where processing will start
- * @param {string} args.limit -li --limit <limit> - line where processing will end
- * @param {string} args.use -u --use <use> - pathfile of custom config
+ * @param {string} options.offset --offset <offset> - line where processing will start
+ * @param {string} options.limit --limit <limit> - line where processing will end
+ * @param {string} options.use -U --use <use> - pathfile of custom config
  */
-const update = async (args) => {
-  const config = await getConfig(args.use);
+const update = async (command, options) => {
+  const config = await getConfig(options.use);
   const ezunpaywall = await connection();
 
-  if (args.list) {
-    if (args.startDate) {
-      logger.error('option --startDate is impossible to use with --list');
+  if (command === 'job') {
+    if (options.filename) {
+      const pattern = /^[a-zA-Z0-9_.-]+(.gz)$/;
+      if (!pattern.test(options.filename)) {
+        logger.error('Only ".gz" files are accepted');
+        process.exit(1);
+      }
+    }
+
+    if (options.limit && options.offset) {
+      if (Number(options.limit) <= Number(options.offset)) {
+        logger.error('Limit cannot be low than offset or 0');
+        process.exit(1);
+      }
+    }
+
+    if (new Date(options.startDate).getTime() > Date.now()) {
+      logger.error('startDate cannot be in the futur');
       process.exit(1);
     }
-    if (args.endDate) {
-      logger.error('option --endDate is impossible to use with --list');
+
+    if (options.endDate && !options.startDate) {
+      logger.error('startDate is missing');
       process.exit(1);
     }
-    if (args.file) {
-      logger.error('option --list is impossible to use with --file');
+
+    if (options.startDate && options.endDate) {
+      if (new Date(options.endDate).getTime() < new Date(options.startDate).getTime()) {
+        logger.error('endDate cannot be lower than startDate');
+        process.exit(1);
+      }
+    }
+
+    const pattern = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
+
+    if (options.startDate && !pattern.test(options.startDate)) {
+      logger.error('startDate are in wrong format, required YYYY-mm-dd');
       process.exit(1);
     }
-  }
 
-  // check files and dates
-  if (args.file) {
-    if (args.startDate) {
-      logger.error('option --startDate is impossible to use with --file');
+    if (options.endDate && !pattern.test(options.endDate)) {
+      logger.error('endDate are in wrong format, required YYYY-mm-dd');
       process.exit(1);
     }
-    if (args.endDate) {
-      logger.error('option --endDate is impossible to use with --file');
-      process.exit(1);
+
+    if (!options.force) {
+      let latestSnapshotFromUnpaywall;
+
+      try {
+        latestSnapshotFromUnpaywall = await ezunpaywall({
+          method: 'get',
+          url: '/api/update/unpaywall/snapshot',
+          params: {
+            latest: true,
+          },
+        });
+        latestSnapshotFromUnpaywall = latestSnapshotFromUnpaywall?.data;
+      } catch (err) {
+        logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/unpaywall/snapshot`);
+        logger.error(err);
+        process.exit(1);
+      }
+
+      const report = await getReport('', true);
+
+      const task = report.steps.find((x) => x.task === 'insert');
+      if (task) {
+        if (latestSnapshotFromUnpaywall.filename === task.file && !report.error) {
+          logger.info(`No new update available from unpaywall, the last one has already been inserted at "${report.endAt}" with [${task.file}]`);
+          logger.info('You can reload it with options --force');
+          process.exit(0);
+        }
+      }
     }
-  }
 
-  // check date and lines limiter
-  if (args.offset && args.startDate) {
-    logger.error('option --offset is impossible to use with --startDate');
-    process.exit(1);
-  }
-  if (args.offset && args.endDate) {
-    logger.error('option --offset is impossible to use with --endDate');
-    process.exit(1);
-  }
-  if (args.limit && args.startDate) {
-    logger.error('option --endDate is impossible to use with --limit');
-    process.exit(1);
-  }
-  if (args.limit && args.endDate) {
-    logger.error('option --startDate is impossible to use with --limit');
-    process.exit(1);
-  }
-
-  // check if only endDate
-  if (args.endDate && !args.startDate) {
-    logger.error('option --endDate is impossible to use without --startDate');
-    process.exit(1);
-  }
-
-  // check format Date
-  const pattern = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
-  if (args.startDate && !pattern.test(args.startDate)) {
-    logger.error('startDate are in bad format, expected YYYY-mm-dd');
-    process.exit(1);
-  }
-  if (args.endDate && !pattern.test(args.endDate)) {
-    logger.error('endDate are in bad format, expected YYYY-mm-dd');
-    process.exit(1);
-  }
-  if (args.startDate && args.endDate) {
-    if (new Date(args.endDate).getTime() < new Date(args.startDate).getTime()) {
-      logger.error('end date is lower than start date');
-      process.exit(1);
+    if (options.list) {
+      const snapshots = await getSnapshots();
+      if (!snapshots.length) {
+        logger.info('No snapshots on ezunpaywall');
+        process.exit(0);
+      }
+      const snapshot = await inquirer.prompt([{
+        type: 'list',
+        pageSize: 5,
+        name: 'files',
+        choices: snapshots,
+        message: 'files',
+        default: snapshots.slice(),
+        source: (answersSoFar, input) => new Promise((resolve) => {
+          const result = snapshots.files
+            .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
+          resolve(result);
+        }),
+      }]);
+      options.file = snapshot.files;
     }
-  }
-  if (new Date(args.startDate).getTime() > Date.now()) {
-    logger.error('startDate is in the futur');
-    process.exit(1);
-  }
 
-  let res;
+    const data = {};
 
-  if (!args.force) {
-    let latestSnapshotFromUnpaywall;
+    if (options.file) data.filename = options.file;
+    if (options.offset) data.offset = options.offset;
+    if (options.limit) data.limit = options.limit;
+    if (options.startDate) data.startDate = options.startDate;
+    if (options.endDate) data.endDate = options.endDate;
+    if (options.index) data.index = options.index;
+
+    let res;
 
     try {
-      latestSnapshotFromUnpaywall = await ezunpaywall({
-        method: 'get',
-        url: '/api/update/unpaywall/snapshot',
-        params: {
-          latest: true,
-        },
+      res = await ezunpaywall({
+        method: 'post',
+        url: '/api/update/job',
+        data,
         headers: {
-          api_key: config.apikey,
+          'X-API-KEY': config.ezunpaywall.apikey,
         },
       });
-      latestSnapshotFromUnpaywall = latestSnapshotFromUnpaywall?.data;
     } catch (err) {
-      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/unpaywall/snapshot`);
+      if (err?.response?.status === 409) {
+        logger.warn(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/job - update in progress 409`);
+        process.exit(0);
+      }
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/job`);
       logger.error(err);
       process.exit(1);
     }
+    logger.info(res?.data?.message);
+  }
 
+  if (command === 'report') {
     let report;
-    try {
-      report = await ezunpaywall({
-        method: 'get',
-        url: '/api/update/report',
-        params: {
-          latest: true,
-        },
-        headers: {
-          api_key: config.apikey,
-        },
-      });
-      report = report?.data?.report;
-    } catch (err) {
-      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/state`);
-      logger.error(err);
-      process.exit(1);
+
+    if (options.list) {
+      const reports = await getReport('', '');
+      if (!reports.length) {
+        logger.info('No reports on ezunpaywall');
+        process.exit(0);
+      }
+      let filename;
+      filename = await inquirer.prompt([{
+        type: 'list',
+        pageSize: 5,
+        name: 'files',
+        choices: reports,
+        message: 'files',
+        default: reports.slice(),
+        source: (answersSoFar, input) => new Promise((resolve) => {
+          const result = reports.files
+            .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
+          resolve(result);
+        }),
+      }]);
+      filename = filename.files;
+
+      report = await getReport(filename, '');
+      console.log(JSON.stringify(report, null, 2));
+      process.exit(0);
     }
 
-    const task = report.steps.find((x) => x.task === 'insert');
+    if (options.file) {
+      report = await getReport(options.file, '');
+      console.log(JSON.stringify(report, null, 2));
+      process.exit(0);
+    }
 
-    if (latestSnapshotFromUnpaywall.filename === task.file && !report.error) {
-      logger.info(`No new update available from unpaywall, the last one has already been inserted at "${report.endAt}" with [${task.file}]`);
-      logger.info('You can reload it with args --force');
+    if (options.latest) {
+      report = await getReport('', true);
+      console.log(JSON.stringify(report, null, 2));
       process.exit(0);
     }
   }
 
-  if (args.status) {
+  if (command === 'status') {
+    let res;
     try {
       res = await ezunpaywall({
         method: 'get',
-        url: '/api/update/state',
-        headers: {
-          api_key: config.apikey,
-        },
+        url: '/api/update/status',
       });
     } catch (err) {
-      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/state`);
-      logger.error(err);
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/status`);
       process.exit(1);
     }
-    console.log(JSON.stringify(res?.data, null, 2));
-    logger.info('latest state');
-    process.exit(0);
-  }
-
-  const data = {};
-
-  if (args.list) {
-    const snapshots = await getSnapshots();
-    if (!snapshots.length) {
-      logger.info('No snapshots on ezunpaywall');
+    const status = res?.data?.inUpdate;
+    if (!status) {
+      logger.info('No update is in progress');
+      logger.info('Use ezu report --latest to see the latest report');
+    } else {
+      logger.info('An update is being done');
+      const state = await getState('', true);
+      console.log(JSON.stringify(state, null, 2));
       process.exit(0);
     }
-    const snapshot = await inquirer.prompt([{
-      type: 'list',
-      pageSize: 5,
-      name: 'files',
-      choices: snapshots,
-      message: 'files',
-      default: snapshots.slice(),
-      source: (answersSoFar, input) => new Promise((resolve) => {
-        const result = snapshots.files
-          .filter((file) => file.toLowerCase().includes(input.toLowerCase()));
-        resolve(result);
-      }),
-    }]);
-    args.file = snapshot.files;
   }
-
-  if (args.file) data.filename = args.file;
-  if (args.offset) data.offset = args.offset;
-  if (args.limit) data.limit = args.limit;
-  if (args.startDate) data.startDate = args.startDate;
-  if (args.endDate) data.endDate = args.endDate;
-  if (args.index) data.index = args.index;
-
-  try {
-    res = await ezunpaywall({
-      method: 'post',
-      url: '/api/update/job',
-      data,
-      headers: {
-        'X-API-KEY': config.apikey,
-      },
-    });
-  } catch (err) {
-    if (err?.response?.status === 409) {
-      logger.warn(`POST ${ezunpaywall.defaults.baseURL}/api/update/job - update in progress 409`);
-      process.exit(1);
-    }
-    logger.error(`POST ${ezunpaywall.defaults.baseURL}/api/update/job - ${err}`);
-    process.exit(1);
-  }
-  logger.info(res.data.message);
 };
 
-module.exports = {
-  update,
-};
+module.exports = update;

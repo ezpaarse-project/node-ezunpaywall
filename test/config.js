@@ -34,6 +34,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost',
           port: '8080',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -42,7 +43,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
@@ -64,6 +64,7 @@ describe('Test: command config', async () => {
           protocol: 'https',
           host: 'localhost',
           port: '8080',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -72,7 +73,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
@@ -89,6 +89,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost.test',
           port: '8080',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -97,7 +98,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
@@ -114,6 +114,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost',
           port: '3000',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -122,7 +123,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
@@ -139,6 +139,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost',
           port: '8080',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'https',
@@ -147,7 +148,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
@@ -164,6 +164,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost',
           port: '8080',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -172,7 +173,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
@@ -189,6 +189,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost',
           port: '8080',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -197,7 +198,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
@@ -214,6 +214,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost',
           port: '8080',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -222,7 +223,6 @@ describe('Test: command config', async () => {
           user: 'UserTest',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
@@ -239,6 +239,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost',
           port: '8080',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -247,14 +248,13 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'password',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);
     });
 
     it('Should update apikey on custom config', async () => {
-      await exec(`${ezu} config --set apikey keykey`);
+      await exec(`${ezu} config --set ezunpaywall.apikey keykey`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
@@ -264,6 +264,7 @@ describe('Test: command config', async () => {
           protocol: 'http',
           host: 'localhost',
           port: '8080',
+          apikey: 'keykey',
         },
         ezmeta: {
           protocol: 'http',
@@ -272,7 +273,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'keykey',
       };
 
       expect(config).be.eql(config2);
@@ -289,6 +289,7 @@ describe('Test: command config', async () => {
           protocol: 'https',
           host: 'localhost',
           port: '443',
+          apikey: 'admin',
         },
         ezmeta: {
           protocol: 'http',
@@ -297,7 +298,6 @@ describe('Test: command config', async () => {
           user: 'elastic',
           password: 'changeme',
         },
-        apikey: 'admin',
       };
 
       expect(config).be.eql(config2);

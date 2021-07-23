@@ -18,6 +18,7 @@ const setConfig = async () => {
       protocol: 'https',
       host: 'localhost',
       port: '443',
+      apikey: 'admin',
     },
     ezmeta: {
       protocol: 'http',
@@ -26,7 +27,6 @@ const setConfig = async () => {
       user: 'elastic',
       password: 'changeme',
     },
-    apikey: 'admin',
   };
 
   try {
@@ -55,15 +55,15 @@ const setConfig = async () => {
 const manageConfig = async (args) => {
   if (args.list) {
     console.log(`
-      --ezunpaywallProtocol <ezunpaywallProtocol> ezunpaywall protocol
-      --ezunpaywallHost <ezunpaywallHost> ezunpaywall host
-      --ezunpaywallPort <ezunpaywallPort> ezunpaywall port
-      --ezmetaHost <ezmetaHost> ezmeta host
-      --ezmetaURL <ezmetaURL> ezmeta url
-      --ezmetaPort <ezmetaPort> ezmeta port
-      --ezmetaUser <ezmetaUser> ezmeta user
-      --ezmetaPassword <ezmetaPassword> ezmeta password
-      --apikey <apikey> admin apikey`.trim().replace(/^\s*/gm, ''));
+      ezunpaywall.protocol
+      ezunpaywall.host
+      ezunpaywall.port
+      ezunpaywall.apikey
+      ezmeta.protocol
+      ezmeta.host
+      ezmeta.port
+      ezmeta.user
+      ezmeta.password`.trim().replace(/^\s*/gm, ''));
     process.exit(0);
   }
 
@@ -107,6 +107,4 @@ const manageConfig = async (args) => {
   process.exit(0);
 };
 
-module.exports = {
-  manageConfig,
-};
+module.exports = manageConfig;

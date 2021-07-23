@@ -11,6 +11,7 @@ const reset = async () => {
       protocol: 'http',
       host: 'localhost',
       port: '8080',
+      apikey: 'admin',
     },
     ezmeta: {
       protocol: 'http',
@@ -19,7 +20,6 @@ const reset = async () => {
       user: 'elastic',
       password: 'changeme',
     },
-    apikey: 'admin',
   };
 
   try {

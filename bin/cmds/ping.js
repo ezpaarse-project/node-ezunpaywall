@@ -8,13 +8,12 @@ const logger = require('../../lib/logger');
 /**
  * check if service is available
  *
- * @param {boolean} args.use -u --use - pathfile of custom config
+ * @param {boolean} options.use -u --use - pathfile of custom config
  */
-const ping = async (args) => {
-  const config = await getConfig(args.use);
+const ping = async (options) => {
+  const config = await getConfig(options.use);
 
   const ezunpaywall = await connection();
-  const ezmetaURL = `${config.ezmeta.protocol}://${config.ezmeta.host}:${config.ezmeta.port}`;
 
   try {
     await ezunpaywall({
@@ -22,10 +21,11 @@ const ping = async (args) => {
       url: '/api/graphql',
     });
   } catch (err) {
-    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/graphql - ${err}`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/graphql`);
+    logger.error(err);
     process.exit(1);
   }
-  logger.info('ping graphql service: OK');
+  logger.info('Ping graphql service: OK');
 
   try {
     await ezunpaywall({
@@ -33,11 +33,12 @@ const ping = async (args) => {
       url: '/api/update',
     });
   } catch (err) {
-    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/update - ${err}`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update`);
+    logger.error(err);
     process.exit(1);
   }
 
-  logger.info('ping update service: OK');
+  logger.info('Ping update service: OK');
 
   try {
     await ezunpaywall({
@@ -45,11 +46,12 @@ const ping = async (args) => {
       url: '/api/enrich',
     });
   } catch (err) {
-    logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/enrich - ${err}`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich`);
+    logger.error(err);
     process.exit(1);
   }
 
-  logger.info('ping enrich service: OK');
+  logger.info('Ping enrich service: OK');
 
   const client = new Client({
     node: {
@@ -66,12 +68,14 @@ const ping = async (args) => {
   try {
     ezmetaping = await client.ping();
   } catch (err) {
-    logger.error(`${ezmetaURL}/ping`);
+    logger.error(`Cannot request ${config.ezmeta.protocol}://${config.ezmeta.host}:${config.ezmeta.port}`);
+    logger.error(err);
     process.exit(1);
   }
 
   if (ezmetaping?.statusCode !== 200) {
-    logger.error(`${ezmetaURL} - ${ezmetaping?.statusCode}`);
+    logger.error(`Cannot request ${config.ezmeta.protocol}://${config.ezmeta.host}:${config.ezmeta.port}`);
+    logger.error(`code HTTP: ${ezmetaping?.statusCode}`);
     process.exit(1);
   }
 
@@ -79,6 +83,4 @@ const ping = async (args) => {
   process.exit(0);
 };
 
-module.exports = {
-  ping,
-};
+module.exports = ping;

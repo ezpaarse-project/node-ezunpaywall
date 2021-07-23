@@ -42,7 +42,7 @@ describe('Test: command enrich', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
 
-      await exec(`${ezu} enrichCSV -f ${filepath} -o ${enriched} -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
 
       let state;
       do {
@@ -60,7 +60,7 @@ describe('Test: command enrich', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file2.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
 
-      await exec(`${ezu} enrichCSV -f ${filepath} -o ${enriched} -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
 
       let state;
       do {
@@ -76,11 +76,11 @@ describe('Test: command enrich', async () => {
   });
 
   describe('Do a enrichment of a csv file with some unpaywall attributes (is_oa, best_oa_location.license, z_authors.family)', () => {
-    it('Should enrich the file on 3 lines with args {is_oa} and download it', async () => {
+    it('Should enrich the file on 3 lines with args { is_oa } and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
 
-      await exec(`${ezu} enrichCSV -f ${filepath} -o ${enriched} -a "{is_oa}" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{is_oa}" --index unpaywall-test`);
 
       let state;
       do {
@@ -98,7 +98,7 @@ describe('Test: command enrich', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
 
-      await exec(`${ezu} enrichCSV -f ${filepath} -o ${enriched} -a "{ best_oa_location { license } }" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ best_oa_location { license } }" --index unpaywall-test`);
 
       let state;
       do {
@@ -116,7 +116,7 @@ describe('Test: command enrich', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
 
-      await exec(`${ezu} enrichCSV -f ${filepath} -o ${enriched} -a "{ z_authors { given } }" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ z_authors { given } }" --index unpaywall-test`);
 
       let state;
       do {
@@ -134,7 +134,7 @@ describe('Test: command enrich', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
 
-      await exec(`${ezu} enrichCSV -f ${filepath} -o ${enriched} -a "{ is_oa, best_oa_location { license }, z_authors{ family } }" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }" --index unpaywall-test`);
 
       let state;
       do {
@@ -154,7 +154,7 @@ describe('Test: command enrich', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
 
-      await exec(`${ezu} enrichCSV -f ${filepath} -o ${enriched} -s ";" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --separator ";" --index unpaywall-test`);
 
       let state;
       do {
@@ -190,7 +190,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
 
-      await exec(`${ezu} enrichJSON -f ${filepath} -o ${enriched} -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
 
       let state;
       while (!state?.done) {
@@ -208,7 +208,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file2.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
 
-      await exec(`${ezu} enrichJSON -f ${filepath} -o ${enriched} -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
 
       let state;
       do {
@@ -222,11 +222,11 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       expect(same).to.be.equal(true);
     });
 
-    it('Should enrich the file on 3 lines with is_oa attributes and download it', async () => {
+    it('Should enrich the file on 3 lines with { is_oa } attributes and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
 
-      await exec(`${ezu} enrichJSON -f ${filepath} -o ${enriched} -a "{ is_oa }" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa }" --index unpaywall-test`);
 
       let state;
       do {
@@ -244,7 +244,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
 
-      await exec(`${ezu} enrichJSON -f ${filepath} -o ${enriched} -a "{ best_oa_location { license } }" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ best_oa_location { license } }" --index unpaywall-test`);
 
       let state;
       do {
@@ -262,7 +262,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
 
-      await exec(`${ezu} enrichJSON -f ${filepath} -o ${enriched} -a "{ z_authors { family } }" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ z_authors { family } }" --index unpaywall-test`);
 
       let state;
       do {
@@ -280,7 +280,7 @@ describe('Test: enrichment with a json file (command ezu)', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
 
-      await exec(`${ezu} enrichJSON -f ${filepath} -o ${enriched} -a "{ is_oa, best_oa_location { license }, z_authors{ family } }" -I unpaywall-test`);
+      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }" --index unpaywall-test`);
 
       let state;
       do {
