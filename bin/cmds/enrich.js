@@ -10,13 +10,12 @@ const logger = require('../../lib/logger');
 /**
  * start a csv file enrichment
  *
- * @param {string} options.file --file <file> - file which must be enriched
- * @param {string} options.attributes --attributes <attributes> - attributes which must be enriched
+ * @param {string} options.file --file <file> - File which must be enriched
+ * @param {string} options.attributes --attributes <attributes> - Attributes which must be enriched
  * in graphql format. By default, all attributes are added
- * @param {string} options.separator --separator <separator> - separator of csv out file
- * @param {string} options.out --out <out> - name of enriched file
- * @param {boolean} options.verbose -v --verbose - logs how much lines are enriched
- * @param {boolean} options.use --use <use> - pathfile of custom config
+ * @param {string} options.separator --separator <separator> - Separator of csv out file
+ * @param {string} options.out --out <out> - Name of enriched file
+ * @param {boolean} options.use --use <use> - filepath of custom config
  */
 const enrich = async (command, options) => {
   const config = await getConfig(options.use);

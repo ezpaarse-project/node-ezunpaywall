@@ -43,13 +43,8 @@ const setConfig = async () => {
 /**
  * config management command to establish the connection between the command and ezunpaywall
  *
- * @param {boolean} args.get -g --get - display the configuration
- * @param {boolean} args.set -s --set - initialize the configuration file in $HOME/.config
- * @param {string} args.ezunpaywallURL --ezunpaywallURL <ezunpaywallURL> - ezunpaywall url
- * @param {number} args.ezunpaywallPort --ezunpaywallPort <ezunpaywallPort> - ezunpaywall port
- * @param {string} args.ezmetaURL --ezmetalURL <ezmetalURL> - ezmetal url
- * @param {number} args.ezmetaPort --ezmetalPort <ezmetalPort> - ezmetal port
- * @param {string} args.apikey --apikey <apikey> - admin apikey
+ * @param {boolean} args.get -g --get - display configuration
+ * @param {boolean} args.set -s --set - update configuration file in $HOME/.config
  * @param {boolean} args.list -l --list - list of attributes required for configuration
  */
 const manageConfig = async (args) => {

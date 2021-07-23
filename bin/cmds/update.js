@@ -73,15 +73,15 @@ const getReport = async (file, latest) => {
 /**
  * Starts an unpaywall data update process
  *
- * @param {string} options.file --file <file> - snapshot's file installed on ezunpaywall
- * @param {boolean} options.list -L --list - list of snapshot installed on ezunpaywall
- * @param {string} options.startDate --startDate <starteDate> - start date to download and insert
+ * @param {string} options.filename --file <file> - Snapshot's file installed on ezunpaywall
+ * @param {boolean} options.list -L --list - List of snapshots installed on ezunpaywall
+ * @param {string} options.startDate --startDate <starteDate> - Start date to download and insert
  * updates from unpaywall
- * @param {string} options.endDate -ed --endDate <endDate> - end date to download
+ * @param {string} options.endDate -ed --endDate <endDate> - End date to download
  * and insert updates from unpaywall
- * @param {string} options.offset --offset <offset> - line where processing will start
- * @param {string} options.limit --limit <limit> - line where processing will end
- * @param {string} options.use -U --use <use> - pathfile of custom config
+ * @param {string} options.offset --offset <offset> - Line where processing will start
+ * @param {string} options.limit --limit <limit> - Line where processing will end
+ * @param {string} options.use -U --use <use> - Filepath of custom config
  */
 const update = async (command, options) => {
   const config = await getConfig(options.use);

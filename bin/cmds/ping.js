@@ -8,7 +8,7 @@ const logger = require('../../lib/logger');
 /**
  * check if service is available
  *
- * @param {boolean} options.use -u --use - pathfile of custom config
+ * @param {boolean} options.use -u --use - filepath of custom config
  */
 const ping = async (options) => {
   const config = await getConfig(options.use);

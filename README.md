@@ -315,10 +315,10 @@ Command
 ##### Parameters
 | Name | Description |
 | --- | --- |
-| --file | file which must be enriched |
-| --attributes | attributes which must be enriched (separeted by comma). By default, all attributes are added |
-| --separator | separator of out csv file |
-| --out | name of enriched file. By default, the output file is named: out.jsonl |
+| --file | File which must be enriched |
+| --attributes | Attributes which must be enriched in graphql format. By default, all attributes are added |
+| --separator | Separator of out csv file |
+| --out | Name of enriched file. By default, it's named: out.jsonl |
 | -I --index  | name of the index from which the data will be retrieved |
 | -U --use | use a custom config |
 ##### Examples
