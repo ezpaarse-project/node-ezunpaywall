@@ -64,7 +64,8 @@ const enrich = async (command, options) => {
         responseType: 'json',
       });
     } catch (err) {
-      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/upload - ${err}`);
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/upload`);
+      logger.error(err);
       process.exit(1);
     }
 
@@ -108,12 +109,14 @@ const enrich = async (command, options) => {
         responseType: 'stream',
       });
     } catch (err) {
-      logger.error(`GET ${ezunpaywall.defaults.baseURL}/api/enrich/enriched/${id}.${type} - ${err}`);
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/enriched/${id}.${type}`);
+      logger.error(err);
       process.exit(1);
     }
 
     const writer = fs.createWriteStream(out);
     enrichedFile.data.pipe(writer);
+    logger.info(`File enriched at ${path.resolve(out)}`);
   }
 };
 
