@@ -175,7 +175,7 @@ $ ezunpaywall update job --startDate 2020-04-27
 ```
 
 ```bash
-$ info: Dowload and insert snapshot from unpaywall from 2020-04-27 and ${date}
+$ info: Dowload and insert snapshot from unpaywall from 2020-04-27 and <Date of today>
 ```
 ---
 
