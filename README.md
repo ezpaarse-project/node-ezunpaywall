@@ -3,176 +3,342 @@
 **Table of content**
 - [Prerequisites](#prerequisites)
 - [Installation](#Installation)
-- [Global options](#Global-options)
-- [Command line usage](#Command-line-usage)
+- [Development](#Development)
 - [Commands](#Commands)
+  - [config](#config)
+  - [ping](#ping)
+  - [update](#update)
+  - [enrich](#enrich)
 - [Test](#Test)
 ## Prerequisites
 
 The tools you need to let node-ezunpaywall run are :
-* nvm
-* node 14.15.2
+* git >= 2.27.0
+* npm >= 6.14.8
+* NodeJS >= 14.15.0
 ## Installation
 
 ```bash
+$ git clone https://github.com/ezpaarse-project/node-ezunoaywall.git
+$ cd node-ezunoaywall
 $ npm i -g .
 ```
-## Global options
-| Name | Type | Description |
-| --- | --- | --- |
-| -V, --version | Boolean | Print the version number |
-| -h, --help | Boolean | Show some help |
+## Development
 
-You can get help for any command by typing `node-ezunpaywall <command> --help`.
-## Command line usage
-The module provides an `ezunpaywall` command (aliased `ezu`).
-## Commands
-### ezu config
-Update config to fetch ez-unpyawall.
-#### Parameters
-| Name | Description |
-| --- | --- |
-| -g --get | display the configuration |
-| -s --set | set a value to a config key in $HOME/.config |
-| -k --apikey | admin apikey |
-| -l --list | list of attributes required for configuration |
-#### Examples
 ```bash
-$ ezunpaywall config --set ezunpaywall.protocol https
-$ ezunpaywall config --set ezunpaywall.host localhost
-$ ezunpaywall config --set ezunpaywall.port 443
-$ ezunpaywall config --set ezmeta.protocol http
-$ ezunpaywall config --set ezmeta.host localhost
-$ ezunpaywall config --set ezmeta.port 9200
-$ ezunpaywall config --set ezmeta.user elastic
-$ ezunpaywall config --set ezmeta.password changeme
-$ ezunpaywall config --set apikey admin
+$ git clone https://github.com/ezpaarse-project/node-ezunpaywall.git
+$ cd node-ezunpaywall
+$ npm install
 ```
-### ezu ping
-Check if service is available.
+## Commands
 
+You can get help for any command by typing `ezu <command> --help`.
+
+The module provides an `ezunpaywall` command (aliased `ezu`).
+
+| Name | Description |
+| --- | --- |
+| config | Manage config |
+| ping | ping ezunpaywall services |
+| update | Load content of unpaywall snapshot in elastic | 
+| enrich | enrich file with ezunpaywall | 
+### config
+Manage config to fetch ezunpyawall.
 #### Parameters
 | Name | Description |
 | --- | --- |
-| -u --use | use a custom config |
+| --get | Get the configuration |
+| --set | Set a value to a config key in $HOME/.config |
+| -L --list | List of attributes required for configuration |
+#### Examples
+---
+```bash
+$ ezunpaywall config -L
+```
+```
+ezunpaywall.protocol
+ezunpaywall.host
+ezunpaywall.port
+ezunpaywall.apikey
+ezmeta.protocol
+ezmeta.host
+ezmeta.port
+ezmeta.user
+ezmeta.password
+```
+---
+```bash
+$ ezunpaywall config --set ezunpaywall.host localhost.test.fr
+```
+---
+```bash
+{
+  "ezunpaywall": {
+    "protocol": "https",
+    "host": "localhost.test.fr",
+    "port": "443"
+    "apikey": "admin"
+  },
+  "ezmeta": {
+    "protocol": "http",
+    "host": "localhost",
+    "port": "9200",
+    "user": "elastic",
+    "password": "changeme"
+  },
+}
+info: from /home/user/.config/.ezunpaywallrc
+```
+### ping
+Check if services are available.
+#### Parameters
+| Name | Description |
+| --- | --- |
+| -u --use | Use a custom config |
 #### Example
 ```bash
 $ ezunpaywall ping
 ```
-### ezu update
-Starts an unpaywall data update process. If you use command update without parameter, it will download the last update published by unpaywall and insert its content. For automated this, it is possible to call this command via a cron (unpaywall publishes an update every Thursday UTC-7).
-#### Parameters
+```bash
+info: Ping graphql service: OK
+info: Ping update service: OK
+info: Ping enrich service: OK
+info: ezmeta: OK
+```
+### update
+
+Command
+
 | Name | Description |
 | --- | --- |
-| -f --file | snapshot's file installed on ezunpaywall |
-| -s --startDate | start date to download and insert updates from unpaywall |
-| -e --endDate | end date to download and insert updates from unpaywall |
-| -o --offset | line where processing will start |
-| -l --limit | line where processing will end |
-| -L --list | list of snapshot installed on ezunpaywall |
-| -I --index  | name of the index to which the data is inserted |
-| -U --use | use a custom config |
-#### Examples
+| job | Start a update process |
+| status | Get status of process |
+| report | Get report |
+| | |
+#### job
+updates ezunpaywall data
+##### Parameters
+
+| Name | Description |
+| --- | --- |
+| --file | Snapshot's file installed on ezunpaywall |
+| --startDate | Start date to download and insert updates from unpaywall |
+| --endDate | End date to download and insert updates from unpaywall |
+| --offset | Line where processing will start |
+| --limit | Line where processing will end |
+| --force | Force reload |
+| -L --list | Get list of snapshot installed on ezunpaywall |
+| -I --index  | Name of the index to which the data is inserted |
+| -U --use | Use a custom config |
+| | |
+##### Examples
+---
 ```bash
-# insert the content of the selected file on list
-$ ezunpaywall update -l
-# insert the content between line 1 000 and 400 000 of the selected file on list
-$ ezunpaywall update -l -sl 1000 -el 400000
-# insert the content of fils.json.gz
-$ ezunpaywall update -f ./file.jsonl.gz 
-# insert the content between line 1 000 and 400 000 of fils.json.gz
-$ ezunpaywall update -f ./file.jsonl.gz -sl 1000 -el 400000
-# Downloads and inserts updates from unpaywall between 2020-04-27 and now
-$ ezunpaywall update -sd 2020-04-27
-# Downloads and inserts updates from unpaywall between 2020-04-27 and 2020-07-01 
-$ ezunpaywall update -sd 2020-04-27 -se 2020-07-01
+$ ezunpaywall update job
+```
+```bash
+$ info: Weekly update started
+```
+---
+```bash
+$ ezunpaywall update job -L
+```
+```bash
+$ ? files (Use arrow keys)
+  ❯ file1.jsonl.gz 
+    file2.jsonl.gz 
+    file3.jsonl.gz 
+```
+```bash
+$ info: Update with file1.jsonl.gz
+```
+---
+
+```bash
+$ ezunpaywall update job --file file1.jsonl.gz
 ```
 
-### ezu status
-indicates if there is an update.
-
-#### Parameters
-| Name | Description |
-| --- | --- |
-| -U --use | use a custom config |
-#### Example
+```bash
+$ info: Update with file1.jsonl.gz
+```
+---
+```bash
+$ ezunpaywall update job --file file1.jsonl.gz --offset 10 --limit 20
+```
 
 ```bash
-$ ezunpaywall status
+$ info: Update with file1.jsonl.gz
 ```
-### ezu reports
-Displays the contents of latest update report on ezunpaywall.
-#### Parameters
-| Name | Description |
-| --- | --- |
-| -f --file | report file installed on ezunpaywall |
-| -l --latest | get the latest report |
-| -s --status | status of report, success and error only accepted |
-| -L --list | list of reports generated by ezunpaywall |
-| -U --use | use a custom config |
-#### Examples
+---
 ```bash
-# display the latest report
-$ ezunpaywall report -la
-# display the latest success report
-$ ezunpaywall report -la -s success
-# display the latest error report
-$ ezunpaywall report -la -s error
-# display the list of reports
-$ ezunpaywall report -l
-# display the list of success reports
-$ ezunpaywall report -l -s success
-# display the list of error reports
-$ ezunpaywall report -l -s error
+$ ezunpaywall update job --startDate 2020-04-27
 ```
-### ezu enrichJSON
-Enriched a JSON file with attributes unpaywall.
-By default, if no attributes is informed, we enriched with all attributes.
-#### Parameters
+
+```bash
+$ info: Dowload and insert snapshot from unpaywall from 2020-04-27 and ${date}
+```
+---
+
+```bash
+$ ezunpaywall update job --startDate 2020-04-27
+```
+
+```bash
+$ info: Dowload and insert snapshot from unpaywall from 2020-04-27 and 2020-04-30
+```
+---
+
+#### status
+get the status of the running process
+
+##### Parameters
 | Name | Description |
 | --- | --- |
-| -f --file | file which must be enriched |
-| -a --attributes | attributes which must be enriched (separeted by comma). By default, all attributes are added |
-| -o --out | name of enriched file. By default, the output file is named: out.jsonl |
-| -v --verbose | logs how much lines are enriched |
+| -U --use | Use a custom config |
+##### Example
+---
+```bash
+$ ezu update status
+```
+
+```bash
+$ info: An update is being done
+{
+  "state": {
+    "done": false,
+    "createdAt": "2021-07-23T08:13:38.334Z",
+    "endAt": null,
+    "steps": [
+      {
+        "task": "askUnpaywall",
+        "took": 0.012,
+        "status": "success"
+      },
+      {
+        "task": "insert",
+        "file": "fake3.jsonl.gz",
+        "linesRead": 0,
+        "percent": 0,
+        "took": 0,
+        "status": "inProgress"
+      }
+    ],
+    "error": false
+  }
+}
+```
+
+or
+
+```bash
+$ info: No update is in progress
+$ info: Use ezu report --latest to see the latest report
+```
+---
+#### report
+get report of ezunpaywal data update.
+##### Parameters
+
+| Name | Description |
+| --- | --- |
+| --file | Name of report |
+| --latest | Get the latest report |
+| -L --list | List of reports |
+| -U --use | Use a custom config |
+##### Examples
+---
+```bash
+$ ezu update report -L
+```
+```bash
+? reports (Use arrow keys)
+❯ report1.json
+  report2.json
+  report3.json
+```
+```bash
+{
+  "done": true,
+  "createdAt": "2021-07-23T08:13:40.802Z",
+  "endAt": "2021-07-23T08:13:40.902Z",
+  "steps": [
+    {
+      "task": "insert",
+      "file": "fake1.jsonl.gz",
+      "linesRead": 50,
+      "percent": 100,
+      "took": 0.084,
+      "status": "success"
+    }
+  ],
+  "error": false,
+  "took": 0.100
+}
+```
+---
+```bash
+$ ezu update report --latest
+```
+```bash
+{
+  "done": true,
+  "createdAt": "2021-07-23T08:13:40.802Z",
+  "endAt": "2021-07-23T08:13:40.902Z",
+  "steps": [
+    {
+      "task": "insert",
+      "file": "fake1.jsonl.gz",
+      "linesRead": 50,
+      "percent": 100,
+      "took": 0.084,
+      "status": "success"
+    }
+  ],
+  "error": false,
+  "took": 0.100
+}
+```
+---
+### enrich
+Enriched a file with attributes unpaywall.
+By default, if no attributes is informed, it will enriched with all attributes.
+
+Command
+
+| Name | Description |
+| --- | --- |
+| job | Start a update process |
+| status (comming soon) | Get status of process |
+| | |
+
+#### job
+##### Parameters
+| Name | Description |
+| --- | --- |
+| --file | file which must be enriched |
+| --attributes | attributes which must be enriched (separeted by comma). By default, all attributes are added |
+| --separator | separator of out csv file |
+| --out | name of enriched file. By default, the output file is named: out.jsonl |
 | -I --index  | name of the index from which the data will be retrieved |
 | -U --use | use a custom config |
-#### Examples
-```bash
-# enrich a file with all unpaywall attributes
-$ ezunpaywall enricher -f ./pathOfFile.json
-# enrich a file with graphql argument { is_oa, best_oa_location { license } }
-$ ezunpaywall enricher -f ./pathOfFile.json -a "{ is_oa, best_oa_location { license } }"
-```
-### ezu enrichCSV
-Enriched a CSV file with attributes unpaywall
-by default, if no attributes is informed, we enriched with all attributes.
-#### Parameters
-| Name | Description |
-| --- | --- |
-| -f --file | file which must be enriched |
-| -a --attributes | attributes which must be enriched (separeted by comma). By default, all attributes are added |
-| -s --separator | separator of csv out file |
-| -o --out | name of enriched file. By default, the output file is named: out.csv |
-| -v --verbose | logs how much lines are enriched |
-| -I --index  | name of the index from which the data will be retrieved |
-| -U --use | use a custom config |
-#### Examples
-```bash
-# enrich a file with all attributes
-$ ezunpaywall enricher -f ./pathOfFile.csv
-# enrich a file with graphql argument { is_oa, best_oa_location { license } }
-$ ezunpaywall enricher -f ./pathOfFile.csv -a "{ is_oa, best_oa_location { license } }" -s ","
-```
+##### Examples
 
+---
+```bash
+$ ezu enrich job --file mustBeEnrich.csv --separator ";"
+```
+---
+```bash
+$ ezu enrich job --file mustBeEnrich.jsonl --separator ";" --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }"
+```
+---
+
+
+## Unpaywall structure
 To see all available unpaywall attributes, [click here](https://github.com/ezpaarse-project/ez-unpaywall/tree/master#object-structure).
 
 ## Test
-
-If you want to test all the commands, please install [ezunpaywall](https://github.com/ezpaarse-project/ez-unpaywall) and run it in [test mode](https://github.com/ezpaarse-project/ez-unpaywall#start)
-
-
-Once ezunpaywall has been launched in test mode, you can run at the root of the node-ezunpaywall repository
+Make sure you have [ezunpaywall](https://github.com/ezpaarse-project/ezunpaywall) start in dev mode
 
 ```bash
 $ npm run test
