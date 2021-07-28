@@ -19,6 +19,7 @@ const getState = async () => {
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/api/enrich/state `);
     logger.error(err);
+    process.exit(1);
   }
   return res?.body?.state;
 };

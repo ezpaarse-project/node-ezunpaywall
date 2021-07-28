@@ -5,6 +5,7 @@ const set = require('lodash.set');
 const has = require('lodash.has');
 
 const logger = require('../../lib/logger');
+const { exit } = require('process');
 
 /**
  * create a config file in /$HOME/.config/.ezunpaywallrc
@@ -34,6 +35,7 @@ const setConfig = async () => {
   } catch (err) {
     logger.error(`Cannot write ${JSON.stringify(config, null, 2)} in ${pathConfig}`);
     logger.error(err);
+    process.exit(1);
   }
 
   logger.info(JSON.stringify(config, null, 2));

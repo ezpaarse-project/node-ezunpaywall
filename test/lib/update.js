@@ -22,6 +22,7 @@ const deleteSnapshot = async (filename) => {
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/api/update/snapshot/${filename}`);
     logger.error(err);
+    process.exit(1);
   }
 };
 
@@ -38,6 +39,7 @@ const addSnapshot = async (filename) => {
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/api/update/snapshot`);
     logger.error(err);
+    process.exit(1);
   }
 };
 
@@ -51,6 +53,7 @@ const updateChangeFile = async () => {
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/changefiles`);
     logger.error(err);
+    process.exit(1);
   }
 };
 
@@ -65,6 +68,7 @@ const checkIfInUpdate = async () => {
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/api/update/status`);
     logger.error(err);
+    process.exit(1);
   }
   return res?.body?.inUpdate;
 };
@@ -80,6 +84,7 @@ const getState = async () => {
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/api/update/state`);
     logger.error(err);
+    process.exit(1);
   }
   return res?.body?.state;
 };

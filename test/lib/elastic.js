@@ -35,6 +35,7 @@ const checkIfIndexExist = async (name) => {
   } catch (err) {
     logger.error(`Cannot verify if ${name} index exist`);
     logger.error(err);
+    process.exit(1);
   }
   return res.body;
 };
@@ -53,6 +54,7 @@ const deleteIndex = async (name) => {
     } catch (err) {
       logger.error(`Cannot delete index ${name} exist`);
       logger.error(err);
+      process.exit(1);
     }
   }
 };
@@ -73,6 +75,7 @@ const createIndex = async (name, index) => {
     } catch (err) {
       logger.error(`Cannot create index ${name} exist`);
       logger.error(err);
+      process.exit(1);
     }
   }
 };
@@ -93,6 +96,7 @@ const countDocuments = async (name) => {
     } catch (err) {
       logger.error(`Cannot count documents on ${name} index`);
       logger.error(err);
+      process.exit(1);
     }
   }
   return data.body.count ? data.body.count : 0;
@@ -106,6 +110,7 @@ const insertDataUnpaywall = async () => {
   } catch (err) {
     logger.error(`Cannot readstream ${filepath}`);
     logger.error(err);
+    process.exit(1);
   }
 
   const rl = readline.createInterface({
@@ -126,6 +131,7 @@ const insertDataUnpaywall = async () => {
   } catch (err) {
     logger.error('Cannot bulk');
     logger.error(err);
+    process.exit(1);
   }
 };
 

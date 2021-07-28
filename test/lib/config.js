@@ -27,6 +27,7 @@ const reset = async () => {
   } catch (err) {
     logger.error(`Cannot write ${JSON.stringify(config, null, 2)} in ${pathConfig}`);
     logger.error(err);
+    process.exit(1);
   }
 };
 

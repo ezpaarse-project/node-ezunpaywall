@@ -41,13 +41,15 @@ program
   .option('--offset <offset>', 'line where processing will start')
   .option('--limit <limit>', 'line where processing will end')
   .option('--latest', 'line where processing will end')
+  .option('--date <date>', 'date of report')
+  .option('--verbose', 'display loadbar and exit if process end')
   .option('-L --list', 'list of snapshot installed on ezunpaywall')
   .option('-I --index <index>', 'name of the index to which the data is inserted')
   .option('-U --use <use>', 'use a custom config')
   .action((
     command,
     options,
-  ) => update(command, options));
+  ) => update(command, options).catch((err) => console.log(err)));
 
 program
   .command('enrich <command>')
