@@ -232,7 +232,7 @@ or
 
 ```bash
 $ info: No update is in progress
-$ info: Use ezu report --latest to see the latest report
+$ info: Use ezu update report --latest to see the latest report
 ```
 ---
 #### report
