@@ -4,9 +4,7 @@ const logger = require('../../lib/logger');
 
 chai.use(chaiHttp);
 
-
-
-const ezunpaywallURL = 'https://localhost';
+const ezunpaywallURL = 'http://localhost';
 
 /**
  * get state of enrich process

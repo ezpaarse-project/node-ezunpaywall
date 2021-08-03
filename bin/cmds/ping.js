@@ -13,11 +13,12 @@ const logger = require('../../lib/logger');
  */
 const ping = async (options) => {
   const config = await getConfig(options.use);
-
   const ezunpaywall = await connection();
 
+  let res;
+
   try {
-    await ezunpaywall({
+    res = await ezunpaywall({
       method: 'GET',
       url: '/api',
     });
@@ -27,6 +28,13 @@ const ping = async (options) => {
     process.exit(1);
   }
   logger.info('Ping graphql service: OK');
+
+  if (res?.data?.elastic !== 'Alive') {
+    logger.error('Cannot request elastic');
+    process.exit(1);
+  }
+
+  logger.info('ezmeta: OK');
 
   try {
     await ezunpaywall({
@@ -53,34 +61,6 @@ const ping = async (options) => {
   }
 
   logger.info('Ping enrich service: OK');
-
-  const client = new Client({
-    node: {
-      url: new URL(config.ezmeta.baseURL),
-      auth: {
-        username: config.ezmeta.user,
-        password: config.ezmeta.password,
-      },
-    },
-  });
-
-  let ezmetaping;
-
-  try {
-    ezmetaping = await client.ping();
-  } catch (err) {
-    logger.error(`Cannot request ${config.ezmeta.baseURL}`);
-    logger.error(err);
-    process.exit(1);
-  }
-
-  if (ezmetaping?.statusCode !== 200) {
-    logger.error(`Cannot request ${config.ezmeta.baseURL}`);
-    logger.error(`code HTTP: ${ezmetaping?.statusCode}`);
-    process.exit(1);
-  }
-
-  logger.info('ezmeta: OK');
   process.exit(0);
 };
 

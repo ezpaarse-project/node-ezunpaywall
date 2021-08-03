@@ -19,7 +19,7 @@ program.version(pkg.version);
 program
   .command('config')
   .description('config management command to establish the connection between the command and ezunpaywall')
-  .description('Example: ezu config --set ezunpaywall.baseURL https://localhost')
+  .description('Example: ezu config --set ezunpaywall.baseURL http://localhost')
   .option('-g --get', 'display the configuration')
   .option('-s --set <key> [value]', 'update config')
   .option('-L --list', 'list of attributes required for configuration')

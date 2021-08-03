@@ -262,7 +262,7 @@ const update = async (command, options) => {
         url: '/api/update/job',
         data,
         headers: {
-          'X-API-KEY': config.ezunpaywall.apikey,
+          'X-API-KEY': config.apikey,
         },
       });
     } catch (err) {

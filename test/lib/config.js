@@ -7,15 +7,8 @@ const reset = async () => {
   const pathConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
 
   const config = {
-    ezunpaywall: {
-      baseURL: 'https://localhost:443',
-      apikey: 'admin',
-    },
-    ezmeta: {
-      baseURL: 'http://localhost:9200',
-      user: 'elastic',
-      password: 'changeme',
-    },
+    baseURL: 'http://localhost',
+    apikey: 'admin',
   };
 
   try {

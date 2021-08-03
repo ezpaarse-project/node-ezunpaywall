@@ -56,28 +56,18 @@ Manage config to fetch ezunpyawall.
 $ ezunpaywall config -L
 ```
 ```
-ezunpaywall.baseURL
-ezunpaywall.apikey
-ezmeta.baseURL
-ezmeta.user
-ezmeta.password
+baseURL
+apikey
 ```
 ---
 ```bash
-$ ezunpaywall config --set ezunpaywall.baseURL https://localhost.test.fr
+$ ezunpaywall config --set baseURL https://localhost.test.fr
 ```
 ---
 ```bash
 {
-  "ezunpaywall": {
-    "baseURL": "https://localhost.test.fr",
-    "apikey": "admin"
-  },
-  "ezmeta": {
-    "baseURL": "http://localhost:9200",
-    "user": "elastic",
-    "password": "changeme"
-  },
+  "baseURL": "https://localhost.test.fr",
+  "apikey": "admin"
 }
 info: from /home/user/.config/.ezunpaywallrc
 ```

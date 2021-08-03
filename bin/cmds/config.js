@@ -14,15 +14,8 @@ const setConfig = async () => {
   const pathConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
 
   const config = {
-    ezunpaywall: {
-      baseURL: 'https://localhost:443',
-      apikey: 'admin',
-    },
-    ezmeta: {
-      baseURL: 'http://localhost:9200',
-      user: 'elastic',
-      password: 'changeme',
-    },
+    baseURL: 'http://localhost',
+    apikey: 'admin',
   };
 
   try {
@@ -48,10 +41,7 @@ const manageConfig = async (args) => {
   if (args.list) {
     console.log(`
       ezunpaywall.baseURL
-      ezunpaywall.apikey
-      ezmeta.baseURL
-      ezmeta.user
-      ezmeta.password`.trim().replace(/^\s*/gm, ''));
+      ezunpaywall.apikey`.trim().replace(/^\s*/gm, ''));
     process.exit(0);
   }
 

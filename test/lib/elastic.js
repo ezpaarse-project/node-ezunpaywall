@@ -141,6 +141,6 @@ module.exports = {
   deleteIndex,
   countDocuments,
   checkIfIndexExist,
-  client,
   insertDataUnpaywall,
+  client,
 };

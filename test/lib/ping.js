@@ -6,7 +6,7 @@ const { client } = require('./elastic');
 
 chai.use(chaiHttp);
 
-const ezunpaywallURL = 'https://localhost';
+const ezunpaywallURL = 'http://localhost';
 const fakeUnpaywallURL = 'http://localhost:12000';
 
 const ping = async () => {
@@ -17,9 +17,10 @@ const ping = async () => {
     try {
       res = await chai.request(ezunpaywallURL).get('/api/');
     } catch (err) {
-      logger.err(`Cannot ping ${ezunpaywallURL}/api/graphql/`);
-      logger.err(err);
+      logger.error(`Cannot ping ${ezunpaywallURL}/api/graphql/`);
+      logger.error(err);
     }
+    console.log(ezunpaywallURL + '/api/');
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
@@ -30,8 +31,8 @@ const ping = async () => {
     try {
       res = await chai.request(ezunpaywallURL).get('/api/update/');
     } catch (err) {
-      logger.err(`Cannot ping ${ezunpaywallURL}/api/update/`);
-      logger.err(err);
+      logger.error(`Cannot ping ${ezunpaywallURL}/api/update/`);
+      logger.error(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -43,8 +44,8 @@ const ping = async () => {
     try {
       res = await chai.request(ezunpaywallURL).get('/api/enrich/');
     } catch (err) {
-      logger.err(`Cannot ping ${ezunpaywallURL}/api/enrich/`);
-      logger.err(err);
+      logger.error(`Cannot ping ${ezunpaywallURL}/api/enrich/`);
+      logger.error(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -56,8 +57,8 @@ const ping = async () => {
     try {
       res = await chai.request(fakeUnpaywallURL).get('/');
     } catch (err) {
-      logger.err(`Cannot ping ${fakeUnpaywallURL}/`);
-      logger.err(err);
+      logger.error(`Cannot ping ${fakeUnpaywallURL}/`);
+      logger.error(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
@@ -69,8 +70,8 @@ const ping = async () => {
     try {
       res = await client.ping();
     } catch (err) {
-      logger.err('Cannot ping elatic');
-      logger.err(err);
+      logger.error('Cannot ping elatic');
+      logger.error(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
