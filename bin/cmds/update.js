@@ -306,7 +306,6 @@ const update = async (command, options) => {
       }]);
       filename = filename.files;
 
-      console.log(filename);
       report = await getReport(filename, {});
       console.log(JSON.stringify(report, null, 2));
       process.exit(0);
@@ -351,6 +350,7 @@ const update = async (command, options) => {
     if (!status) {
       logger.info('No update is in progress');
       logger.info('Use ezu update report --latest to see the latest report');
+      process.exit(0);
     } else {
       logger.info('An update is being done');
       if (options.verbose) {

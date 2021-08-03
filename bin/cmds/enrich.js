@@ -47,8 +47,6 @@ const enrich = async (command, options) => {
     if (options.attributes) data.args = options.attributes;
     if (options.index) data.index = options.index;
 
-    console.log(options.attributes);
-
     const stat = await fs.stat(options.file);
 
     const formData = new FormData();
