@@ -5,7 +5,6 @@ const set = require('lodash.set');
 const has = require('lodash.has');
 
 const logger = require('../../lib/logger');
-const { exit } = require('process');
 
 /**
  * create a config file in /$HOME/.config/.ezunpaywallrc
@@ -16,15 +15,11 @@ const setConfig = async () => {
 
   const config = {
     ezunpaywall: {
-      protocol: 'https',
-      host: 'localhost',
-      port: '443',
+      baseURL: 'https://localhost:443',
       apikey: 'admin',
     },
     ezmeta: {
-      protocol: 'http',
-      host: 'localhost',
-      port: '9200',
+      baseURL: 'http://localhost:9200',
       user: 'elastic',
       password: 'changeme',
     },
@@ -52,13 +47,9 @@ const setConfig = async () => {
 const manageConfig = async (args) => {
   if (args.list) {
     console.log(`
-      ezunpaywall.protocol
-      ezunpaywall.host
-      ezunpaywall.port
+      ezunpaywall.baseURL
       ezunpaywall.apikey
-      ezmeta.protocol
-      ezmeta.host
-      ezmeta.port
+      ezmeta.baseURL
       ezmeta.user
       ezmeta.password`.trim().replace(/^\s*/gm, ''));
     process.exit(0);
@@ -104,4 +95,7 @@ const manageConfig = async (args) => {
   process.exit(0);
 };
 
-module.exports = manageConfig;
+module.exports = {
+  manageConfig,
+  setConfig,
+};

@@ -33,7 +33,7 @@ const getState = async (file, latest) => {
     logger.error(err);
     process.exit(1);
   }
-  return res?.data?.state || [];
+  return res?.data?.state || res?.data;
 };
 
 const verbose = async () => {
@@ -127,7 +127,7 @@ const getReport = async (file, query) => {
     process.exit(1);
   }
 
-  return res?.data || [];
+  return res?.data?.report || res?.data;
 };
 
 /**

@@ -128,6 +128,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
       }
 
       const report = JSON.parse(res?.stdout.trim());
+      console.log(report);
 
       expect(report).have.property('done').equal(true);
       expect(report).have.property('createdAt').to.not.equal(undefined);

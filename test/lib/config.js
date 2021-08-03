@@ -8,15 +8,11 @@ const reset = async () => {
 
   const config = {
     ezunpaywall: {
-      protocol: 'http',
-      host: 'localhost',
-      port: '8080',
+      baseURL: 'https://localhost:443',
       apikey: 'admin',
     },
     ezmeta: {
-      protocol: 'http',
-      host: 'localhost',
-      port: '9200',
+      baseURL: 'http://localhost:9200',
       user: 'elastic',
       password: 'changeme',
     },

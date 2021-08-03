@@ -4,7 +4,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 const program = require('commander');
 const pkg = require('../package.json');
 
-const manageConfig = require('./cmds/config');
+const { manageConfig } = require('./cmds/config');
 const ping = require('./cmds/ping');
 const update = require('./cmds/update');
 const enrich = require('./cmds/enrich');
@@ -19,7 +19,7 @@ program.version(pkg.version);
 program
   .command('config')
   .description('config management command to establish the connection between the command and ezunpaywall')
-  .description('Example: ezu config --set ezunpaywall.host localhost')
+  .description('Example: ezu config --set ezunpaywall.baseURL https://localhost')
   .option('-g --get', 'display the configuration')
   .option('-s --set <key> [value]', 'update config')
   .option('-L --list', 'list of attributes required for configuration')

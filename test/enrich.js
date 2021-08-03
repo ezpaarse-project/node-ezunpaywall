@@ -33,6 +33,7 @@ describe('Test: command enrich', async () => {
     await ping();
     await createIndex('unpaywall-test', indexUnpawall);
     await insertDataUnpaywall();
+
     const ndData = await countDocuments('unpaywall-test');
     expect(ndData).eq(50);
   });

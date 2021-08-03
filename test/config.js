@@ -23,6 +23,27 @@ describe('Test: command config', async () => {
       await reset();
     });
 
+    it('Should set default config on custom config', async () => {
+      await exec(`${ezu} config --set default`);
+
+      // TODO put customConfig path for from
+      const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
+
+      const config2 = {
+        ezunpaywall: {
+          baseURL: 'https://localhost:443',
+          apikey: 'admin',
+        },
+        ezmeta: {
+          baseURL: 'http://localhost:9200',
+          user: 'elastic',
+          password: 'changeme',
+        },
+      };
+
+      expect(config).be.eql(config2);
+    });
+
     it('Should display custom config', async () => {
       await exec(`${ezu} config`);
 
@@ -31,15 +52,11 @@ describe('Test: command config', async () => {
 
       const config2 = {
         ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '8080',
+          baseURL: 'https://localhost:443',
           apikey: 'admin',
         },
         ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9200',
+          baseURL: 'http://localhost:9200',
           user: 'elastic',
           password: 'changeme',
         },
@@ -53,23 +70,19 @@ describe('Test: command config', async () => {
     beforeEach(async () => {
       await reset();
     });
-    it('Should update ezunpaywall.protocol on custom config', async () => {
-      await exec(`${ezu} config --set ezunpaywall.protocol https`);
+    it('Should update ezunpaywall.baseURL on custom config', async () => {
+      await exec(`${ezu} config --set ezunpaywall.baseURL https://test.fr`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
 
       const config2 = {
         ezunpaywall: {
-          protocol: 'https',
-          host: 'localhost',
-          port: '8080',
+          baseURL: 'https://test.fr',
           apikey: 'admin',
         },
         ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9200',
+          baseURL: 'http://localhost:9200',
           user: 'elastic',
           password: 'changeme',
         },
@@ -78,23 +91,19 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezunpaywall.host on custom config', async () => {
-      await exec(`${ezu} config --set ezunpaywall.host localhost.test`);
+    it('Should update apikey on custom config', async () => {
+      await exec(`${ezu} config --set ezunpaywall.apikey keykey`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
 
       const config2 = {
         ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost.test',
-          port: '8080',
-          apikey: 'admin',
+          baseURL: 'https://localhost:443',
+          apikey: 'keykey',
         },
         ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9200',
+          baseURL: 'http://localhost:9200',
           user: 'elastic',
           password: 'changeme',
         },
@@ -103,98 +112,19 @@ describe('Test: command config', async () => {
       expect(config).be.eql(config2);
     });
 
-    it('Should update ezunpaywal.port on custom config', async () => {
-      await exec(`${ezu} config --set ezunpaywall.port 3000`);
+    it('Should update ezmeta.baseURL on custom config', async () => {
+      await exec(`${ezu} config --set ezmeta.baseURL http://test.fr`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
 
       const config2 = {
         ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '3000',
+          baseURL: 'https://localhost:443',
           apikey: 'admin',
         },
         ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9200',
-          user: 'elastic',
-          password: 'changeme',
-        },
-      };
-
-      expect(config).be.eql(config2);
-    });
-
-    it('Should update ezmeta.protocol on custom config', async () => {
-      await exec(`${ezu} config --set ezmeta.protocol https`);
-
-      // TODO put customConfig path for from
-      const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
-
-      const config2 = {
-        ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '8080',
-          apikey: 'admin',
-        },
-        ezmeta: {
-          protocol: 'https',
-          host: 'localhost',
-          port: '9200',
-          user: 'elastic',
-          password: 'changeme',
-        },
-      };
-
-      expect(config).be.eql(config2);
-    });
-
-    it('Should update ezmeta.host on custom config', async () => {
-      await exec(`${ezu} config --set ezmeta.host localhost.test`);
-
-      // TODO put customConfig path for from
-      const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
-
-      const config2 = {
-        ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '8080',
-          apikey: 'admin',
-        },
-        ezmeta: {
-          protocol: 'http',
-          host: 'localhost.test',
-          port: '9200',
-          user: 'elastic',
-          password: 'changeme',
-        },
-      };
-
-      expect(config).be.eql(config2);
-    });
-
-    it('Should update ezmeta.port on custom config', async () => {
-      await exec(`${ezu} config --set ezmeta.port 9201`);
-
-      // TODO put customConfig path for from
-      const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
-
-      const config2 = {
-        ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '8080',
-          apikey: 'admin',
-        },
-        ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9201',
+          baseURL: 'http://test.fr',
           user: 'elastic',
           password: 'changeme',
         },
@@ -211,15 +141,11 @@ describe('Test: command config', async () => {
 
       const config2 = {
         ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '8080',
+          baseURL: 'https://localhost:443',
           apikey: 'admin',
         },
         ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9200',
+          baseURL: 'http://localhost:9200',
           user: 'UserTest',
           password: 'changeme',
         },
@@ -236,15 +162,11 @@ describe('Test: command config', async () => {
 
       const config2 = {
         ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '8080',
+          baseURL: 'https://localhost:443',
           apikey: 'admin',
         },
         ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9200',
+          baseURL: 'http://localhost:9200',
           user: 'elastic',
           password: 'password',
         },
@@ -252,55 +174,9 @@ describe('Test: command config', async () => {
 
       expect(config).be.eql(config2);
     });
+  });
 
-    it('Should update apikey on custom config', async () => {
-      await exec(`${ezu} config --set ezunpaywall.apikey keykey`);
-
-      // TODO put customConfig path for from
-      const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
-
-      const config2 = {
-        ezunpaywall: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '8080',
-          apikey: 'keykey',
-        },
-        ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9200',
-          user: 'elastic',
-          password: 'changeme',
-        },
-      };
-
-      expect(config).be.eql(config2);
-    });
-
-    it('Should set default config on custom config', async () => {
-      await exec(`${ezu} config --set default`);
-
-      // TODO put customConfig path for from
-      const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
-
-      const config2 = {
-        ezunpaywall: {
-          protocol: 'https',
-          host: 'localhost',
-          port: '443',
-          apikey: 'admin',
-        },
-        ezmeta: {
-          protocol: 'http',
-          host: 'localhost',
-          port: '9200',
-          user: 'elastic',
-          password: 'changeme',
-        },
-      };
-
-      expect(config).be.eql(config2);
-    });
+  after(async () => {
+    await reset();
   });
 });

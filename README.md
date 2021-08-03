@@ -56,33 +56,25 @@ Manage config to fetch ezunpyawall.
 $ ezunpaywall config -L
 ```
 ```
-ezunpaywall.protocol
-ezunpaywall.host
-ezunpaywall.port
+ezunpaywall.baseURL
 ezunpaywall.apikey
-ezmeta.protocol
-ezmeta.host
-ezmeta.port
+ezmeta.baseURL
 ezmeta.user
 ezmeta.password
 ```
 ---
 ```bash
-$ ezunpaywall config --set ezunpaywall.host localhost.test.fr
+$ ezunpaywall config --set ezunpaywall.baseURL https://localhost.test.fr
 ```
 ---
 ```bash
 {
   "ezunpaywall": {
-    "protocol": "https",
-    "host": "localhost.test.fr",
-    "port": "443"
+    "baseURL": "https://localhost.test.fr",
     "apikey": "admin"
   },
   "ezmeta": {
-    "protocol": "http",
-    "host": "localhost",
-    "port": "9200",
+    "baseURL": "http://localhost:9200",
     "user": "elastic",
     "password": "changeme"
   },

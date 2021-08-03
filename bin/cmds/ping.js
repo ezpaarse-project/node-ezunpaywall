@@ -3,6 +3,7 @@ const { URL } = require('url');
 
 const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
+
 const logger = require('../../lib/logger');
 
 /**
@@ -18,10 +19,10 @@ const ping = async (options) => {
   try {
     await ezunpaywall({
       method: 'GET',
-      url: '/api/graphql',
+      url: '/api',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/graphql`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api`);
     logger.error(err);
     process.exit(1);
   }
@@ -55,7 +56,7 @@ const ping = async (options) => {
 
   const client = new Client({
     node: {
-      url: new URL(`${config.ezmeta.protocol}://${config.ezmeta.host}:${config.ezmeta.port}`),
+      url: new URL(config.ezmeta.baseURL),
       auth: {
         username: config.ezmeta.user,
         password: config.ezmeta.password,
@@ -68,13 +69,13 @@ const ping = async (options) => {
   try {
     ezmetaping = await client.ping();
   } catch (err) {
-    logger.error(`Cannot request ${config.ezmeta.protocol}://${config.ezmeta.host}:${config.ezmeta.port}`);
+    logger.error(`Cannot request ${config.ezmeta.baseURL}`);
     logger.error(err);
     process.exit(1);
   }
 
   if (ezmetaping?.statusCode !== 200) {
-    logger.error(`Cannot request ${config.ezmeta.protocol}://${config.ezmeta.host}:${config.ezmeta.port}`);
+    logger.error(`Cannot request ${config.ezmeta.baseURL}`);
     logger.error(`code HTTP: ${ezmetaping?.statusCode}`);
     process.exit(1);
   }

@@ -15,7 +15,7 @@ const ping = async () => {
   // graphql service
   while (res?.status !== 200) {
     try {
-      res = await chai.request(ezunpaywallURL).get('/api/graphql/');
+      res = await chai.request(ezunpaywallURL).get('/api/');
     } catch (err) {
       logger.err(`Cannot ping ${ezunpaywallURL}/api/graphql/`);
       logger.err(err);

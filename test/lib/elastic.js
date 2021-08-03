@@ -5,10 +5,11 @@ const path = require('path');
 const fs = require('fs-extra');
 const readline = require('readline');
 
+const { URL } = require('url');
+
 chai.use(chaiHttp);
 
 const { Client } = require('@elastic/elasticsearch');
-const { URL } = require('url');
 const logger = require('../../lib/logger');
 
 const client = new Client({
