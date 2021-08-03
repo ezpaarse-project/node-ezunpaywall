@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "author": "felixleo22",
+  "license": "CeCILL",
   "bin": {
     "ezunpaywall": "./bin/ezunpaywall",
     "ezu": "./bin/ezunpaywall"
@@ -11,8 +13,6 @@
     "precommit": "npm run lint",
     "test": "export NODE_TLS_REJECT_UNAUTHORIZED=0; mocha --timeout 5000"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@elastic/elasticsearch": "^7.9.0",
     "axios": "^0.20.0",
