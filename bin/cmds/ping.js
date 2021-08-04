@@ -1,6 +1,3 @@
-const { Client } = require('@elastic/elasticsearch');
-const { URL } = require('url');
-
 const { getConfig } = require('../../lib/config');
 const { connection } = require('../../lib/ezunpaywall');
 
