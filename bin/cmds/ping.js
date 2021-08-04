@@ -1,23 +1,67 @@
-const { connection, getConfig } = require('../../lib/axios');
+const { Client } = require('@elastic/elasticsearch');
+const { URL } = require('url');
+
+const { getConfig } = require('../../lib/config');
+const { connection } = require('../../lib/ezunpaywall');
+
 const logger = require('../../lib/logger');
 
-module.exports = {
-  ping: async (args) => {
-    const axios = await connection(args.use);
-    const config = await getConfig(args.use);
-    let res;
-    try {
-      res = await axios({
-        method: 'GET',
-        url: '/ping',
-      });
-    } catch (err) {
-      logger.error(`service unavailable ${config.url}:${config.port}`);
-      process.exit(1);
-    }
-    if (res?.data?.data === 'pong') {
-      logger.info(`service available ${config.url}:${config.port}`);
-      process.exit(0);
-    }
-  },
+/**
+ * check if service is available
+ *
+ * @param {boolean} options.use -u --use - filepath of custom config
+ */
+const ping = async (options) => {
+  const config = await getConfig(options.use);
+  const ezunpaywall = await connection();
+
+  let res;
+
+  try {
+    res = await ezunpaywall({
+      method: 'GET',
+      url: '/api',
+    });
+  } catch (err) {
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api`);
+    logger.error(err);
+    process.exit(1);
+  }
+  logger.info('Ping graphql service: OK');
+
+  if (res?.data?.elastic !== 'Alive') {
+    logger.error('Cannot request elastic');
+    process.exit(1);
+  }
+
+  logger.info('ezmeta: OK');
+
+  try {
+    await ezunpaywall({
+      method: 'GET',
+      url: '/api/update',
+    });
+  } catch (err) {
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update`);
+    logger.error(err);
+    process.exit(1);
+  }
+
+  logger.info('Ping update service: OK');
+
+  try {
+    await ezunpaywall({
+      method: 'GET',
+      url: '/api/enrich',
+    });
+  } catch (err) {
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich`);
+    logger.error(err);
+    process.exit(1);
+  }
+
+  logger.info('Ping enrich service: OK');
+  process.exit(0);
 };
+
+module.exports = ping;
