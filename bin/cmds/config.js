@@ -46,11 +46,12 @@ const manageConfig = async (args) => {
   }
 
   const configPath = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
-  const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
   if (!await fs.pathExists(configPath)) {
     await setConfig();
   }
+
+  const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
   if (args.get) {
     console.log(JSON.stringify(config, null, 2));
