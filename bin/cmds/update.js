@@ -105,29 +105,56 @@ const getSnapshots = async () => {
 };
 
 /**
- * get list of report in ezunpaywall
- * @returns {array<string>} array of name of snapshot
+ *
  */
-const getReport = async (file, query) => {
+const getReport = async (filename, query) => {
   const ezunpaywall = await connection();
   let res;
   try {
     res = await ezunpaywall({
       method: 'GET',
+      url: `/api/update/report/${filename}`,
       params: query,
-      url: `/api/update/report${file ? `/${file}` : ''}`,
     });
   } catch (err) {
     if (err?.response?.status === 404) {
-      logger.warn(`Report ${file || `${query.date}.json`} doesn't exist`);
+      logger.warn(`Report ${filename ? `${filename}.json ` : ''}doesn't exist, use --force to force update`);
       process.exit(0);
     }
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/report${file ? `/${file}` : ''}`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/report${filename ? `/${filename}` : ''}`);
+    logger.error(err);
+    process.exit(1);
+  }
+  return res?.data?.report;
+};
+
+/**
+ * get list of report in ezunpaywall
+ * @returns {array<string>} array of name of snapshot
+ */
+const getReports = async () => {
+  const ezunpaywall = await connection();
+  let res;
+
+  const allowNotFound = (status) => ((status >= 200 && status < 300) || status === 404);
+
+  try {
+    res = await ezunpaywall({
+      method: 'GET',
+      url: '/api/update/report',
+      validateStatus: allowNotFound,
+    });
+  } catch (err) {
+    if (err?.response?.status === 404) {
+      logger.warn('No report available');
+      process.exit(0);
+    }
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/report`);
     logger.error(err);
     process.exit(1);
   }
 
-  return res?.data?.report || res?.data;
+  return res?.data;
 };
 
 /**
@@ -148,7 +175,7 @@ const update = async (command, options) => {
   const ezunpaywall = await connection();
 
   if (command === 'job') {
-    if (options.fle) {
+    if (options.file) {
       const pattern = /^[a-zA-Z0-9_.-]+(.gz)$/;
       if (!pattern.test(options.file)) {
         logger.error('Only ".gz" files are accepted');
@@ -210,15 +237,39 @@ const update = async (command, options) => {
         process.exit(1);
       }
 
+      let snapshotsInstalled;
+
+      try {
+        snapshotsInstalled = await ezunpaywall({
+          method: 'get',
+          url: '/api/update/snapshot',
+          params: {
+            latest: true,
+          },
+        });
+      } catch (err) {
+        logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/unpaywall/snapshot`);
+        logger.error(err);
+        process.exit(1);
+      }
+
+      if (!snapshotsInstalled?.data) {
+        logger.warn('No snapshots are installed in ezunpaywall, it is recommended to install the large snapshot available every 6 months before launching the updates');
+        logger.warn('you can force the update with --force');
+        process.exit(0);
+      }
+
       const report = await getReport('', { latest: true });
 
-      const tasks = report.steps.filter((x) => x.task === 'insert');
-      const [task] = tasks.reverse();
-      if (task) {
-        if (latestSnapshotFromUnpaywall.filename === task.file && !report.error) {
-          logger.info(`No new update available from unpaywall, the last one has already been inserted at "${report.endAt}" with [${task.file}]`);
-          logger.info('You can reload it with options --force');
-          process.exit(0);
+      if (report) {
+        const tasks = report.steps.filter((x) => x.task === 'insert');
+        const [task] = tasks.reverse();
+        if (task) {
+          if (latestSnapshotFromUnpaywall.filename === task.file && !report.error) {
+            logger.info(`No new update available from unpaywall, the last one has already been inserted at "${report.endAt}" with [${task.file}]`);
+            logger.info('You can reload it with options --force');
+            process.exit(0);
+          }
         }
       }
     }
@@ -285,7 +336,7 @@ const update = async (command, options) => {
     let report;
 
     if (options.list) {
-      const reports = await getReport('', {});
+      const reports = await getReports();
       if (!reports.length) {
         logger.info('No reports on ezunpaywall');
         process.exit(0);
