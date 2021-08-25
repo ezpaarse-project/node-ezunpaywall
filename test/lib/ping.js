@@ -17,10 +17,9 @@ const ping = async () => {
     try {
       res = await chai.request(ezunpaywallURL).get('/api/');
     } catch (err) {
-      logger.error(`Cannot ping ${ezunpaywallURL}/api/graphql/`);
+      logger.error(`Cannot ping ${ezunpaywallURL}/api/`);
       logger.error(err);
     }
-    console.log(ezunpaywallURL + '/api/');
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
