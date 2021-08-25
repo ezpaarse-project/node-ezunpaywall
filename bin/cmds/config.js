@@ -25,8 +25,6 @@ const setConfig = async () => {
     logger.error(err);
     process.exit(1);
   }
-
-  logger.info(JSON.stringify(config, null, 2));
   logger.info(`configuration has been initialized in ${pathConfig}`);
 };
 
