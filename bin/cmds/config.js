@@ -58,6 +58,7 @@ const manageConfig = async (args) => {
   }
 
   if (args.set === 'default') {
+    console.log(JSON.stringify(config, null, 2));
     await setConfig();
     process.exit(0);
   }
