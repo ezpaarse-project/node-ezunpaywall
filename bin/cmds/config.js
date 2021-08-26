@@ -38,8 +38,8 @@ const setConfig = async () => {
 const manageConfig = async (args) => {
   if (args.list) {
     console.log(`
-      ezunpaywall.baseURL
-      ezunpaywall.apikey`.trim().replace(/^\s*/gm, ''));
+      baseURL
+      apikey`.trim().replace(/^\s*/gm, ''));
     process.exit(0);
   }
 
