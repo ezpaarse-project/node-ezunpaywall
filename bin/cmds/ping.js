@@ -17,7 +17,7 @@ const ping = async (options) => {
   try {
     res = await ezunpaywall({
       method: 'GET',
-      url: '/api',
+      url: '/api/',
     });
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api`);
@@ -36,7 +36,7 @@ const ping = async (options) => {
   try {
     await ezunpaywall({
       method: 'GET',
-      url: '/api/update',
+      url: '/api/update/',
     });
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update`);
@@ -49,7 +49,7 @@ const ping = async (options) => {
   try {
     await ezunpaywall({
       method: 'GET',
-      url: '/api/enrich',
+      url: '/api/enrich/',
     });
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich`);
