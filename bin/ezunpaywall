@@ -66,5 +66,3 @@ program
   ) => enrich(command, options));
 
 program.parse(process.argv);
-
-process.exit(0);

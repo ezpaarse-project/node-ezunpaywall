@@ -58,6 +58,38 @@ const ping = async (options) => {
   }
 
   logger.info('Ping enrich service: OK');
+
+  try {
+    await ezunpaywall({
+      method: 'GET',
+      url: '/api/auth/',
+    });
+  } catch (err) {
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/auth`);
+    logger.error(err);
+    process.exit(1);
+  }
+
+  logger.info('Ping auth service: OK');
+
+  let configApikey;
+
+  try {
+    configApikey = await ezunpaywall({
+      method: 'GET',
+      url: '/api/auth/config',
+      headers: {
+        'x-api-key': config.apikey,
+      },
+    });
+  } catch (err) {
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/auth/config`);
+    logger.error(err);
+    process.exit(1);
+  }
+
+  logger.info(`You have access to ${configApikey?.data?.config?.access.join(', ')} service(s)`);
+
   process.exit(0);
 };
 
