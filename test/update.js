@@ -31,7 +31,7 @@ const redColor = ['\x1B[31m', '\x1B[39m'];
 const error = `${redColor[0]}error${redColor[1]}`;
 
 describe('Test: insert the content of a file already installed on ezunpaywall', async () => {
-  describe('Do a classic insertion of a file already installed', () => {
+  describe('Do insertion of a file already installed', () => {
     before(async () => {
       await ping();
       await deleteSnapshot('fake1.jsonl.gz');
@@ -88,7 +88,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
     });
   });
 
-  describe('Do a classic insertion of a file already installed with parameter limit=10', () => {
+  describe('Do insertion of a file already installed with parameter limit=10', () => {
     before(async () => {
       await ping();
       await deleteSnapshot('fake1.jsonl.gz');
@@ -145,7 +145,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
     });
   });
 
-  describe('Do a classic insertion of a file already installed offset=40', () => {
+  describe('Do insertion of a file already installed offset=40', () => {
     before(async () => {
       await ping();
       await deleteSnapshot('fake1.jsonl.gz');
@@ -204,7 +204,7 @@ describe('Test: insert the content of a file already installed on ezunpaywall', 
 });
 
 describe('Test: weekly update', async () => {
-  describe('Do a classic weekly update', () => {
+  describe('Do weekly update', () => {
     before(async () => {
       await ping();
       await updateChangeFile();
@@ -218,7 +218,7 @@ describe('Test: weekly update', async () => {
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update job --index unpaywall-test --force`);
+        res = await exec(`${ezu} update job --interval week --index unpaywall-test --force`);
       } catch (err) {
         console.log(err);
       }
@@ -303,7 +303,7 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date2} --index unpaywall-test --force`);
+      const res = await exec(`${ezu} update job --startDate ${date2} --interval week --index unpaywall-test --force`);
       expect(res?.stdout.trim()).equal(`${info}: Dowload and insert snapshot from unpaywall from ${date2} and ${dateNow}`);
     });
 
@@ -375,7 +375,7 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date3} --endDate ${date2} --index unpaywall-test --force`);
+      const res = await exec(`${ezu} update job --startDate ${date3} --endDate ${date2} --interval week --index unpaywall-test --force`);
 
       expect(res?.stdout.trim()).equal(`${info}: Dowload and insert snapshot from unpaywall from ${date3} and ${date2}`);
     });
@@ -448,7 +448,7 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date5} --endDate ${date4} --force`);
+      const res = await exec(`${ezu} update job --startDate ${date5} --endDate ${date4} --interval week --force`);
       expect(res?.stdout.trim()).equal(`${info}: Dowload and insert snapshot from unpaywall from ${date5} and ${date4}`);
     });
 
@@ -467,7 +467,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Don't do a download and insert with endDate=${date1} only`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --endDate ${date1}`);
+        await exec(`${ezu} update job --endDate ${date1} --interval week`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate is missing`);
       }
@@ -477,7 +477,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe('Don\'t do a download and insert with startDate in the wrong format', () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate LookAtMyDab`);
+        await exec(`${ezu} update job --startDate LookAtMyDab --interval week`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
@@ -485,7 +485,7 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate 01-01-2000`);
+        await exec(`${ezu} update job --startDate 01-01-2000 --interval week`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
@@ -493,7 +493,7 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate 2000-50-50`);
+        await exec(`${ezu} update job --startDate 2000-50-50 --interval week`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
@@ -503,7 +503,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Don't download and insert between ${date2} and ${date3} because startDate=${date2} is superior than endDate=${date3}`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate ${date2} --endDate ${date3}`);
+        await exec(`${ezu} update job --startDate ${date2} --endDate ${date3} --interval week`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: endDate cannot be lower than startDate`);
       }
@@ -513,7 +513,7 @@ describe('Test: download and insert file from unpaywall between a period', async
   describe(`Don't download and insert with startDate=${tomorrow} because there can be no futuristic file`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate ${tomorrow}`);
+        await exec(`${ezu} update job --startDate ${tomorrow} --interval week`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate cannot be in the futur`);
       }
