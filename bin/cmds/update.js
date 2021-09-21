@@ -62,7 +62,7 @@ const verbose = async () => {
 
     if (latestStep?.status === 'inProgress') {
       while (latestStep?.percent !== 100) {
-        if (latestStep?.status !== 'inProgress') {
+        if (state?.error) {
           logger.error('process ended by error');
           process.exit(1);
         }
