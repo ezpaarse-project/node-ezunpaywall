@@ -88,8 +88,6 @@ const ping = async (options) => {
     process.exit(1);
   }
 
-  console.log(configApikey.data);
-
   logger.info(`You have access to ${configApikey?.data?.access.join(', ')} service(s)`);
 
   process.exit(0);
