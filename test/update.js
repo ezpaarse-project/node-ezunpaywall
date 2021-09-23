@@ -379,7 +379,6 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should return the process start', async () => {
       const res = await exec(`${ezu} update job --startDate ${date3} --endDate ${date2} --index unpaywall-test --interval week --force`);
-
       expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date3} and ${date2}`);
     });
 

@@ -62,6 +62,10 @@ const verbose = async () => {
 
     if (latestStep?.status === 'inProgress') {
       while (latestStep?.percent !== 100) {
+        if (state?.error) {
+          logger.error('process ended by error');
+          process.exit(1);
+        }
         try {
           state = await getState('', true);
         } catch (err) {
@@ -175,6 +179,14 @@ const update = async (command, options) => {
   const ezunpaywall = await connection();
 
   if (command === 'job') {
+    if (options.interval) {
+      const intervals = ['week', 'day'];
+      if (!intervals.includes(options.interval)) {
+        logger.error(`${options.interval} is not accepted, only 'week' and 'day' are accepted`);
+        process.exit(1);
+      }
+    }
+
     if (options.file) {
       const pattern = /^[a-zA-Z0-9_.-]+(.gz)$/;
       if (!pattern.test(options.file)) {
