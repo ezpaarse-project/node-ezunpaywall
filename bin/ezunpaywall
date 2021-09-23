@@ -39,6 +39,7 @@ program
   .option('--endDate <endDate>', 'end date to download and insert updates from unpaywall')
   .option('--offset <offset>', 'line where processing will start')
   .option('--limit <limit>', 'line where processing will end')
+  .option('--interval <interval>', 'week or day update')
   .option('--latest', 'latest report')
   .option('--date <date>', 'date of report')
   .option('--verbose', 'display loadbar and exit if process end')

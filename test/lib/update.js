@@ -46,10 +46,11 @@ const addSnapshot = async (filename) => {
 /**
  *
  */
-const updateChangeFile = async () => {
+const updateChangeFile = async (interval) => {
   try {
     await chai.request(fakeUnpaywall)
-      .patch('/changefiles');
+      .patch('/changefiles')
+      .query({ interval });
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/changefiles`);
     logger.error(err);

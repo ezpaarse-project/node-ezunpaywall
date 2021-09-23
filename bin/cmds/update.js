@@ -304,6 +304,7 @@ const update = async (command, options) => {
     if (options.startDate) data.startDate = options.startDate;
     if (options.endDate) data.endDate = options.endDate;
     if (options.index) data.index = options.index;
+    if (options.interval) data.interval = options.interval;
 
     let res;
 
