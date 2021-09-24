@@ -30,184 +30,11 @@ const info = `${greenColor[0]}info${greenColor[1]}`;
 const redColor = ['\x1B[31m', '\x1B[39m'];
 const error = `${redColor[0]}error${redColor[1]}`;
 
-describe('Test: insert the content of a file already installed on ezunpaywall', async () => {
-  describe('Do insertion of a file already installed', () => {
+describe('Day: test day update', async () => {
+  describe('Day: Do daily update', () => {
     before(async () => {
       await ping();
-      await deleteSnapshot('fake1.jsonl.gz');
-      await deleteIndex('unpaywall-test', indexUnpawall);
-      await createIndex('unpaywall-test', indexUnpawall);
-      await addSnapshot('fake1.jsonl.gz');
-    });
-
-    it('Should return the process start', async () => {
-      let res;
-      try {
-        res = await exec(`${ezu} update job --file fake1.jsonl.gz --index unpaywall-test --interval week --force`);
-      } catch (err) {
-        console.log(err);
-      }
-      expect(res?.stdout.trim()).equal(`${info}: Update with fake1.jsonl.gz`);
-    });
-
-    it('Should insert 50 data', async () => {
-      // wait for the update to finish
-      let isUpdate = true;
-      while (isUpdate) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        isUpdate = await checkIfInUpdate();
-      }
-      const count = await countDocuments('unpaywall-test');
-      expect(count).to.equal(50);
-    });
-
-    it('Should get report with all informations from the insertion', async () => {
-      // wait for the update to finish
-      let res;
-      try {
-        res = await exec(`${ezu} update report --latest`);
-      } catch (err) {
-        console.log(err);
-      }
-
-      const report = JSON.parse(res?.stdout.trim());
-
-      expect(report).have.property('done').equal(true);
-      expect(report).have.property('createdAt').to.not.equal(undefined);
-      expect(report).have.property('endAt').to.not.equal(undefined);
-      expect(report).have.property('steps').to.be.an('array');
-      expect(report).have.property('error').equal(false);
-      expect(report).have.property('took').to.not.equal(undefined);
-
-      expect(report.steps[0]).have.property('task').equal('insert');
-      expect(report.steps[0]).have.property('file').equal('fake1.jsonl.gz');
-      expect(report.steps[0]).have.property('percent').equal(100);
-      expect(report.steps[0]).have.property('linesRead').equal(50);
-      expect(report.steps[0]).have.property('took').to.not.equal(undefined);
-      expect(report.steps[0]).have.property('status').equal('success');
-    });
-  });
-
-  describe('Do insertion of a file already installed with parameter limit=10', () => {
-    before(async () => {
-      await ping();
-      await deleteSnapshot('fake1.jsonl.gz');
-      await deleteIndex('unpaywall-test', indexUnpawall);
-      await createIndex('unpaywall-test', indexUnpawall);
-      await addSnapshot('fake1.jsonl.gz');
-    });
-
-    it('Should return the process start', async () => {
-      let res;
-      try {
-        res = await exec(`${ezu} update job --file fake1.jsonl.gz --limit 10 --index unpaywall-test --interval week --force`);
-      } catch (err) {
-        console.log(err);
-      }
-      expect(res?.stdout.trim()).equal(`${info}: Update with fake1.jsonl.gz`);
-    });
-
-    it('Should insert 10 data', async () => {
-      // wait for the update to finish
-      let isUpdate = true;
-      while (isUpdate) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        isUpdate = await checkIfInUpdate();
-      }
-      const count = await countDocuments('unpaywall-test');
-      expect(count).to.equal(10);
-    });
-
-    it('Should get report with all informations from the insertion', async () => {
-      // wait for the update to finish
-      let res;
-      try {
-        res = await exec(`${ezu} update report --latest`);
-      } catch (err) {
-        console.log(err);
-      }
-
-      const report = JSON.parse(res?.stdout.trim());
-
-      expect(report).have.property('done').equal(true);
-      expect(report).have.property('createdAt').to.not.equal(undefined);
-      expect(report).have.property('endAt').to.not.equal(undefined);
-      expect(report).have.property('steps').to.be.an('array');
-      expect(report).have.property('error').equal(false);
-      expect(report).have.property('took').to.not.equal(undefined);
-
-      expect(report.steps[0]).have.property('task').equal('insert');
-      expect(report.steps[0]).have.property('file').equal('fake1.jsonl.gz');
-      expect(report.steps[0]).have.property('percent').equal(100);
-      expect(report.steps[0]).have.property('linesRead').equal(10);
-      expect(report.steps[0]).have.property('took').to.not.equal(undefined);
-      expect(report.steps[0]).have.property('status').equal('success');
-    });
-  });
-
-  describe('Do insertion of a file already installed offset=40', () => {
-    before(async () => {
-      await ping();
-      await deleteSnapshot('fake1.jsonl.gz');
-      await deleteIndex('unpaywall-test', indexUnpawall);
-      await createIndex('unpaywall-test', indexUnpawall);
-      await addSnapshot('fake1.jsonl.gz');
-    });
-
-    it('Should return the process start', async () => {
-      let res;
-      try {
-        res = await exec(`${ezu} update job --file fake1.jsonl.gz --offset 40 --index unpaywall-test --interval week --force`);
-      } catch (err) {
-        console.log(err);
-      }
-      expect(res?.stdout.trim()).equal(`${info}: Update with fake1.jsonl.gz`);
-    });
-
-    it('Should insert 10 data', async () => {
-      // wait for the update to finish
-      let isUpdate = true;
-      while (isUpdate) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        isUpdate = await checkIfInUpdate();
-      }
-      const count = await countDocuments('unpaywall-test');
-      expect(count).to.equal(10);
-    });
-
-    it('Should get report with all informations from the insertion', async () => {
-      // wait for the update to finish
-      let res;
-      try {
-        res = await exec(`${ezu} update report --latest`);
-      } catch (err) {
-        console.log(err);
-      }
-
-      const report = JSON.parse(res?.stdout.trim());
-
-      expect(report).have.property('done').equal(true);
-      expect(report).have.property('createdAt').to.not.equal(undefined);
-      expect(report).have.property('endAt').to.not.equal(undefined);
-      expect(report).have.property('steps').to.be.an('array');
-      expect(report).have.property('error').equal(false);
-      expect(report).have.property('took').to.not.equal(undefined);
-
-      expect(report.steps[0]).have.property('task').equal('insert');
-      expect(report.steps[0]).have.property('file').equal('fake1.jsonl.gz');
-      expect(report.steps[0]).have.property('percent').equal(100);
-      expect(report.steps[0]).have.property('linesRead').equal(50);
-      expect(report.steps[0]).have.property('took').to.not.equal(undefined);
-      expect(report.steps[0]).have.property('status').equal('success');
-    });
-  });
-});
-
-describe('Test: weekly update', async () => {
-  describe('Do weekly update', () => {
-    before(async () => {
-      await ping();
-      await updateChangeFile('week');
+      await updateChangeFile('day');
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteSnapshot('fake2.jsonl.gz');
       await deleteSnapshot('fake3.jsonl.gz');
@@ -218,11 +45,11 @@ describe('Test: weekly update', async () => {
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update job --index unpaywall-test --interval week --force`);
+        res = await exec(`${ezu} update job --index unpaywall-test --interval day --force`);
       } catch (err) {
         console.log(err);
       }
-      expect(res?.stdout.trim()).equal(`${info}: Weekly update started`);
+      expect(res?.stdout.trim()).equal(`${info}: Daily update started`);
     });
 
     it('Should insert 50 data', async () => {
@@ -274,7 +101,7 @@ describe('Test: weekly update', async () => {
   });
 });
 
-describe('Test: download and insert file from unpaywall between a period', async () => {
+describe('Day: download and insert file from unpaywall between a period', async () => {
   const now = Date.now();
   const oneDay = (1 * 24 * 60 * 60 * 1000);
 
@@ -282,19 +109,18 @@ describe('Test: download and insert file from unpaywall between a period', async
   const dateNow = new Date(now).toISOString().slice(0, 10);
   // yersterday
   const date1 = new Date(now - (1 * oneDay)).toISOString().slice(0, 10);
-  // yersterday - one week
-  const date2 = new Date(now - (8 * oneDay)).toISOString().slice(0, 10);
-  // yersterday - two weeks
-  const date3 = new Date(now - (15 * oneDay)).toISOString().slice(0, 10);
-  // theses dates are for test between a short period
-  const date4 = new Date(now - (4 * oneDay)).toISOString().slice(0, 10);
-  const date5 = new Date(now - (5 * oneDay)).toISOString().slice(0, 10);
+  // 2 days before
+  const date2 = new Date(now - (2 * oneDay)).toISOString().slice(0, 10);
+
+  // these dates are for test with dates on which no update file has been published from unpaywall
+  const date3 = new Date(now - (6 * oneDay)).toISOString().slice(0, 10);
+  const date4 = new Date(now - (7 * oneDay)).toISOString().slice(0, 10);
   const tomorrow = new Date(now + (1 * oneDay)).toISOString().slice(0, 10);
 
-  describe(`Do a download and insert between ${date2} and ${dateNow}`, async () => {
+  describe(`Day: do a download and insert between ${date2} and ${dateNow}`, async () => {
     before(async () => {
       await ping();
-      await updateChangeFile('week');
+      await updateChangeFile('day');
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteSnapshot('fake2.jsonl.gz');
       await deleteSnapshot('fake3.jsonl.gz');
@@ -303,12 +129,9 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date2} --index unpaywall-test --interval week --force`);
-      expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date2} and ${dateNow}`);
+      const res = await exec(`${ezu} update job --startDate ${date1} --index unpaywall-test --interval day --force`);
+      expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date1} and ${dateNow}`);
     });
-
-    console.log('date2', date2);
-    console.log('dateNow', dateNow);
 
     it('Should insert 150 data', async () => {
       // wait for the update to finish
@@ -366,10 +189,10 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe(`Do a download and insert between ${date3} and ${date2}`, () => {
+  describe(`Day: do a download and insert between ${date3} and ${date2}`, () => {
     before(async () => {
       await ping();
-      await updateChangeFile('week');
+      await updateChangeFile('day');
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteSnapshot('fake2.jsonl.gz');
       await deleteSnapshot('fake3.jsonl.gz');
@@ -378,8 +201,8 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date3} --endDate ${date2} --index unpaywall-test --interval week --force`);
-      expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date3} and ${date2}`);
+      const res = await exec(`${ezu} update job --startDate ${date2} --endDate ${date1} --index unpaywall-test --interval day --force`);
+      expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date2} and ${date1}`);
     });
 
     it('Should insert 2100 data', async () => {
@@ -438,10 +261,10 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe(`Don't download and insert between ${date5} and ${date4} because there is no file between these dates in ezunpaywall`, () => {
+  describe(`Day: don't download and insert between ${date4} and ${date3} because there is no file between these dates in ezunpaywall`, () => {
     before(async () => {
       await ping();
-      await updateChangeFile('week');
+      await updateChangeFile('day');
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteSnapshot('fake2.jsonl.gz');
       await deleteSnapshot('fake3.jsonl.gz');
@@ -450,8 +273,8 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date5} --endDate ${date4} --interval week --force`);
-      expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date5} and ${date4}`);
+      const res = await exec(`${ezu} update job --startDate ${date4} --endDate ${date3} --interval day --force`);
+      expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date4} and ${date3}`);
     });
 
     it('Should insert nothing', async () => {
@@ -466,20 +289,20 @@ describe('Test: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe(`Don't do a download and insert with endDate=${date1} only`, () => {
+  describe(`Day: don't do a download and insert with endDate=${date1} only`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --endDate ${date1} --interval week`);
+        await exec(`${ezu} update job --endDate ${date1} --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate is missing`);
       }
     });
   });
 
-  describe('Don\'t do a download and insert with startDate in the wrong format', () => {
+  describe('Day: don\'t do a download and insert with startDate in the wrong format', () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate LookAtMyDab --interval week`);
+        await exec(`${ezu} update job --startDate LookAtMyDab --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
@@ -487,7 +310,7 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate 01-01-2000 --interval week`);
+        await exec(`${ezu} update job --startDate 01-01-2000 --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
@@ -495,27 +318,27 @@ describe('Test: download and insert file from unpaywall between a period', async
 
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate 2000-50-50 --interval week`);
+        await exec(`${ezu} update job --startDate 2000-50-50 --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
     });
   });
 
-  describe(`Don't download and insert between ${date2} and ${date3} because startDate=${date2} is superior than endDate=${date3}`, () => {
+  describe(`Day: don't download and insert between ${date2} and ${date3} because startDate=${date2} is superior than endDate=${date3}`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate ${date2} --endDate ${date3} --interval week`);
+        await exec(`${ezu} update job --startDate ${date2} --endDate ${date3} --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: endDate cannot be lower than startDate`);
       }
     });
   });
 
-  describe(`Don't download and insert with startDate=${tomorrow} because there can be no futuristic file`, () => {
+  describe(`Day: don't download and insert with startDate=${tomorrow} because there can be no futuristic file`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate ${tomorrow} --interval week`);
+        await exec(`${ezu} update job --startDate ${tomorrow} --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate cannot be in the futur`);
       }
