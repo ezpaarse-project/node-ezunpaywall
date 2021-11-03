@@ -326,7 +326,7 @@ const update = async (command, options) => {
         url: '/api/update/job',
         data,
         headers: {
-          'X-API-KEY': config.apikey,
+          'x-api-key': config.apikey,
         },
       });
     } catch (err) {

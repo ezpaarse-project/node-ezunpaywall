@@ -9,6 +9,7 @@ const reset = async () => {
   const config = {
     baseURL: 'http://localhost',
     apikey: 'admin',
+    redisPassword: 'changeme',
   };
 
   try {

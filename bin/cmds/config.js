@@ -16,6 +16,7 @@ const setConfig = async () => {
   const config = {
     baseURL: 'http://localhost',
     apikey: 'admin',
+    redisPassword: 'changeme',
   };
 
   try {
@@ -39,7 +40,8 @@ const manageConfig = async (args) => {
   if (args.list) {
     console.log(`
       baseURL
-      apikey`.trim().replace(/^\s*/gm, ''));
+      apikey
+      redisPassword`.trim().replace(/^\s*/gm, ''));
     process.exit(0);
   }
 

@@ -34,7 +34,7 @@ const addSnapshot = async (filename) => {
   try {
     await chai.request(ezunpaywallURL)
       .post('/api/update/snapshot')
-      .set('X-API-KEY', 'admin')
+      .set('x-api-key', 'admin')
       .attach('file', path.resolve(snapshotsDir, filename), filename);
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/api/update/snapshot`);

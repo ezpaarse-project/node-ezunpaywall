@@ -8,6 +8,7 @@ const { manageConfig } = require('./cmds/config');
 const ping = require('./cmds/ping');
 const update = require('./cmds/update');
 const enrich = require('./cmds/enrich');
+const manageApiKey = require('./cmds/apikey');
 
 program.on('command:*', () => {
   console.error(`Invalid command: ${program.args.join(' ')}\nSee --help for a list of available commands.`);
@@ -20,7 +21,7 @@ program
   .command('config')
   .description('config management command to establish the connection between the command and ezunpaywall')
   .option('-g --get', 'display the configuration')
-  .option('-s --set <key> [value]', 'update config')
+  .option('-s --set <key> <value>', 'update config')
   .option('-L --list', 'list of attributes required for configuration')
   .action((options) => manageConfig(options));
 
@@ -66,5 +67,19 @@ program
     command,
     options,
   ) => enrich(command, options));
+
+program
+  .command('apikey <command>')
+  .description('manage apikey to access to ezunpaywall services')
+  .option('--keyname <keyname>', 'name of apikey')
+  .option('--access <access>', 'name of the services to which the owner of the key has access')
+  .option('--attributes <attributes>', 'name of the unpaywall attributes to which the owner of the key has access')
+  .option('--allowed <allowed>', 'indicates whether the key is authorized or not')
+  .option('--apikey <apikey>', 'indicates whether the key is authorized or not')
+  .option('--all', 'get all apikey')
+  .action((
+    command,
+    options,
+  ) => manageApiKey(command, options));
 
 program.parse(process.argv);

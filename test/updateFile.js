@@ -29,10 +29,13 @@ const info = `${greenColor[0]}info${greenColor[1]}`;
 const redColor = ['\x1B[31m', '\x1B[39m'];
 const error = `${redColor[0]}error${redColor[1]}`;
 
-describe('File: test insert the content of a file already installed on ezunpaywall', async () => {
-  describe('File: do insertion of a file already installed', () => {
+describe('Update: test insert the content of a file already installed on ezunpaywall', async () => {
+  before(async () => {
+    await ping();
+  });
+
+  describe('Update: do insertion of a file already installed', () => {
     before(async () => {
-      await ping();
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteIndex('unpaywall-test', indexUnpawall);
       await createIndex('unpaywall-test', indexUnpawall);
@@ -87,9 +90,8 @@ describe('File: test insert the content of a file already installed on ezunpaywa
     });
   });
 
-  describe('File: do insertion of a file already installed with parameter limit=10', () => {
+  describe('Update: do insertion of a file already installed with parameter limit=10', () => {
     before(async () => {
-      await ping();
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteIndex('unpaywall-test', indexUnpawall);
       await createIndex('unpaywall-test', indexUnpawall);
@@ -144,9 +146,8 @@ describe('File: test insert the content of a file already installed on ezunpaywa
     });
   });
 
-  describe('File: do insertion of a file already installed offset=40', () => {
+  describe('Update: do insertion of a file already installed offset=40', () => {
     before(async () => {
-      await ping();
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteIndex('unpaywall-test', indexUnpawall);
       await createIndex('unpaywall-test', indexUnpawall);

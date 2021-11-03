@@ -77,7 +77,7 @@ const enrich = async (command, options) => {
         data,
         headers: {
           'Content-length': stat.size,
-          'X-API-KEY': config.apikey,
+          'x-api-key': config.apikey,
         },
         responseType: 'json',
       });
