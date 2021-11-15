@@ -46,7 +46,7 @@ describe('Update: test day update', async () => {
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update job --index unpaywall-test --interval day --force`);
+        res = await exec(`${ezu} update-job --index unpaywall-test --interval day --force`);
       } catch (err) {
         console.log(err);
       }
@@ -68,7 +68,7 @@ describe('Update: test day update', async () => {
       // wait for the update to finish
       let res;
       try {
-        res = await exec(`${ezu} update report --latest`);
+        res = await exec(`${ezu} update-report --latest`);
       } catch (err) {
         console.log(err);
       }
@@ -129,7 +129,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date1} --index unpaywall-test --interval day --force`);
+      const res = await exec(`${ezu} update-job --startDate ${date1} --index unpaywall-test --interval day --force`);
       expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date1} and ${dateNow}`);
     });
 
@@ -146,7 +146,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
 
     it('Should get report with all informations from the insertion', async () => {
       // wait for the update to finish
-      const res = await exec(`${ezu} update report --latest`);
+      const res = await exec(`${ezu} update-report --latest`);
 
       const report = JSON.parse(res?.stdout.trim());
 
@@ -200,7 +200,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date2} --endDate ${date1} --index unpaywall-test --interval day --force`);
+      const res = await exec(`${ezu} update-job --startDate ${date2} --endDate ${date1} --index unpaywall-test --interval day --force`);
       expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date2} and ${date1}`);
     });
 
@@ -217,7 +217,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
 
     it('Should get report with all informations from the insertion', async () => {
       // wait for the update to finish
-      const res = await exec(`${ezu} update report --latest`);
+      const res = await exec(`${ezu} update-report --latest`);
 
       const report = JSON.parse(res?.stdout.trim());
 
@@ -271,7 +271,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
     });
 
     it('Should return the process start', async () => {
-      const res = await exec(`${ezu} update job --startDate ${date4} --endDate ${date3} --interval day --force`);
+      const res = await exec(`${ezu} update-job --startDate ${date4} --endDate ${date3} --interval day --force`);
       expect(res?.stdout.trim()).equal(`${info}: Download and insert snapshot from unpaywall from ${date4} and ${date3}`);
     });
 
@@ -290,7 +290,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
   describe(`Update: don't do a download and insert with endDate=${date1} only`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --endDate ${date1} --interval day`);
+        await exec(`${ezu} update-job --endDate ${date1} --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate is missing`);
       }
@@ -300,7 +300,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
   describe('Update: don\'t do a download and insert with startDate in the wrong format', () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate LookAtMyDab --interval day`);
+        await exec(`${ezu} update-job --startDate LookAtMyDab --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
@@ -308,7 +308,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
 
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate 01-01-2000 --interval day`);
+        await exec(`${ezu} update-job --startDate 01-01-2000 --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
@@ -316,7 +316,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
 
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate 2000-50-50 --interval day`);
+        await exec(`${ezu} update-job --startDate 2000-50-50 --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
       }
@@ -326,7 +326,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
   describe(`Update: don't download and insert between ${date2} and ${date3} because startDate=${date2} is superior than endDate=${date3}`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate ${date2} --endDate ${date3} --interval day`);
+        await exec(`${ezu} update-job --startDate ${date2} --endDate ${date3} --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: endDate cannot be lower than startDate`);
       }
@@ -336,7 +336,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
   describe(`Update: don't download and insert with startDate=${tomorrow} because there can be no futuristic file`, () => {
     it('Should return a error message', async () => {
       try {
-        await exec(`${ezu} update job --startDate ${tomorrow} --interval day`);
+        await exec(`${ezu} update-job --startDate ${tomorrow} --interval day`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: startDate cannot be in the futur`);
       }

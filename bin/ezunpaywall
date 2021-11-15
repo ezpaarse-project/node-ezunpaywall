@@ -6,9 +6,18 @@ const pkg = require('../package.json');
 
 const { manageConfig } = require('./cmds/config');
 const ping = require('./cmds/ping');
-const update = require('./cmds/update');
+const {
+  updateJob,
+  updateReport,
+  updateStatus,
+} = require('./cmds/update');
 const enrich = require('./cmds/enrich');
-const manageApiKey = require('./cmds/apikey');
+const {
+  apiKeyCreate,
+  apiKeyUpdate,
+  apiKeyDelete,
+  apiKeyGet,
+} = require('./cmds/apikey');
 
 program.on('command:*', () => {
   console.error(`Invalid command: ${program.args.join(' ')}\nSee --help for a list of available commands.`);
@@ -23,16 +32,16 @@ program
   .option('-g --get', 'display the configuration')
   .option('-s --set <key> <value>', 'update config')
   .option('-L --list', 'list of attributes required for configuration')
-  .action((options) => manageConfig(options));
+  .action((option) => manageConfig(option));
 
 program
   .command('ping')
   .description('check if service is available')
   .option('-U --use <use>', 'use a custom config')
-  .action((options) => ping(options));
+  .action((option) => ping(option));
 
 program
-  .command('update <command>')
+  .command('update-job')
   .description('start an unpaywall data update process')
   .option('--file <file>', 'snapshot\'s file installed on ezunpaywall')
   .option('--force', 'force update without check if is already installed')
@@ -40,20 +49,34 @@ program
   .option('--endDate <endDate>', 'end date to download and insert updates from unpaywall')
   .option('--offset <offset>', 'line where processing will start')
   .option('--limit <limit>', 'line where processing will end')
-  .option('--latest', 'latest report')
-  .option('--date <date>', 'date of report')
-  .option('--interval <interval>', 'interval of update')
-  .option('--verbose', 'display loadbar and exit if process end')
+  .option('--interval <interval>', 'interval of update (day or week)')
   .option('-L --list', 'list of snapshot installed on ezunpaywall')
   .option('-I --index <index>', 'name of the index to which the data is inserted')
-  .option('-U --use <use>', 'use a custom config')
   .action((
-    command,
-    options,
-  ) => update(command, options).catch((err) => console.log(err)));
+    option,
+  ) => updateJob(option).catch((err) => console.log(err)));
 
 program
-  .command('enrich <command>')
+  .command('update-report')
+  .description('get report of update process')
+  .option('--file <file>', 'snapshot\'s file installed on ezunpaywall')
+  .option('--latest', 'latest report')
+  .option('--date <date>', 'date of report')
+  .option('-L --list', 'list of reports on ezunpaywall')
+  .action((
+    option,
+  ) => updateReport(option).catch((err) => console.log(err)));
+
+program
+  .command('update-status')
+  .description('get status of update process')
+  .option('--verbose', 'snapshot\'s file installed on ezunpaywall')
+  .action((
+    option,
+  ) => updateStatus(option).catch((err) => console.log(err)));
+
+program
+  .command('enrich')
   .description('enrich file with unpaywall attributes')
   .option('--file <file>', 'sile which must be enriched')
   .option('--separator <separator>', 'separator of csv file')
@@ -63,22 +86,47 @@ program
   .option('-I --index <index>', 'name of the index from which the data will be retrieved')
   .option('-U --use <use>', 'use a custom config')
   .action((
-    command,
-    options,
-  ) => enrich(command, options));
+    option,
+  ) => enrich(option));
 
 program
-  .command('apikey <command>')
-  .description('manage apikey to access to ezunpaywall services')
+  .command('apikey-create')
+  .description('create new apikey')
   .option('--keyname <keyname>', 'name of apikey')
-  .option('--access <access>', 'name of the services to which the owner of the key has access')
-  .option('--attributes <attributes>', 'name of the unpaywall attributes to which the owner of the key has access')
-  .option('--allowed <allowed>', 'indicates whether the key is authorized or not')
-  .option('--apikey <apikey>', 'indicates whether the key is authorized or not')
+  .option('--access <access>', 'name of access services of apikey seperated by comma. By default it set at [\'graphql\']')
+  .option('--attributes <attributes>', 'unpaywall attributes seperated apikey seperated by comma. By default it set at \'*\'')
+  .option('--allowed <allowed>', ' indicates if the key is authorized or not. "true" or "false" only. By default it set at true')
+  .action((
+    option,
+  ) => apiKeyCreate(option).catch((err) => console.log(err)));
+
+program
+  .command('apikey-update')
+  .description('update apikey')
+  .option('--apikey <apikey>', 'apikey')
+  .option('--keyname <keyname>', 'name of apikey')
+  .option('--access <access>', 'name of access services of apikey seperated by comma')
+  .option('--attributes <attributes>', 'unpaywall attributes seperated apikey seperated by comma')
+  .option('--allowed <allowed>', 'indicates if the key is authorized or not. "true" or "false" only')
+  .action((
+    option,
+  ) => apiKeyUpdate(option).catch((err) => console.log(err)));
+
+program
+  .command('apikey-delete')
+  .description('delete apikey')
+  .option('--apikey <apikey>', 'apikey')
+  .action((
+    option,
+  ) => apiKeyDelete(option).catch((err) => console.log(err)));
+
+program
+  .command('apikey-get')
+  .description('get config of apikey')
+  .option('--apikey <apikey>', 'apikey')
   .option('--all', 'get all apikey')
   .action((
-    command,
-    options,
-  ) => manageApiKey(command, options));
+    option,
+  ) => apiKeyGet(option).catch((err) => console.log(err)));
 
 program.parse(process.argv);

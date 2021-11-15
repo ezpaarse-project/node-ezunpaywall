@@ -32,12 +32,12 @@ const setConfig = async () => {
 /**
  * config management command to establish the connection between the command and ezunpaywall
  *
- * @param {boolean} args.get -g --get - display configuration
- * @param {boolean} args.set -s --set - update configuration file in $HOME/.config
- * @param {boolean} args.list -l --list - list of attributes required for configuration
+ * @param {boolean} option.get -g --get - display configuration
+ * @param {boolean} option.set -s --set - update configuration file in $HOME/.config
+ * @param {boolean} option.list -l --list - list of attributes required for configuration
  */
-const manageConfig = async (args) => {
-  if (args.list) {
+const manageConfig = async (option) => {
+  if (option.list) {
     console.log(`
       baseURL
       apikey
@@ -53,23 +53,27 @@ const manageConfig = async (args) => {
 
   const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
-  if (args.get) {
+  if (option.get) {
     console.log(JSON.stringify(config, null, 2));
     logger.info(`from ${configPath}`);
     process.exit(0);
   }
 
-  if (args.set === 'default') {
+  if (option.set === 'default') {
     console.log(JSON.stringify(config, null, 2));
     await setConfig();
     process.exit(0);
   }
 
-  if (args.set) {
-    if (has(config, args.set)) {
-      set(config, args.set, ...args.args);
+  console.log(option.set);
+  console.log(option.args[0]);
+
+  if (option.set) {
+    if (has(config, option.set)) {
+      set(config, option.set, option.args[0]);
+      console.log(config);
     } else {
-      logger.error(`${args.set} doesn't exist on config`);
+      logger.error(`${option.set} doesn't exist on config`);
       process.exit(1);
     }
   }

@@ -33,7 +33,7 @@ describe('Apikey: test apikey command', async () => {
       await deleteAll();
     });
     it('Should create apikey with all config', async () => {
-      const res = await exec(`${ezu} apikey create --keyname user-test1 --access graphql --attributes "*" --allowed true`);
+      const res = await exec(`${ezu} apikey-create --keyname user-test1 --access graphql --attributes "*" --allowed true`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -45,7 +45,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should create apikey with only name', async () => {
-      const res = await exec(`${ezu} apikey create --keyname user-test2`);
+      const res = await exec(`${ezu} apikey-create --keyname user-test2`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -58,7 +58,7 @@ describe('Apikey: test apikey command', async () => {
 
     it('Shouldn\'t create apikey because it\'s already exist', async () => {
       try {
-        await exec(`${ezu} apikey create --keyname user-test1`);
+        await exec(`${ezu} apikey-create --keyname user-test1`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: [user-test1] already exist`);
       }
@@ -66,7 +66,7 @@ describe('Apikey: test apikey command', async () => {
 
     it('Shouldn\'t create apikey because access "hello" doesn\'t exist', async () => {
       try {
-        await exec(`${ezu} apikey create --keyname test-user3 --access hello`);
+        await exec(`${ezu} apikey-create --keyname test-user3 --access hello`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: argument "access" [hello] doesn't exist`);
       }
@@ -74,7 +74,7 @@ describe('Apikey: test apikey command', async () => {
 
     it('Shouldn\'t create apikey because attributes "hello" doesn\'t exist', async () => {
       try {
-        await exec(`${ezu} apikey create --keyname user-test3 --attributes hello`);
+        await exec(`${ezu} apikey-create --keyname user-test3 --attributes hello`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: argument "attributes" [hello] doesn't exist`);
       }
@@ -82,7 +82,7 @@ describe('Apikey: test apikey command', async () => {
 
     it('Shouldn\'t create apikey because allowed are in wrong format', async () => {
       try {
-        await exec(`${ezu} apikey create --keyname user-test3 --allowed hello`);
+        await exec(`${ezu} apikey-create --keyname user-test3 --allowed hello`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: argument "allowed" [hello] is in bad format`);
       }
@@ -101,7 +101,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should update config.name of apikey', async () => {
-      const res = await exec(`${ezu} apikey update --apikey user --keyname new-name`);
+      const res = await exec(`${ezu} apikey-update --apikey user --keyname new-name`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -113,7 +113,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should update config.access of apikey', async () => {
-      const res = await exec(`${ezu} apikey update --apikey user --access update`);
+      const res = await exec(`${ezu} apikey-update --apikey user --access update`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -125,7 +125,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should update config.attributes of apikey', async () => {
-      const res = await exec(`${ezu} apikey update --apikey user --attributes doi`);
+      const res = await exec(`${ezu} apikey-update --apikey user --attributes doi`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -137,7 +137,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should update config.allowed to false of apikey', async () => {
-      const res = await exec(`${ezu} apikey update --apikey user --allowed false`);
+      const res = await exec(`${ezu} apikey-update --apikey user --allowed false`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -149,7 +149,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should update config.allowed to true of apikey', async () => {
-      const res = await exec(`${ezu} apikey update --apikey notAllowed --allowed true`);
+      const res = await exec(`${ezu} apikey-update --apikey notAllowed --allowed true`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -161,7 +161,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should update config.name and config.access of apikey', async () => {
-      const res = await exec(`${ezu} apikey update --apikey user --keyname new-name --access update`);
+      const res = await exec(`${ezu} apikey-update --apikey user --keyname new-name --access update`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -174,7 +174,7 @@ describe('Apikey: test apikey command', async () => {
 
     it('Shouldn\'t update config.access because "hello" doesn\'t exist', async () => {
       try {
-        await exec(`${ezu} apikey update --apikey user --access hello`);
+        await exec(`${ezu} apikey-update --apikey user --access hello`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: argument "access" [hello] doesn't exist`);
       }
@@ -182,7 +182,7 @@ describe('Apikey: test apikey command', async () => {
 
     it('Shouldn\'t update config.attributes because "hello" doesn\'t exist', async () => {
       try {
-        await exec(`${ezu} apikey update --apikey user --attributes hello`);
+        await exec(`${ezu} apikey-update --apikey user --attributes hello`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: argument "attributes" [hello] doesn't exist`);
       }
@@ -190,7 +190,7 @@ describe('Apikey: test apikey command', async () => {
 
     it('Shouldn\'t update config.allowed because "hello" doesn\'t exist', async () => {
       try {
-        await exec(`${ezu} apikey update --apikey user --keyname new-name`);
+        await exec(`${ezu} apikey-update --apikey user --keyname new-name`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: argument "allowed" [hello] is in bad format`);
       }
@@ -204,13 +204,13 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should delete apikey', async () => {
-      const res = await exec(`${ezu} apikey delete --apikey user`);
+      const res = await exec(`${ezu} apikey-delete --apikey user`);
       expect(res?.stdout.trim()).equal(`${info}: apikey [user] is deleted successfully`);
     });
 
     it('Shouldn\'t delete apikey because hello apikey doesn\'t exist', async () => {
       try {
-        await exec(`${ezu} apikey delete --apikey hello`);
+        await exec(`${ezu} apikey-delete --apikey hello`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: [hello] apikey doesn't exist`);
       }
@@ -229,7 +229,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should get config of apikey', async () => {
-      const res = await exec(`${ezu} apikey get --apikey user`);
+      const res = await exec(`${ezu} apikey-get --apikey user`);
 
       const key = JSON.parse(res?.stdout.trim());
 
@@ -240,7 +240,7 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should get all apikey', async () => {
-      const res = await exec(`${ezu} apikey get --all`);
+      const res = await exec(`${ezu} apikey-get --all`);
 
       const keys = JSON.parse(res?.stdout.trim());
 
@@ -253,7 +253,7 @@ describe('Apikey: test apikey command', async () => {
 
     it('Shouldn\'t get config of apikey because this apikey doesn\'t exist', async () => {
       try {
-        await exec(`${ezu} apikey get --apikey hello`);
+        await exec(`${ezu} apikey-get --apikey hello`);
       } catch (err) {
         expect(err?.stdout.trim()).equal(`${error}: [hello] apikey doesn't exist`);
       }

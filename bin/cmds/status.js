@@ -5,10 +5,10 @@ const { getConfig } = require('../../lib/config');
 /**
  * Indicates if an update process is running
  *
- * @param {boolean} args.use -u --use - pathfile of custom config
+ * @param {boolean} option.use -u --use - pathfile of custom config
  */
-const getStatus = async (args) => {
-  const config = await getConfig(args.use);
+const getStatus = async (option) => {
+  const config = await getConfig(option.use);
 
   const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
 

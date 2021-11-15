@@ -6,10 +6,10 @@ const logger = require('../../lib/logger');
 /**
  * check if service is available
  *
- * @param {boolean} options.use -u --use - filepath of custom config
+ * @param {boolean} option.use -u --use - filepath of custom config
  */
-const ping = async (options) => {
-  const config = await getConfig(options.use);
+const ping = async (option) => {
+  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
 
   let res;
