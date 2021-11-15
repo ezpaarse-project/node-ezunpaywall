@@ -146,6 +146,7 @@ const manageApiKey = async (command, options) => {
         logger.error(`[${options.keyname}] already exist`);
         process.exit(1);
       }
+      // TODO 401
       logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/create`);
       logger.error(err);
       process.exit(1);
@@ -232,6 +233,7 @@ const manageApiKey = async (command, options) => {
         },
       });
     } catch (err) {
+      // TODO 401
       logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config`);
       logger.error(err);
       process.exit(1);
@@ -286,6 +288,7 @@ const manageApiKey = async (command, options) => {
           },
         });
       } catch (err) {
+        // TODO 401
         logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/all`);
         logger.error(err);
         process.exit(1);
