@@ -62,10 +62,13 @@ const ping = async (options) => {
   try {
     await ezunpaywall({
       method: 'GET',
-      url: '/api/auth/',
+      url: '/api/apikey/',
+      headers: {
+        'x-api-key': config.apikey
+      },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/auth`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey`);
     logger.error(err);
     process.exit(1);
   }
@@ -77,13 +80,13 @@ const ping = async (options) => {
   try {
     configApikey = await ezunpaywall({
       method: 'GET',
-      url: '/api/auth/config',
+      url: '/api/apikey/config',
       headers: {
         'x-api-key': config.apikey,
       },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/auth/config`);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config`);
     logger.error(err);
     process.exit(1);
   }
