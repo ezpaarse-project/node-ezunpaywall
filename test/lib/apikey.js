@@ -12,6 +12,7 @@ const load = async () => {
   try {
     await chai.request(apikeyURL)
       .post('/load')
+      .query({ dev: true })
       .set('redis-password', 'changeme');
   } catch (err) {
     console.error('Cannot request apikey service');

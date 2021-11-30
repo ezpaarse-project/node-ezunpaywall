@@ -310,7 +310,6 @@ const update = async (command, options) => {
 
     const data = {};
 
-    if (options.snapshot) data.url = true;
     if (options.file) data.filename = options.file;
     if (options.offset) data.offset = options.offset;
     if (options.limit) data.limit = options.limit;
@@ -318,6 +317,7 @@ const update = async (command, options) => {
     if (options.endDate) data.endDate = options.endDate;
     if (options.index) data.index = options.index;
     if (options.interval) data.interval = options.interval;
+    if (options.snapshot) data.snapshot = true;
 
     let res;
 
