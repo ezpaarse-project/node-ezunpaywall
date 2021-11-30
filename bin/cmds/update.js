@@ -310,6 +310,7 @@ const update = async (command, options) => {
 
     const data = {};
 
+    if (options.snapshot) data.url = true;
     if (options.file) data.filename = options.file;
     if (options.offset) data.offset = options.offset;
     if (options.limit) data.limit = options.limit;

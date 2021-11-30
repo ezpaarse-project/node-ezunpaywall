@@ -34,6 +34,7 @@ program
 program
   .command('update <command>')
   .description('start an unpaywall data update process')
+  .option('--snapshot', 'install the snapshot from unpaywall')
   .option('--file <file>', 'snapshot\'s file installed on ezunpaywall')
   .option('--force', 'force update without check if is already installed')
   .option('--startDate <startDate>', 'start date to download and insert updates from unpaywall')
