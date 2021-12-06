@@ -75,7 +75,7 @@ program
   .option('--access <access>', 'name of the services to which the owner of the key has access')
   .option('--attributes <attributes>', 'name of the unpaywall attributes to which the owner of the key has access')
   .option('--allowed <allowed>', 'indicates whether the key is authorized or not')
-  .option('--apikey <apikey>', 'indicates whether the key is authorized or not')
+  .option('--apikey <apikey>', 'apikey')
   .option('--all', 'get all apikey')
   .action((
     command,
