@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const FormData = require('form-data');
 
-const { connection } = require('../lib/ezunpaywall');
+const connection = require('../lib/ezunpaywall');
 const { getConfig } = require('../lib/config');
 const logger = require('../lib/logger');
 
@@ -18,8 +18,8 @@ const logger = require('../lib/logger');
  * @param {boolean} option.use --use <use> - filepath of custom config
  */
 const enrich = async (option) => {
-  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   const extAccepted = ['csv', 'jsonl'];
 
@@ -61,7 +61,7 @@ const enrich = async (option) => {
       responseType: 'json',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/upload - ${err?.response?.status}`);
+    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -80,7 +80,7 @@ const enrich = async (option) => {
       responseType: 'json',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/job - ${err?.response?.status}`);
+    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -104,7 +104,7 @@ const enrich = async (option) => {
       responseType: 'stream',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich/enriched/${id}.${type} - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 

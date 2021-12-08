@@ -1,32 +1,27 @@
-const axios = require('axios');
-
-const { getConfig } = require('../lib/config');
+const connection = require('../lib/ezunpaywall');
+const logger = require('../lib/logger');
 
 /**
  * Indicates if an update process is running
- *
- * @param {boolean} option.use -u --use - pathfile of custom config
  */
-const getStatus = async (option) => {
-  const config = await getConfig(option.use);
-
-  const ezunpaywallURL = `${config.ezunpaywall.protocol}://${config.ezunpaywall.host}:${config.ezunpaywall.port}`;
+const getStatus = async () => {
+  const ezunpaywall = await connection();
 
   let res;
   try {
-    res = await axios({
-      method: 'get',
-      url: `${ezunpaywallURL}/update/status`,
+    res = await ezunpaywall({
+      method: 'GET',
+      url: '/update/status',
     });
   } catch (err) {
-    console.error(`service unavailable ${config.url}:${config.port}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
-  const status = res?.data?.inUpdate;
+  const status = res?.data;
   if (!status) {
-    console.log('no update is in progress');
+    logger.info('no update is in progress');
   } else {
-    console.log('an update is being done');
+    logger.info('an update is being done');
   }
 };
 

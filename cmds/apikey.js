@@ -2,7 +2,7 @@ const joi = require('joi');
 
 const logger = require('../lib/logger');
 
-const { connection } = require('../lib/ezunpaywall');
+const connection = require('../lib/ezunpaywall');
 const { getConfig } = require('../lib/config');
 
 const availableAccess = ['update', 'enrich', 'graphql'];
@@ -78,8 +78,8 @@ const unpaywallAttrs = [
  * "true" or "false" only. By default it set at true
  */
 const apiKeyCreate = async (option) => {
-  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   const options = {
     name: option?.keyname,
@@ -113,7 +113,7 @@ const apiKeyCreate = async (option) => {
       },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/create - ${err?.response?.status}`);
+    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -134,8 +134,8 @@ const apiKeyCreate = async (option) => {
  * is authorized or not. "true" or "false" only
  */
 const apiKeyUpdate = async (option) => {
-  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   const options = {
     apikey: option.apikey,
@@ -171,7 +171,7 @@ const apiKeyUpdate = async (option) => {
       },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/update - ${err?.response?.status}`);
+    logger.errorRequest('PUT', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -185,8 +185,8 @@ const apiKeyUpdate = async (option) => {
  * @param {String} option.apikey --apikey <apikey> | apikey
  */
 const apiKeyDelete = async (option) => {
-  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   const { error, value } = joi.string().required().validate(option.apikey);
 
@@ -205,7 +205,7 @@ const apiKeyDelete = async (option) => {
       },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/delete/${option.apikey} - ${err?.response?.status}`);
+    logger.errorRequest('DELETE', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
   logger.info(`apikey [${option.apikey}] is deleted successfully`);
@@ -219,8 +219,8 @@ const apiKeyDelete = async (option) => {
  * @param {String} option.apikey --apikey <apikey> | get informations about this apikey
  */
 const apiKeyGet = async (option) => {
-  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   if (option.all) {
     let res;
@@ -235,7 +235,7 @@ const apiKeyGet = async (option) => {
         },
       });
     } catch (err) {
-      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/all - ${err?.response?.status}`);
+      logger.errorRequest('GET', err?.response?.config, err?.response?.status);
       process.exit(1);
     }
 
@@ -253,7 +253,7 @@ const apiKeyGet = async (option) => {
         responseType: 'json',
       });
     } catch (err) {
-      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config/${option.apikey} - ${err?.response?.status}`);
+      logger.errorRequest('GET', err?.response?.config, err?.response?.status);
       process.exit(1);
     }
 

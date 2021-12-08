@@ -42,7 +42,6 @@ program
 program
   .command('ping')
   .description('check if service is available')
-  .option('-U --use <use>', 'use a custom config')
   .action((option) => ping(option));
 
 program
@@ -84,7 +83,6 @@ program
   .description('get report of update process')
   .option('--file <file>', 'snapshot\'s file installed on ezunpaywall')
   .option('--latest', 'latest report')
-  .option('--date <date>', 'date of report')
   .option('-L --list', 'list of reports on ezunpaywall')
   .action((
     option,
@@ -107,7 +105,6 @@ program
   .option('--out <out>', 'name of enriched file. By default, the output file is named: out.jsonl')
   .option('--verbose', 'display loadbar and exit if process end')
   .option('-I --index <index>', 'name of the index from which the data will be retrieved')
-  .option('-U --use <use>', 'use a custom config')
   .action((
     option,
   ) => enrich(option));

@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
 const cliProgress = require('cli-progress');
 
-const { connection } = require('../lib/ezunpaywall');
+const connection = require('../lib/ezunpaywall');
+
 const logger = require('../lib/logger');
 
 const createCliProgress = (percent, task, file) => {
@@ -21,14 +22,14 @@ const getState = async (file, latest) => {
   let res;
   try {
     res = await ezunpaywall({
-      method: 'GET',
+      method: 'POST',
+      url: `/api/update/state${file ? `/${file}` : ''}`,
       params: {
         latest,
       },
-      url: `/api/update/state${file ? `/${file}` : ''}`,
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/state`);
+    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
     logger.error(err);
     process.exit(1);
   }
@@ -100,7 +101,7 @@ const getSnapshots = async () => {
       url: '/api/update/snapshot',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/snapshot - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
   return res?.data || [];
@@ -119,14 +120,10 @@ const getReport = async (filename, query) => {
       params: query,
     });
   } catch (err) {
-    if (err?.response?.status === 404) {
-      logger.warn(`Report ${filename ? `${filename}.json ` : ''}doesn't exist, use --force to force update`);
-      process.exit(0);
-    }
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/report${filename ? `/${filename}` : ''} - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
-  return res?.data?.report;
+  return res?.data;
 };
 
 /**
@@ -150,7 +147,7 @@ const getReports = async () => {
       logger.warn('No report available');
       process.exit(0);
     }
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/report`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     logger.error(err);
     process.exit(1);
   }
@@ -158,12 +155,13 @@ const getReports = async () => {
   return res?.data;
 };
 
-const force = async (ezunpaywall) => {
+const force = async () => {
+  const ezunpaywall = await connection();
   let latestSnapshotFromUnpaywall;
 
   try {
     latestSnapshotFromUnpaywall = await ezunpaywall({
-      method: 'get',
+      method: 'GET',
       url: '/api/update/unpaywall/changefiles',
       params: {
         latest: true,
@@ -171,7 +169,7 @@ const force = async (ezunpaywall) => {
     });
     latestSnapshotFromUnpaywall = latestSnapshotFromUnpaywall?.data;
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/unpaywall/changefiles - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -179,14 +177,14 @@ const force = async (ezunpaywall) => {
 
   try {
     snapshotsInstalled = await ezunpaywall({
-      method: 'get',
+      method: 'GET',
       url: '/api/update/snapshot',
       params: {
         latest: true,
       },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/unpaywall/snapshot - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 

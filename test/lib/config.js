@@ -4,7 +4,7 @@ const os = require('os');
 const logger = require('../../lib/logger');
 
 const reset = async () => {
-  const pathConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
+  const pathConfig = path.resolve(os.homedir(), '.config', 'ezunpaywall.json');
 
   const config = {
     baseURL: 'http://localhost',

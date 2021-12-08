@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 const inquirer = require('inquirer');
 const { format } = require('date-fns');
-const { connection } = require('../lib/ezunpaywall');
+const connection = require('../lib/ezunpaywall');
 const { getConfig } = require('../lib/config');
 const logger = require('../lib/logger');
 
@@ -13,7 +13,6 @@ const {
   getReports,
   force,
 } = require('../bin/update');
-const { options } = require('joi');
 
 /**
  * Starts an unpaywall data update process
@@ -26,8 +25,8 @@ const { options } = require('joi');
  * @param {Boolean} option.index -I --index | name of the index to which the data is inserted
  */
 const updateJobFile = async (option) => {
-  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   if (option.file) {
     const pattern = /^[a-zA-Z0-9_.-]+(.gz)$/;
@@ -45,7 +44,7 @@ const updateJobFile = async (option) => {
   }
 
   if (!option.force) {
-    await force(ezunpaywall);
+    await force();
   }
 
   if (option.list) {
@@ -78,7 +77,7 @@ const updateJobFile = async (option) => {
 
   try {
     await ezunpaywall({
-      method: 'post',
+      method: 'POST',
       url: `/api/update/job/changefile/${option.file}`,
       data,
       headers: {
@@ -86,7 +85,7 @@ const updateJobFile = async (option) => {
       },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/job/changefile/${option.file} - ${err?.response?.status} `);
+    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
   logger.info(`Insert "${option.file}"`);
@@ -109,8 +108,8 @@ const updateJobFile = async (option) => {
  * @param {Boolean} option.index -I --index | name of the index to which the data is inserted
  */
 const updateJobPeriod = async (option) => {
-  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   if (option.interval) {
     const intervals = ['week', 'day'];
@@ -150,7 +149,7 @@ const updateJobPeriod = async (option) => {
   }
 
   if (!option.force) {
-    await force(ezunpaywall);
+    await force();
   }
 
   const data = {};
@@ -162,7 +161,7 @@ const updateJobPeriod = async (option) => {
 
   try {
     await ezunpaywall({
-      method: 'post',
+      method: 'POST',
       url: '/api/update/job/period',
       data,
       headers: {
@@ -170,11 +169,7 @@ const updateJobPeriod = async (option) => {
       },
     });
   } catch (err) {
-    if (err?.response?.status === 409) {
-      logger.warn('an update is already in progress');
-      process.exit(0);
-    }
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/job - ${err?.response?.status}`);
+    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -205,11 +200,11 @@ const updateJobPeriod = async (option) => {
  * @param {Boolean} option.index -I --index | name of the index to which the data is inserted
  */
 const updateJobSnapshot = async (option) => {
-  const config = await getConfig(option.use);
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   if (!option.force) {
-    await force(ezunpaywall);
+    await force();
   }
 
   const data = {};
@@ -218,7 +213,7 @@ const updateJobSnapshot = async (option) => {
 
   try {
     await ezunpaywall({
-      method: 'post',
+      method: 'POST',
       url: '/api/update/job/period',
       data,
       headers: {
@@ -226,12 +221,7 @@ const updateJobSnapshot = async (option) => {
       },
     });
   } catch (err) {
-    if (err?.response?.status === 409) {
-      logger.warn(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/job - update in progress 409`);
-      process.exit(0);
-    }
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/job`);
-    logger.error(err);
+    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
   logger.info('Insert current snapshot');
@@ -291,16 +281,6 @@ const updateReport = async (option) => {
     console.log(JSON.stringify(report, null, 2));
     process.exit(0);
   }
-
-  if (option.date) {
-    if (new Date(option.date).getTime() > Date.now()) {
-      logger.error('startDate cannot be in the futur');
-      process.exit(1);
-    }
-    report = await getReport('', { date: option.date });
-    console.log(JSON.stringify(report, null, 2));
-    process.exit(0);
-  }
   process.exit(0);
 };
 
@@ -311,15 +291,14 @@ const updateReport = async (option) => {
  */
 const updateStatus = async (option) => {
   const ezunpaywall = await connection();
-
   let res;
   try {
     res = await ezunpaywall({
-      method: 'get',
+      method: 'GET',
       url: '/api/update/status',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update/status`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 

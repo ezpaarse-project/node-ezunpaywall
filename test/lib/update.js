@@ -67,7 +67,7 @@ const checkIfInUpdate = async () => {
     logger.error(`Cannot request ${ezunpaywallURL}/api/update/status - ${err?.response?.status}`);
     process.exit(1);
   }
-  return res?.body?.inUpdate;
+  return res?.body;
 };
 
 /**

@@ -5,29 +5,7 @@ const set = require('lodash.set');
 const has = require('lodash.has');
 
 const logger = require('../lib/logger');
-
-/**
- * create a config file in /$HOME/.config/.ezunpaywallrc
- * which contains the information to request on ezunpaywall
- */
-const setConfig = async () => {
-  const pathConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
-
-  const config = {
-    baseURL: 'http://localhost',
-    apikey: 'admin',
-    redisPassword: 'changeme',
-  };
-
-  try {
-    await fs.writeFile(pathConfig, JSON.stringify(config, null, 2), 'utf8');
-  } catch (err) {
-    logger.error(`Cannot write ${JSON.stringify(config, null, 2)} in ${pathConfig}`);
-    logger.error(err);
-    process.exit(1);
-  }
-  logger.info(`configuration has been initialized in ${pathConfig}`);
-};
+const { setConfig } = require('../lib/config');
 
 /**
  * config management command to establish the connection between the command and ezunpaywall
@@ -45,7 +23,7 @@ const manageConfig = async (option) => {
     process.exit(0);
   }
 
-  const configPath = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
+  const configPath = path.resolve(os.homedir(), '.config', 'ezunpaywall.json');
 
   if (!await fs.pathExists(configPath)) {
     await setConfig();
@@ -65,13 +43,9 @@ const manageConfig = async (option) => {
     process.exit(0);
   }
 
-  console.log(option.set);
-  console.log(option.args[0]);
-
   if (option.set) {
     if (has(config, option.set)) {
       set(config, option.set, option.args[0]);
-      console.log(config);
     } else {
       logger.error(`${option.set} doesn't exist on config`);
       process.exit(1);

@@ -1,5 +1,5 @@
+const connection = require('../lib/ezunpaywall');
 const { getConfig } = require('../lib/config');
-const { connection } = require('../lib/ezunpaywall');
 
 const logger = require('../lib/logger');
 
@@ -8,9 +8,9 @@ const logger = require('../lib/logger');
  *
  * @param {boolean} option.use -u --use - filepath of custom config
  */
-const ping = async (option) => {
-  const config = await getConfig(option.use);
+const ping = async () => {
   const ezunpaywall = await connection();
+  const config = await getConfig();
 
   let res;
 
@@ -20,7 +20,7 @@ const ping = async (option) => {
       url: '/api/',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/ - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
   logger.info('Ping graphql service: OK');
@@ -38,7 +38,7 @@ const ping = async (option) => {
       url: '/api/update/',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -50,7 +50,7 @@ const ping = async (option) => {
       url: '/api/enrich/',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -62,7 +62,7 @@ const ping = async (option) => {
       url: '/api/apikey/',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 
@@ -79,7 +79,7 @@ const ping = async (option) => {
       },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config - ${err?.response?.status}`);
+    logger.errorRequest('GET', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
 

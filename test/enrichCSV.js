@@ -169,9 +169,6 @@ describe('Test: enrichment with a CSV file', async () => {
       expect(same).to.be.equal(true);
     });
   });
-  describe('Don\'t do a enrichment of a csv file because the arguments doesn\'t exist on ezunpaywall index', () => {
-    // TODO
-  });
   after(async () => {
     await deleteIndex('unpaywall-test');
   });

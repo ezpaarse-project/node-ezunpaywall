@@ -11,7 +11,7 @@ const { reset } = require('./lib/config');
 const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 
 // TODO use custom config
-const customConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');
+const customConfig = path.resolve(os.homedir(), '.config', 'ezunpaywall.json');
 
 describe('Test: command config', async () => {
   before(async () => {

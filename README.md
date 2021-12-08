@@ -69,7 +69,7 @@ $ ezunpaywall config --set baseURL https://localhost.test.fr
   "baseURL": "https://localhost.test.fr",
   "apikey": "admin"
 }
-info: from /home/user/.config/.ezunpaywallrc
+info: from /home/user/.config/ezunpaywall.json
 ```
 ### ping
 Check if services are available.
