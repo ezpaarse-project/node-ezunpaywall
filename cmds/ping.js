@@ -1,7 +1,7 @@
-const { getConfig } = require('../../lib/config');
-const { connection } = require('../../lib/ezunpaywall');
+const { getConfig } = require('../lib/config');
+const { connection } = require('../lib/ezunpaywall');
 
-const logger = require('../../lib/logger');
+const logger = require('../lib/logger');
 
 /**
  * check if service is available
@@ -20,8 +20,7 @@ const ping = async (option) => {
       url: '/api/',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api`);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/ - ${err?.response?.status}`);
     process.exit(1);
   }
   logger.info('Ping graphql service: OK');
@@ -39,8 +38,7 @@ const ping = async (option) => {
       url: '/api/update/',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update`);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/update - ${err?.response?.status}`);
     process.exit(1);
   }
 
@@ -52,8 +50,7 @@ const ping = async (option) => {
       url: '/api/enrich/',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich`);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/enrich - ${err?.response?.status}`);
     process.exit(1);
   }
 
@@ -65,8 +62,7 @@ const ping = async (option) => {
       url: '/api/apikey/',
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey`);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey - ${err?.response?.status}`);
     process.exit(1);
   }
 
@@ -83,8 +79,7 @@ const ping = async (option) => {
       },
     });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config`);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config - ${err?.response?.status}`);
     process.exit(1);
   }
 

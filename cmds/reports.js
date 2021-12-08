@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const axios = require('axios');
 
-const { getConfig } = require('../../lib/config');
+const { getConfig } = require('../lib/config');
 
 /**
  * get list of report in ezunpaywall
@@ -111,7 +111,7 @@ const report = async (option) => {
     console.error(`service unavailable ${config.url}:${config.port}`);
     process.exit(1);
   }
-  console.log(JSON.stringify(res1.data?.report, null, 2));
+  console.log(JSON.stringify(res1.data, null, 2));
 };
 
 module.exports = {

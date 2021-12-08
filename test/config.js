@@ -8,7 +8,7 @@ const os = require('os');
 
 const { reset } = require('./lib/config');
 
-const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
+const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 
 // TODO use custom config
 const customConfig = path.resolve(os.homedir(), '.config', '.ezunpaywallrc');

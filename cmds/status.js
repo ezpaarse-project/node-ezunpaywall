@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const { getConfig } = require('../../lib/config');
+const { getConfig } = require('../lib/config');
 
 /**
  * Indicates if an update process is running

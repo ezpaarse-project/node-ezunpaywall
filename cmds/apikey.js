@@ -1,9 +1,11 @@
-const fs = require('fs-extra');
-const path = require('path');
+const joi = require('joi');
 
-const logger = require('../../lib/logger');
-const { connection } = require('../../lib/ezunpaywall');
-const { getConfig } = require('../../lib/config');
+const logger = require('../lib/logger');
+
+const { connection } = require('../lib/ezunpaywall');
+const { getConfig } = require('../lib/config');
+
+const availableAccess = ['update', 'enrich', 'graphql'];
 
 const unpaywallAttrs = [
   '*',
@@ -79,55 +81,24 @@ const apiKeyCreate = async (option) => {
   const config = await getConfig(option.use);
   const ezunpaywall = await connection();
 
-  if (!option.keyname) {
-    logger.error('name expected');
-    process.exit(1);
-  }
-
-  let access;
-  if (option?.access) {
-    const availableAccess = ['update', 'enrich', 'graphql', 'apikey'];
-    access = option.access.split(',');
-    access.forEach((e) => {
-      if (!availableAccess.includes(e)) {
-        logger.error(`argument "access" [${e}] doesn't exist`);
-        process.exit(1);
-      }
-    });
-  }
-
-  if (option?.attributes) {
-    const attrs = option.attributes.split(',');
-    attrs.forEach((attr) => {
-      if (!unpaywallAttrs.includes(attr)) {
-        logger.error(`argument "attributes" [${attr}] doesn't exist`);
-        process.exit(1);
-      }
-    });
-  }
-
-  let allowed;
-
-  if (option?.allowed) {
-    if (option?.allowed !== 'true' && option?.allowed !== 'false') {
-      logger.error(`argument "allowed" [${option.allowed}] is in bad format`);
-      process.exit(1);
-    }
-  }
-
-  if (option?.allowed === 'true') allowed = true;
-  if (option?.allowed === 'false') allowed = false;
-
-  const configApiKey = {
-    name: option.keyname,
-    access,
-    attributes: option.attributes,
-    allowed,
+  const options = {
+    name: option?.keyname,
+    attributes: option?.attributes,
+    access: option?.access?.split(','),
+    allowed: option?.allowed,
   };
 
-  if (!configApiKey?.access) configApiKey.access = ['graphql'];
-  if (!configApiKey?.attributes) configApiKey.attributes = '*';
-  if (!configApiKey?.allowed) configApiKey.allowed = true;
+  const { error, value } = joi.object({
+    name: joi.string().trim().required(),
+    attributes: joi.string().trim().valid(...unpaywallAttrs).default('*'),
+    access: joi.array().items(joi.string().trim().valid(...availableAccess)).default(['graphql']),
+    allowed: joi.string().default('true'),
+  }).validate(options);
+
+  if (error) {
+    logger.error(error.details[0].message);
+    process.exit(1);
+  }
 
   let res;
 
@@ -136,22 +107,13 @@ const apiKeyCreate = async (option) => {
       method: 'POST',
       url: '/api/apikey/create',
       responseType: 'json',
-      data: configApiKey,
+      data: value,
       headers: {
         'redis-password': config.redisPassword,
       },
     });
   } catch (err) {
-    if (err?.response?.status === 403) {
-      logger.error(`[${option.keyname}] already exist`);
-      process.exit(1);
-    }
-    if (err?.response?.status === 401) {
-      logger.error('You are not authorized to manage apikey');
-      process.exit(1);
-    }
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/create`);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/create - ${err?.response?.status}`);
     process.exit(1);
   }
 
@@ -174,88 +136,42 @@ const apiKeyCreate = async (option) => {
 const apiKeyUpdate = async (option) => {
   const config = await getConfig(option.use);
   const ezunpaywall = await connection();
-  if (!option.apikey) {
-    logger.error('apikey expected');
+
+  const options = {
+    apikey: option.apikey,
+    name: option?.keyname,
+    attributes: option?.attributes,
+    access: option?.access?.split(','),
+    allowed: option?.allowed,
+  };
+
+  const { error, value } = joi.object({
+    apikey: joi.string().required(),
+    name: joi.string().trim(),
+    attributes: joi.string().trim().valid(...unpaywallAttrs).default('*'),
+    access: joi.array().items(joi.string().trim().valid(...availableAccess)).default(['graphql', 'enrich']),
+    allowed: joi.boolean().default(true),
+  }).validate(options);
+
+  if (error) {
+    logger.error(error.details[0].message);
     process.exit(1);
   }
-
-  let access;
-  if (option.access) {
-    const availableAccess = ['update', 'enrich', 'graphql', 'apikey'];
-    access = option.access.split(',');
-    access.forEach((e) => {
-      if (!availableAccess.includes(e)) {
-        logger.error(`argument "access" [${e}] doesn't exist`);
-        process.exit(1);
-      }
-    });
-  }
-
-  if (option.attributes) {
-    const attrs = option.attributes.split(',');
-    attrs.forEach((attr) => {
-      if (!unpaywallAttrs.includes(attr)) {
-        logger.error(`argument "attributes" [${attr}] doesn't exist`);
-        process.exit(1);
-      }
-    });
-  }
-
-  let allowed;
-  if (option.allowed) {
-    if (option.allowed !== 'true' && option.allowed !== 'false') {
-      logger.error(`argument "allowed" [${option.allowed}] is in bad format`);
-      process.exit(1);
-    }
-  }
-
-  if (option.allowed === 'true') allowed = true;
-  if (option.allowed === 'false') allowed = false;
 
   let res;
-
-  try {
-    res = await ezunpaywall({
-      method: 'GET',
-      url: '/api/apikey/config',
-      responseType: 'json',
-      headers: {
-        'x-api-key': option.apikey,
-      },
-    });
-  } catch (err) {
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config`);
-    logger.error(err);
-    process.exit(1);
-  }
-
-  const configApiKey = res.data;
-
-  if (option.keyname) configApiKey.name = option.keyname;
-  if (access) configApiKey.access = access;
-  if (option.attributes) configApiKey.attributes = option.attributes;
-  if (option.allowed) configApiKey.allowed = allowed;
 
   try {
     res = await ezunpaywall({
       method: 'PUT',
       url: '/api/apikey/update',
       responseType: 'json',
-      data: {
-        apikey: option.apikey,
-        config: configApiKey,
-      },
+      data: value,
       headers: {
         'redis-password': config.redisPassword,
       },
     });
   } catch (err) {
-    if (err?.response?.status === 401) {
-      logger.error('You are not authorized to manage apikey');
-      process.exit(1);
-    }
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config`);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/update - ${err?.response?.status}`);
     process.exit(1);
   }
 
@@ -272,34 +188,24 @@ const apiKeyDelete = async (option) => {
   const config = await getConfig(option.use);
   const ezunpaywall = await connection();
 
-  if (!option.apikey) {
-    logger.error('apikey expected');
+  const { error, value } = joi.string().required().validate(option.apikey);
+
+  if (error) {
+    logger.error(error.details[0].message);
     process.exit(1);
   }
 
   try {
     await ezunpaywall({
       method: 'DELETE',
-      url: '/api/apikey/delete',
+      url: `/api/apikey/delete/${value}`,
       responseType: 'json',
-      data: {
-        apikey: option.apikey,
-      },
       headers: {
         'redis-password': config.redisPassword,
       },
     });
   } catch (err) {
-    if (err.response.status === 404) {
-      logger.error(`[${option.apikey}] apikey doesn't exist`);
-      process.exit(1);
-    }
-    if (err?.response?.status === 401) {
-      logger.error('You are not authorized to manage apikey');
-      process.exit(1);
-    }
-    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/delete`);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/delete/${option.apikey} - ${err?.response?.status}`);
     process.exit(1);
   }
   logger.info(`apikey [${option.apikey}] is deleted successfully`);
@@ -329,12 +235,7 @@ const apiKeyGet = async (option) => {
         },
       });
     } catch (err) {
-      if (err?.response?.status === 401) {
-        logger.error('You are not authorized to manage apikey');
-        process.exit(1);
-      }
-      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/all`);
-      logger.error(err);
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/all - ${err?.response?.status}`);
       process.exit(1);
     }
 
@@ -348,19 +249,11 @@ const apiKeyGet = async (option) => {
     try {
       res = await ezunpaywall({
         method: 'GET',
-        url: '/api/apikey/config',
+        url: `/api/apikey/config/${option.apikey}`,
         responseType: 'json',
-        headers: {
-          'x-api-key': option.apikey,
-        },
       });
     } catch (err) {
-      if (err.response.status === 404) {
-        logger.error(`[${option.apikey}] apikey doesn't exist`);
-        process.exit(1);
-      }
-      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/all`);
-      logger.error(err);
+      logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey/config/${option.apikey} - ${err?.response?.status}`);
       process.exit(1);
     }
 

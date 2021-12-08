@@ -15,7 +15,7 @@ const {
   ping,
 } = require('./lib/ping');
 
-const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
+const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 
 const greenColor = ['\u001b[32m', '\u001b[39m'];
 const info = `${greenColor[0]}info${greenColor[1]}`;
@@ -57,35 +57,43 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Shouldn\'t create apikey because it\'s already exist', async () => {
+      let res;
       try {
         await exec(`${ezu} apikey-create --keyname user-test1`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: [user-test1] already exist`);
+        res = err;
       }
+      expect(res).to.not.equal('undefined');
     });
 
     it('Shouldn\'t create apikey because access "hello" doesn\'t exist', async () => {
+      let res;
       try {
         await exec(`${ezu} apikey-create --keyname test-user3 --access hello`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: argument "access" [hello] doesn't exist`);
+        res = err;
       }
+      expect(res).to.not.equal('undefined');
     });
 
     it('Shouldn\'t create apikey because attributes "hello" doesn\'t exist', async () => {
+      let res;
       try {
         await exec(`${ezu} apikey-create --keyname user-test3 --attributes hello`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: argument "attributes" [hello] doesn't exist`);
+        res = err;
       }
+      expect(res).to.not.equal('undefined');
     });
 
     it('Shouldn\'t create apikey because allowed are in wrong format', async () => {
+      let res;
       try {
         await exec(`${ezu} apikey-create --keyname user-test3 --allowed hello`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: argument "allowed" [hello] is in bad format`);
+        res = err;
       }
+      expect(res).to.not.equal('undefined');
     });
 
     after(async () => {
@@ -106,10 +114,10 @@ describe('Apikey: test apikey command', async () => {
       const key = JSON.parse(res?.stdout.trim());
 
       expect(key).have.property('apikey').equal('user');
-      expect(key.config).have.property('name').equal('new-name');
-      expect(key.config).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
-      expect(key.config).have.property('attributes').equal('*');
-      expect(key.config).have.property('allowed').equal(true);
+      expect(key).have.property('name').equal('new-name');
+      expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
+      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('allowed').equal(true);
     });
 
     it('Should update config.access of apikey', async () => {
@@ -118,10 +126,10 @@ describe('Apikey: test apikey command', async () => {
       const key = JSON.parse(res?.stdout.trim());
 
       expect(key).have.property('apikey').equal('user');
-      expect(key.config).have.property('name').equal('user');
-      expect(key.config).have.property('access').to.be.an('array').eql(['update']);
-      expect(key.config).have.property('attributes').equal('*');
-      expect(key.config).have.property('allowed').equal(true);
+      expect(key).have.property('name').equal('user');
+      expect(key).have.property('access').to.be.an('array').eql(['update']);
+      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('allowed').equal(true);
     });
 
     it('Should update config.attributes of apikey', async () => {
@@ -130,10 +138,10 @@ describe('Apikey: test apikey command', async () => {
       const key = JSON.parse(res?.stdout.trim());
 
       expect(key).have.property('apikey').equal('user');
-      expect(key.config).have.property('name').equal('user');
-      expect(key.config).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
-      expect(key.config).have.property('attributes').equal('doi');
-      expect(key.config).have.property('allowed').equal(true);
+      expect(key).have.property('name').equal('user');
+      expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
+      expect(key).have.property('attributes').equal('doi');
+      expect(key).have.property('allowed').equal(true);
     });
 
     it('Should update config.allowed to false of apikey', async () => {
@@ -142,10 +150,10 @@ describe('Apikey: test apikey command', async () => {
       const key = JSON.parse(res?.stdout.trim());
 
       expect(key).have.property('apikey').equal('user');
-      expect(key.config).have.property('name').equal('user');
-      expect(key.config).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
-      expect(key.config).have.property('attributes').equal('*');
-      expect(key.config).have.property('allowed').equal(false);
+      expect(key).have.property('name').equal('user');
+      expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
+      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('allowed').equal(false);
     });
 
     it('Should update config.allowed to true of apikey', async () => {
@@ -154,10 +162,10 @@ describe('Apikey: test apikey command', async () => {
       const key = JSON.parse(res?.stdout.trim());
 
       expect(key).have.property('apikey').equal('notAllowed');
-      expect(key.config).have.property('name').equal('notAllowed');
-      expect(key.config).have.property('access').to.be.an('array').eql(['graphql', 'enrich', 'update']);
-      expect(key.config).have.property('attributes').equal('*');
-      expect(key.config).have.property('allowed').equal(true);
+      expect(key).have.property('name').equal('notAllowed');
+      expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
+      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('allowed').equal(true);
     });
 
     it('Should update config.name and config.access of apikey', async () => {
@@ -166,34 +174,40 @@ describe('Apikey: test apikey command', async () => {
       const key = JSON.parse(res?.stdout.trim());
 
       expect(key).have.property('apikey').equal('user');
-      expect(key.config).have.property('name').equal('new-name');
-      expect(key.config).have.property('access').to.be.an('array').eql(['update']);
-      expect(key.config).have.property('attributes').equal('*');
-      expect(key.config).have.property('allowed').equal(true);
+      expect(key).have.property('name').equal('new-name');
+      expect(key).have.property('access').to.be.an('array').eql(['update']);
+      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('allowed').equal(true);
     });
 
     it('Shouldn\'t update config.access because "hello" doesn\'t exist', async () => {
+      let res;
       try {
         await exec(`${ezu} apikey-update --apikey user --access hello`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: argument "access" [hello] doesn't exist`);
+        res = err;
       }
+      expect(res).to.not.equal('undefined');
     });
 
     it('Shouldn\'t update config.attributes because "hello" doesn\'t exist', async () => {
+      let res;
       try {
         await exec(`${ezu} apikey-update --apikey user --attributes hello`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: argument "attributes" [hello] doesn't exist`);
+        res = err;
       }
+      expect(res).to.not.equal('undefined');
     });
 
     it('Shouldn\'t update config.allowed because "hello" doesn\'t exist', async () => {
+      let res;
       try {
         await exec(`${ezu} apikey-update --apikey user --keyname new-name`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: argument "allowed" [hello] is in bad format`);
+        res = err;
       }
+      expect(res).to.not.equal('undefined');
     });
   });
 
@@ -209,11 +223,13 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Shouldn\'t delete apikey because hello apikey doesn\'t exist', async () => {
+      let res;
       try {
         await exec(`${ezu} apikey-delete --apikey hello`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: [hello] apikey doesn't exist`);
+        res = err;
       }
+      expect(res).to.not.equal('undefined');
     });
 
     after(async () => {
@@ -255,7 +271,7 @@ describe('Apikey: test apikey command', async () => {
       try {
         await exec(`${ezu} apikey-get --apikey hello`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: [hello] apikey doesn't exist`);
+        expect(err?.stdout.trim()).equal(`${error}: Cannot request http://localhost/api/apikey/config/hello - 404`);
       }
     });
 

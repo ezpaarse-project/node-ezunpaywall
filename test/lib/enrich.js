@@ -13,13 +13,12 @@ const ezunpaywallURL = 'http://localhost';
 const getState = async () => {
   let res;
   try {
-    res = await chai.request(ezunpaywallURL).get('/api/enrich/state');
+    res = await chai.request(ezunpaywallURL).get('/api/enrich/state').query({ latest: true });
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywallURL}/api/enrich/state `);
-    logger.error(err);
+    logger.error(`Cannot request ${ezunpaywallURL}/api/enrich/state - ${err?.response?.status}`);
     process.exit(1);
   }
-  return res?.body?.state;
+  return res?.body;
 };
 module.exports = {
   getState,

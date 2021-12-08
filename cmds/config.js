@@ -4,7 +4,7 @@ const os = require('os');
 const set = require('lodash.set');
 const has = require('lodash.has');
 
-const logger = require('../../lib/logger');
+const logger = require('../lib/logger');
 
 /**
  * create a config file in /$HOME/.config/.ezunpaywallrc

@@ -21,13 +21,10 @@ const {
   deleteIndex,
 } = require('./lib/elastic');
 
-const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
+const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 
 const greenColor = ['\u001b[32m', '\u001b[39m'];
 const info = `${greenColor[0]}info${greenColor[1]}`;
-
-const redColor = ['\x1B[31m', '\x1B[39m'];
-const error = `${redColor[0]}error${redColor[1]}`;
 
 describe('Update: test insert the content of a file already installed on ezunpaywall', async () => {
   before(async () => {
@@ -45,11 +42,11 @@ describe('Update: test insert the content of a file already installed on ezunpay
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update-job --file fake1.jsonl.gz --index unpaywall-test --interval day --force`);
+        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --index unpaywall-test --force`);
       } catch (err) {
         console.log(err);
       }
-      expect(res?.stdout.trim()).equal(`${info}: Update with fake1.jsonl.gz`);
+      expect(res?.stdout.trim()).equal(`${info}: Insert "fake1.jsonl.gz"`);
     });
 
     it('Should insert 50 data', async () => {
@@ -101,11 +98,11 @@ describe('Update: test insert the content of a file already installed on ezunpay
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update-job --file fake1.jsonl.gz --limit 10 --index unpaywall-test --interval day --force`);
+        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --limit 10 --index unpaywall-test --force`);
       } catch (err) {
         console.log(err);
       }
-      expect(res?.stdout.trim()).equal(`${info}: Update with fake1.jsonl.gz`);
+      expect(res?.stdout.trim()).equal(`${info}: Insert "fake1.jsonl.gz"`);
     });
 
     it('Should insert 10 data', async () => {
@@ -157,11 +154,11 @@ describe('Update: test insert the content of a file already installed on ezunpay
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update-job --file fake1.jsonl.gz --offset 40 --index unpaywall-test --interval day --force`);
+        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --offset 40 --index unpaywall-test --force`);
       } catch (err) {
         console.log(err);
       }
-      expect(res?.stdout.trim()).equal(`${info}: Update with fake1.jsonl.gz`);
+      expect(res?.stdout.trim()).equal(`${info}: Insert "fake1.jsonl.gz"`);
     });
 
     it('Should insert 10 data', async () => {

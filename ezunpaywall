@@ -1,17 +1,22 @@
 #!/usr/bin/env node
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 const program = require('commander');
-const pkg = require('../package.json');
+const pkg = require('./package.json');
 
 const { manageConfig } = require('./cmds/config');
+
 const ping = require('./cmds/ping');
+
 const {
-  updateJob,
+  updateJobFile,
+  updateJobPeriod,
+  updateJobSnapshot,
   updateReport,
   updateStatus,
 } = require('./cmds/update');
+
 const enrich = require('./cmds/enrich');
+
 const {
   apiKeyCreate,
   apiKeyUpdate,
@@ -41,20 +46,38 @@ program
   .action((option) => ping(option));
 
 program
-  .command('update-job')
-  .description('start an unpaywall data update process')
+  .command('update-job-file')
+  .description('insert the content of changefile installed on ezunpaywall')
   .option('--file <file>', 'snapshot\'s file installed on ezunpaywall')
   .option('--force', 'force update without check if is already installed')
-  .option('--startDate <startDate>', 'start date to download and insert updates from unpaywall')
-  .option('--endDate <endDate>', 'end date to download and insert updates from unpaywall')
   .option('--offset <offset>', 'line where processing will start')
   .option('--limit <limit>', 'line where processing will end')
-  .option('--interval <interval>', 'interval of update (day or week)')
   .option('-L --list', 'list of snapshot installed on ezunpaywall')
   .option('-I --index <index>', 'name of the index to which the data is inserted')
   .action((
     option,
-  ) => updateJob(option).catch((err) => console.log(err)));
+  ) => updateJobFile(option).catch((err) => console.log(err)));
+
+program
+  .command('update-job-period')
+  .description('start an unpaywall data update process')
+  .option('--force', 'force update without check if is already installed')
+  .option('--startDate <startDate>', 'start date to download and insert updates from unpaywall')
+  .option('--endDate <endDate>', 'end date to download and insert updates from unpaywall')
+  .option('--interval <interval>', 'interval of update (day or week)')
+  .option('-I --index <index>', 'name of the index to which the data is inserted')
+  .action((
+    option,
+  ) => updateJobPeriod(option).catch((err) => console.log(err)));
+
+program
+  .command('update-job-snapshot')
+  .description('download and insert the current snapshot')
+  .option('--force', 'force update without check if is already installed')
+  .option('-I --index <index>', 'name of the index to which the data is inserted')
+  .action((
+    option,
+  ) => updateJobSnapshot(option).catch((err) => console.log(err)));
 
 program
   .command('update-report')

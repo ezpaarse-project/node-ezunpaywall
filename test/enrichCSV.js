@@ -26,7 +26,7 @@ const {
 
 const sourcesDir = path.resolve(__dirname, 'sources');
 
-const ezu = path.resolve(__dirname, '..', 'bin', 'ezunpaywall');
+const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 
 describe('Test: enrichment with a CSV file', async () => {
   before(async () => {
