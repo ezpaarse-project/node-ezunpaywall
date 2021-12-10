@@ -42,7 +42,7 @@ describe('Update: test insert the content of a file already installed on ezunpay
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --index unpaywall-test --force`);
+        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --index unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -98,7 +98,7 @@ describe('Update: test insert the content of a file already installed on ezunpay
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --limit 10 --index unpaywall-test --force`);
+        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --limit 10 --index unpaywall-test`);
       } catch (err) {
         console.log(err);
       }
@@ -154,7 +154,7 @@ describe('Update: test insert the content of a file already installed on ezunpay
     it('Should return the process start', async () => {
       let res;
       try {
-        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --offset 40 --index unpaywall-test --force`);
+        res = await exec(`${ezu} update-job-file --file fake1.jsonl.gz --offset 40 --index unpaywall-test`);
       } catch (err) {
         console.log(err);
       }

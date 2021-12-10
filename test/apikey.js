@@ -30,26 +30,48 @@ describe('Apikey: test apikey command', async () => {
       await deleteAll();
     });
     it('Should create apikey with all config', async () => {
-      const res = await exec(`${ezu} apikey-create --keyname user-test1 --access graphql --attributes "*" --allowed true`);
+      let res;
+      try {
+        res = await exec(`${ezu} apikey-create --keyname user-test1 --access graphql --attributes "*" --allowed true`);
+      } catch (err) {
+        console.error(err);
+      }
 
-      const key = JSON.parse(res?.stdout.trim());
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('apikey').to.not.equal(undefined);
       expect(key.config).have.property('name').equal('user-test1');
       expect(key.config).have.property('access').to.be.an('array').eql(['graphql']);
-      expect(key.config).have.property('attributes').equal('*');
+      expect(key.config).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key.config).have.property('allowed').equal(true);
     });
 
     it('Should create apikey with only name', async () => {
-      const res = await exec(`${ezu} apikey-create --keyname user-test2`);
+      let res;
+      try {
+        res = await exec(`${ezu} apikey-create --keyname user-test2`);
+      } catch (err) {
+        console.error(err);
+      }
 
-      const key = JSON.parse(res?.stdout.trim());
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('apikey').to.not.equal(undefined);
       expect(key.config).have.property('name').equal('user-test2');
       expect(key.config).have.property('access').to.be.an('array').eql(['graphql']);
-      expect(key.config).have.property('attributes').equal('*');
+      expect(key.config).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key.config).have.property('allowed').equal(true);
     });
 
@@ -106,74 +128,168 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should update config.name of apikey', async () => {
-      const res = await exec(`${ezu} apikey-update --apikey user --keyname new-name`);
+      let res;
+      try {
+        res = await exec(`${ezu} apikey-update --apikey user --keyname new-name`);
+      } catch (err) {
+        console.error(err);
+        process.exit(1);
+      }
 
-      const key = JSON.parse(res?.stdout.trim());
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('apikey').equal('user');
       expect(key).have.property('name').equal('new-name');
       expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
-      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key).have.property('allowed').equal(true);
     });
 
     it('Should update config.access of apikey', async () => {
-      const res = await exec(`${ezu} apikey-update --apikey user --access update`);
+      let res;
+      try {
+        res = await exec(`${ezu} apikey-update --apikey user --access update`);
+      } catch (err) {
+        console.error(err);
+      }
 
-      const key = JSON.parse(res?.stdout.trim());
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('apikey').equal('user');
       expect(key).have.property('name').equal('user');
       expect(key).have.property('access').to.be.an('array').eql(['update']);
-      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key).have.property('allowed').equal(true);
     });
 
     it('Should update config.attributes of apikey', async () => {
-      const res = await exec(`${ezu} apikey-update --apikey user --attributes doi`);
+      let res;
 
-      const key = JSON.parse(res?.stdout.trim());
+      try {
+        res = await exec(`${ezu} apikey-update --apikey user --attributes doi`);
+      } catch (err) {
+        console.error(err);
+      }
+
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('apikey').equal('user');
       expect(key).have.property('name').equal('user');
       expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
-      expect(key).have.property('attributes').equal('doi');
+      expect(key).have.property('attributes').to.be.an('array').eql(['doi']);
+      expect(key).have.property('allowed').equal(true);
+    });
+
+    it('Should update config.attributes of apikey', async () => {
+      let res;
+
+      try {
+        res = await exec(`${ezu} apikey-update --apikey user --attributes doi,is_oa`);
+      } catch (err) {
+        console.error(err);
+      }
+
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
+
+      expect(key).have.property('apikey').equal('user');
+      expect(key).have.property('name').equal('user');
+      expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
+      expect(key).have.property('attributes').to.be.an('array').eql(['doi', 'is_oa']);
       expect(key).have.property('allowed').equal(true);
     });
 
     it('Should update config.allowed to false of apikey', async () => {
-      const res = await exec(`${ezu} apikey-update --apikey user --allowed false`);
+      let res;
 
-      const key = JSON.parse(res?.stdout.trim());
+      try {
+        res = await exec(`${ezu} apikey-update --apikey user --allowed false`);
+      } catch (err) {
+        console.error(err);
+      }
+
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('apikey').equal('user');
       expect(key).have.property('name').equal('user');
       expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
-      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key).have.property('allowed').equal(false);
     });
 
     it('Should update config.allowed to true of apikey', async () => {
-      const res = await exec(`${ezu} apikey-update --apikey notAllowed --allowed true`);
+      let res;
 
-      const key = JSON.parse(res?.stdout.trim());
+      try {
+        res = await exec(`${ezu} apikey-update --apikey notAllowed --allowed true`);
+      } catch (err) {
+        console.error(err);
+      }
+
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('apikey').equal('notAllowed');
       expect(key).have.property('name').equal('notAllowed');
       expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
-      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key).have.property('allowed').equal(true);
     });
 
     it('Should update config.name and config.access of apikey', async () => {
-      const res = await exec(`${ezu} apikey-update --apikey user --keyname new-name --access update`);
+      let res;
+      try {
+        res = await exec(`${ezu} apikey-update --apikey user --keyname new-name --access update`);
+      } catch (err) {
+        console.error(err);
+      }
 
-      const key = JSON.parse(res?.stdout.trim());
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('apikey').equal('user');
       expect(key).have.property('name').equal('new-name');
       expect(key).have.property('access').to.be.an('array').eql(['update']);
-      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key).have.property('allowed').equal(true);
     });
 
@@ -215,7 +331,14 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should delete apikey', async () => {
-      const res = await exec(`${ezu} apikey-delete --apikey user`);
+      let res;
+
+      try {
+        res = await exec(`${ezu} apikey-delete --apikey user`);
+      } catch (err) {
+        console.error(err);
+      }
+
       expect(res?.stdout.trim()).equal(`${info}: apikey [user] is deleted successfully`);
     });
 
@@ -242,18 +365,35 @@ describe('Apikey: test apikey command', async () => {
     });
 
     it('Should get config of apikey', async () => {
-      const res = await exec(`${ezu} apikey-get --apikey user`);
+      let res;
+      try {
+        res = await exec(`${ezu} apikey-get --apikey user`);
+      } catch (err) {
+        console.error(err);
+      }
 
-      const key = JSON.parse(res?.stdout.trim());
+      let key;
+
+      try {
+        key = JSON.parse(res?.stdout.trim());
+      } catch (err) {
+        console.error(err);
+      }
 
       expect(key).have.property('name').equal('user');
       expect(key).have.property('access').to.be.an('array').eql(['graphql', 'enrich']);
-      expect(key).have.property('attributes').equal('*');
+      expect(key).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key).have.property('allowed').equal(true);
     });
 
     it('Should get all apikey', async () => {
-      const res = await exec(`${ezu} apikey-get --all`);
+      let res;
+
+      try {
+        res = await exec(`${ezu} apikey-get --all`);
+      } catch (err) {
+        console.error(err);
+      }
 
       const keys = JSON.parse(res?.stdout.trim());
 

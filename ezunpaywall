@@ -41,14 +41,13 @@ program
 
 program
   .command('ping')
-  .description('check if service is available')
+  .description('check if services are available')
   .action((option) => ping(option));
 
 program
   .command('update-job-file')
   .description('insert the content of changefile installed on ezunpaywall')
   .option('--file <file>', 'snapshot\'s file installed on ezunpaywall')
-  .option('--force', 'force update without check if is already installed')
   .option('--offset <offset>', 'line where processing will start')
   .option('--limit <limit>', 'line where processing will end')
   .option('-L --list', 'list of snapshot installed on ezunpaywall')
@@ -72,7 +71,6 @@ program
 program
   .command('update-job-snapshot')
   .description('download and insert the current snapshot')
-  .option('--force', 'force update without check if is already installed')
   .option('-I --index <index>', 'name of the index to which the data is inserted')
   .action((
     option,
@@ -99,10 +97,10 @@ program
 program
   .command('enrich')
   .description('enrich file with unpaywall attributes')
-  .option('--file <file>', 'sile which must be enriched')
+  .option('--file <file>', 'file which must be enriched')
   .option('--separator <separator>', 'separator of csv file')
   .option('--attributes <attributes>', 'attributes which must be enriched in graphql format. By default, all attributes are added')
-  .option('--out <out>', 'name of enriched file. By default, the output file is named: out.jsonl')
+  .option('--out <out>', 'name of enriched file. By default the output file is named: out.jsonl')
   .option('--verbose', 'display loadbar and exit if process end')
   .option('-I --index <index>', 'name of the index from which the data will be retrieved')
   .action((

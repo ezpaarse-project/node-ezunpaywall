@@ -7,8 +7,16 @@
 - [Commands](#Commands)
   - [config](#config)
   - [ping](#ping)
-  - [update](#update)
+  - [update-job-file](#config)
+  - [update-job-period](#update-job-period)
+  - [update-job-snapshot](#update-job-snapshot)
+  - [update-report](#update-report)
+  - [update-status](#update-status)
   - [enrich](#enrich)
+  - [apikey-create](#apikey-create)
+  - [apikey-update](#apikey-update)
+  - [apikey-delete](#apikey-delete)
+  - [apikey-get](#apikey-get)
 - [Test](#Test)
 ## Prerequisites
 
@@ -28,7 +36,7 @@ $ npm i -g .
 ```bash
 $ git clone https://github.com/ezpaarse-project/node-ezunpaywall.git
 $ cd node-ezunpaywall
-$ npm install
+$ npm i
 ```
 ## Commands
 
@@ -38,36 +46,49 @@ The module provides an `ezunpaywall` command (aliased `ezu`).
 
 | Name | Description |
 | --- | --- |
-| config | Manage config |
-| ping | ping ezunpaywall services |
-| update | Load content of unpaywall snapshot in elastic | 
-| enrich | enrich file with ezunpaywall | 
+| config [options] | config management command to establish the connection between the command and ezunpaywall |
+| ping | check if services are available |
+| update-job-file [options] | insert the content of changefile installed on ezunpaywall |
+| update-job-period [options] | start an unpaywall data update process |
+| update-job-snapshot [options] | download and insert the current snapshot |
+| update-report [options] | get report of update process |
+| update-status [options] | get status of update process |
+| enrich [options] | enrich file with unpaywall attributes |
+| apikey-create [options] | create new apikey |
+| apikey-update [options] | update apikey |
+| apikey-delete [options] | delete apikey |
+| apikey-get [options] | get config of apikey |
+| help [command] | display help for command |
 ### config
 Manage config to fetch ezunpyawall.
 #### Parameters
 | Name | Description |
 | --- | --- |
-| --get | Get the configuration |
-| --set | Set a value to a config key in $HOME/.config |
-| -L --list | List of attributes required for configuration |
+| --get | display the configuration |
+| --set \<key> \<value> | update config |
+| -L --list | list of attributes required for configuration |
+| -h, --help | display help for command |
 #### Examples
----
+
 ```bash
 $ ezunpaywall config -L
 ```
+
 ```
 baseURL
 apikey
+redisPassword
 ```
----
+
 ```bash
 $ ezunpaywall config --set baseURL https://localhost.test.fr
 ```
----
+
 ```bash
 {
   "baseURL": "https://localhost.test.fr",
-  "apikey": "admin"
+  "apikey": "admin",
+  "redisPassword": "changeme"
 }
 info: from /home/user/.config/ezunpaywall.json
 ```
@@ -80,110 +101,165 @@ Check if services are available.
 #### Example
 ```bash
 $ ezunpaywall ping
-```
-```bash
+
 info: Ping graphql service: OK
 info: Ping update service: OK
 info: Ping enrich service: OK
+info: Ping apikey service: OK
 info: ezmeta: OK
+info: You have access to graphql, enrich, update service(s)
 ```
-### update
+---
+### update-job-file
 
-Command
+insert the content of changefile installed on ezunpaywall
+#### Parameters
 
 | Name | Description |
 | --- | --- |
-| job | Start a update process |
-| status | Get status of process |
-| report | Get report |
+| --file <file> | snapshot's file installed on ezunpaywall |
+| --offset | line where processing will start |
+| --limit | line where processing will end |
+| -L --list | list of snapshot installed on ezunpaywall |
+| -I --index | name of the index to which the data is inserted |
+| -h, --help | display help for command |
+
+#### Example
+
+```bash
+$ ezu update-job-file --file fake1.jsonl.gz
+
+info: Insert "fake1.jsonl.gz"
+```
+
+---
+### update-job-period
+
+start an unpaywall data update process
+#### Parameters
+
+| Name | Description |
+| --- | --- |
+| --force | force update without check if is already installed |
+| --startDate \<startDate> | start date to download and insert updates from unpaywall |
+| --endDate  \<endDate> | end date to download and insert updates from unpaywall |
+| --interval \<interval> | interval of update (day or week) |
+| -L --list | list of snapshot installed on ezunpaywall |
+| -I --index  | name of the index to which the data is inserted |
 | | |
-#### job
-updates ezunpaywall data
-##### Parameters
+
+```bash
+$ ezu update-job-period --startDate 2021-12-01 --endDate 2021-12-07
+
+info: Insert "day" changefiles between "2021-12-01" and "2021-12-07"
+```
+
+```bash
+$ ezu update-job-period --period week --startDate 2021-12-01 --endDate 2021-12-07
+
+info: Insert "week" changefiles between "2021-12-01" and "2021-12-07"
+```
+---
+### update-job-snapshot
+
+download and insert the current snapshot
+#### Parameters
 
 | Name | Description |
 | --- | --- |
-| --file | Snapshot's file installed on ezunpaywall |
-| --startDate | Start date to download and insert updates from unpaywall |
-| --endDate | End date to download and insert updates from unpaywall |
-| --offset | Line where processing will start |
-| --limit | Line where processing will end |
-| --force | Force reload |
-| -L --list | Get list of snapshot installed on ezunpaywall |
-| -I --index  | Name of the index to which the data is inserted |
-| -U --use | Use a custom config |
+| -I --index  | name of the index to which the data is inserted |
 | | |
-##### Examples
+
+```bash
+$ ezu update-job-snapshot
+
+info: Insert current snapshot
+```
+
 ---
-```bash
-$ ezunpaywall update job
-```
-```bash
-$ info: Weekly update started
-```
----
-```bash
-$ ezunpaywall update job -L
-```
-```bash
-$ ? files (Use arrow keys)
-  ❯ file1.jsonl.gz 
-    file2.jsonl.gz 
-    file3.jsonl.gz 
-```
-```bash
-$ info: Update with file1.jsonl.gz
-```
----
+### update-report
 
-```bash
-$ ezunpaywall update job --file file1.jsonl.gz
-```
+get report of update process
 
-```bash
-$ info: Update with file1.jsonl.gz
-```
----
-```bash
-$ ezunpaywall update job --file file1.jsonl.gz --offset 10 --limit 20
-```
+#### Parameters
 
-```bash
-$ info: Update with file1.jsonl.gz
-```
----
-```bash
-$ ezunpaywall update job --startDate 2020-04-27
-```
-
-```bash
-$ info: Dowload and insert snapshot from unpaywall from 2020-04-27 and <Date of today>
-```
----
-
-```bash
-$ ezunpaywall update job --startDate 2020-04-27
-```
-
-```bash
-$ info: Dowload and insert snapshot from unpaywall from 2020-04-27 and 2020-04-30
-```
----
-
-#### status
-get the status of the running process
-
-##### Parameters
 | Name | Description |
 | --- | --- |
-| -U --use | Use a custom config |
-##### Example
+| --file \<interval> | changefile installed on ezunpaywall |
+| --latest | latest report |
+| -L --list | list of snapshot installed on ezunpaywall |
+| -I --index  | name of the index to which the data is inserted |
+| | |
+
+#### Examples
+
+
+```bash
+$ ezu update report -L
+
+? reports (Use arrow keys)
+❯ report1.json
+  report2.json
+  report3.json
+
+{
+  "done": true,
+  "createdAt": "2021-07-23T08:13:40.802Z",
+  "endAt": "2021-07-23T08:13:40.902Z",
+  "steps": [
+    {
+      "task": "insert",
+      "file": "fake1.jsonl.gz",
+      "linesRead": 50,
+      "percent": 100,
+      "took": 0.084,
+      "status": "success"
+    }
+  ],
+  "error": false,
+  "took": 0.100
+}
+```
+
+```bash
+$ ezu update report --latest
+
+{
+  "done": true,
+  "createdAt": "2021-07-23T08:13:40.802Z",
+  "endAt": "2021-07-23T08:13:40.902Z",
+  "steps": [
+    {
+      "task": "insert",
+      "file": "fake1.jsonl.gz",
+      "linesRead": 50,
+      "percent": 100,
+      "took": 0.084,
+      "status": "success"
+    }
+  ],
+  "error": false,
+  "took": 0.100
+}
+```
+
 ---
+### update-status
+
+get status of update process
+
+#### Parameters
+
+| Name | Description |
+| --- | --- |
+| --verbose | show with load bard |
+| | |
+
+#### Example
+
 ```bash
 $ ezu update status
-```
 
-```bash
 $ info: An update is being done
 {
   "state": {
@@ -213,107 +289,126 @@ $ info: An update is being done
 or
 
 ```bash
+$ ezu update status
+
 $ info: No update is in progress
 $ info: Use ezu update report --latest to see the latest report
 ```
 ---
-#### report
-get report of ezunpaywal data update.
-##### Parameters
-
-| Name | Description |
-| --- | --- |
-| --file | Name of report |
-| --latest | Get the latest report |
-| -L --list | List of reports |
-| -U --use | Use a custom config |
-##### Examples
----
-```bash
-$ ezu update report -L
-```
-```bash
-? reports (Use arrow keys)
-❯ report1.json
-  report2.json
-  report3.json
-```
-```bash
-{
-  "done": true,
-  "createdAt": "2021-07-23T08:13:40.802Z",
-  "endAt": "2021-07-23T08:13:40.902Z",
-  "steps": [
-    {
-      "task": "insert",
-      "file": "fake1.jsonl.gz",
-      "linesRead": 50,
-      "percent": 100,
-      "took": 0.084,
-      "status": "success"
-    }
-  ],
-  "error": false,
-  "took": 0.100
-}
-```
----
-```bash
-$ ezu update report --latest
-```
-```bash
-{
-  "done": true,
-  "createdAt": "2021-07-23T08:13:40.802Z",
-  "endAt": "2021-07-23T08:13:40.902Z",
-  "steps": [
-    {
-      "task": "insert",
-      "file": "fake1.jsonl.gz",
-      "linesRead": 50,
-      "percent": 100,
-      "took": 0.084,
-      "status": "success"
-    }
-  ],
-  "error": false,
-  "took": 0.100
-}
-```
----
 ### enrich
-Enriched a file with attributes unpaywall.
-By default, if no attributes is informed, it will enriched with all attributes.
 
-Command
+enrich file with unpaywall attributes
+#### Parameters
 
 | Name | Description |
 | --- | --- |
-| job | Start a update process |
-| status (comming soon) | Get status of process |
+| --file \<file> | file wich must be enriched |
+| --separator <separator> | separator of csv file |
+| --attributes <attributes>  | attributes which must be enriched in graphql format. By default all attributes are added |
+| --out <out> | name of enriched file. By default, the output file is named: out.jsonl / out.csv |
+| --verbose | display loadbar and exit if process end |
+| -I --index  | name of the index to which the data is inserted |
 | | |
 
-#### job
-##### Parameters
-| Name | Description |
-| --- | --- |
-| --file | File which must be enriched |
-| --attributes | Attributes which must be enriched in graphql format. By default, all attributes are added |
-| --separator | Separator of out csv file |
-| --out | Name of enriched file. By default, it's named: out.jsonl |
-| -I --index  | name of the index from which the data will be retrieved |
-| -U --use | use a custom config |
-##### Examples
+#### Examples
 
----
 ```bash
 $ ezu enrich job --file mustBeEnrich.csv --separator ";"
-```
----
-```bash
+
 $ ezu enrich job --file mustBeEnrich.jsonl --separator ";" --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }"
 ```
+
 ---
+### apikey-create
+
+create new apikey
+
+#### Parameters
+
+| Name | Description |
+| --- | --- |
+| --keyname <keyname> | name of apikey |
+| --access <access> | name of access services of apikey seperated by comma. By default it set at ['graphql'] |
+| --attributes <attributes>  | unpaywall attributes seperated apikey seperated by comma. By default it set at '*' |
+| --allowed <allowed> | indicates if the key is authorized or not. "true" or "false" only. By default it set at true |
+| | |
+
+#### Example
+
+```bash
+ezu apikey-create --keyname user1
+
+{
+  "apikey": "b5a975cac5d54839e8cf61d58df3c408f7ac9067eee86d270b0e4ff80d3e198e",
+  "config": {
+    "name": "user1",
+    "access": [
+      "graphql"
+    ],
+    "attributes": "*",
+    "allowed": true
+  }
+}
+```
+
+```bash
+ezu apikey-create --keyname user2 --access graphql,enrich,update --allowed false --attributes doi
+
+{
+  "apikey": "597a0ece8c2faf36f6567709025741f804fca9a9af065e7a59324ef19dd9846d",
+  "config": {
+    "name": "user2",
+    "access": [
+      "graphql",
+      "enrich",
+      "update"
+    ],
+    "attributes": "doi",
+    "allowed": false
+  }
+}
+```
+
+---
+### apikey-update
+
+update apikey
+
+#### Parameters
+
+| Name | Description |
+| --- | --- |
+| --apikey <apikey> | apikey |
+| --keyname <keyname> | name of apikey |
+| --access <access> | name of access services of apikey seperated by comma. By default it set at ['graphql'] |
+| --attributes <attributes>  | unpaywall attributes seperated apikey seperated by comma. By default it set at '*' |
+| --allowed <allowed> | indicates if the key is authorized or not. "true" or "false" only. By default it set at true |
+| | |
+
+---
+
+### apikey-delete
+
+delete apikey
+
+| Name | Description |
+| --- | --- |
+| --apikey <apikey> | apikey |
+| | |
+
+---
+### apikey-get
+
+get config of apikey
+
+#### Parameters
+
+| Name | Description |
+| --- | --- |
+| --apikey <apikey> | apikey |
+| | |
+
+
 
 
 ## Unpaywall structure

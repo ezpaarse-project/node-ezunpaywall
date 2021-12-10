@@ -83,14 +83,14 @@ const apiKeyCreate = async (option) => {
 
   const options = {
     name: option?.keyname,
-    attributes: option?.attributes,
+    attributes: option?.attributes?.split(','),
     access: option?.access?.split(','),
     allowed: option?.allowed,
   };
 
   const { error, value } = joi.object({
     name: joi.string().trim().required(),
-    attributes: joi.string().trim().valid(...unpaywallAttrs).default('*'),
+    attributes: joi.array().items(joi.string().trim().valid(...unpaywallAttrs)).default(['*']),
     access: joi.array().items(joi.string().trim().valid(...availableAccess)).default(['graphql']),
     allowed: joi.string().default('true'),
   }).validate(options);
@@ -113,6 +113,7 @@ const apiKeyCreate = async (option) => {
       },
     });
   } catch (err) {
+    console.log(err.response.data);
     logger.errorRequest('POST', err?.response?.config, err?.response?.status);
     process.exit(1);
   }
@@ -140,7 +141,7 @@ const apiKeyUpdate = async (option) => {
   const options = {
     apikey: option.apikey,
     name: option?.keyname,
-    attributes: option?.attributes,
+    attributes: option?.attributes?.split(','),
     access: option?.access?.split(','),
     allowed: option?.allowed,
   };
@@ -148,7 +149,7 @@ const apiKeyUpdate = async (option) => {
   const { error, value } = joi.object({
     apikey: joi.string().required(),
     name: joi.string().trim(),
-    attributes: joi.string().trim().valid(...unpaywallAttrs).default('*'),
+    attributes: joi.array().items(joi.string().trim().valid(...unpaywallAttrs)).default(['*']),
     access: joi.array().items(joi.string().trim().valid(...availableAccess)).default(['graphql', 'enrich']),
     allowed: joi.boolean().default(true),
   }).validate(options);
@@ -239,7 +240,7 @@ const apiKeyGet = async (option) => {
       process.exit(1);
     }
 
-    console.log(JSON.stringify(res?.data?.keys, null, 2));
+    console.log(JSON.stringify(res?.data, null, 2));
     process.exit(0);
   }
 

@@ -43,10 +43,6 @@ const updateJobFile = async (option) => {
     }
   }
 
-  if (!option.force) {
-    await force();
-  }
-
   if (option.list) {
     const snapshots = await getSnapshots();
     if (!snapshots.length) {
@@ -202,10 +198,6 @@ const updateJobPeriod = async (option) => {
 const updateJobSnapshot = async (option) => {
   const ezunpaywall = await connection();
   const config = await getConfig();
-
-  if (!option.force) {
-    await force();
-  }
 
   const data = {};
 

@@ -73,10 +73,7 @@ const ping = async () => {
   try {
     configApikey = await ezunpaywall({
       method: 'GET',
-      url: '/api/apikey/config',
-      headers: {
-        'x-api-key': config.apikey,
-      },
+      url: `/api/apikey/config/${config.apikey}`,
     });
   } catch (err) {
     logger.errorRequest('GET', err?.response?.config, err?.response?.status);
