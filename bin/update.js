@@ -101,7 +101,7 @@ const getSnapshots = async () => {
       url: '/api/update/snapshot',
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
   return res?.data || [];
@@ -120,7 +120,7 @@ const getReport = async (filename, query) => {
       params: query,
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
   return res?.data;
@@ -147,7 +147,7 @@ const getReports = async () => {
       logger.warn('No report available');
       process.exit(0);
     }
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     logger.error(err);
     process.exit(1);
   }
@@ -169,7 +169,7 @@ const force = async () => {
     });
     latestSnapshotFromUnpaywall = latestSnapshotFromUnpaywall?.data;
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
@@ -184,7 +184,7 @@ const force = async () => {
       },
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 

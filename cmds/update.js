@@ -290,7 +290,7 @@ const updateStatus = async (option) => {
       url: '/api/update/status',
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 

@@ -20,7 +20,7 @@ const ping = async () => {
       url: '/api/',
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
   logger.info('Ping graphql service: OK');
@@ -38,7 +38,7 @@ const ping = async () => {
       url: '/api/update/',
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
@@ -50,7 +50,7 @@ const ping = async () => {
       url: '/api/enrich/',
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
@@ -62,7 +62,7 @@ const ping = async () => {
       url: '/api/apikey/',
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
@@ -76,7 +76,7 @@ const ping = async () => {
       url: `/api/apikey/config/${config.apikey}`,
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 

@@ -104,7 +104,7 @@ const enrich = async (option) => {
       responseType: 'stream',
     });
   } catch (err) {
-    logger.errorRequest(err?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
