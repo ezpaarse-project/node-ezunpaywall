@@ -236,7 +236,7 @@ const apiKeyGet = async (option) => {
         },
       });
     } catch (err) {
-      logger.errorRequest('GET', err?.response?.config, err?.response?.status);
+      logger.errorRequest(err?.config, err?.response?.status);
       process.exit(1);
     }
 
@@ -254,7 +254,7 @@ const apiKeyGet = async (option) => {
         responseType: 'json',
       });
     } catch (err) {
-      logger.errorRequest('GET', err?.response?.config, err?.response?.status);
+      logger.errorRequest(err?.config, err?.response?.status);
       process.exit(1);
     }
 
