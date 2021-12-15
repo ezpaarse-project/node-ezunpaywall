@@ -61,7 +61,7 @@ const enrich = async (option) => {
       responseType: 'json',
     });
   } catch (err) {
-    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
@@ -80,7 +80,7 @@ const enrich = async (option) => {
       responseType: 'json',
     });
   } catch (err) {
-    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 

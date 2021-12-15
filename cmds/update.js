@@ -81,7 +81,7 @@ const updateJobFile = async (option) => {
       },
     });
   } catch (err) {
-    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
   logger.info(`Insert "${option.file}"`);
@@ -165,7 +165,7 @@ const updateJobPeriod = async (option) => {
       },
     });
   } catch (err) {
-    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
@@ -213,7 +213,7 @@ const updateJobSnapshot = async (option) => {
       },
     });
   } catch (err) {
-    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
   logger.info('Insert current snapshot');

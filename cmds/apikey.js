@@ -113,8 +113,7 @@ const apiKeyCreate = async (option) => {
       },
     });
   } catch (err) {
-    console.log(err.response.data);
-    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
@@ -172,7 +171,7 @@ const apiKeyUpdate = async (option) => {
       },
     });
   } catch (err) {
-    logger.errorRequest('PUT', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
@@ -206,7 +205,7 @@ const apiKeyDelete = async (option) => {
       },
     });
   } catch (err) {
-    logger.errorRequest('DELETE', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     process.exit(1);
   }
   logger.info(`apikey [${option.apikey}] is deleted successfully`);

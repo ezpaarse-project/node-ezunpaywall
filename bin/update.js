@@ -29,7 +29,7 @@ const getState = async (file, latest) => {
       },
     });
   } catch (err) {
-    logger.errorRequest('POST', err?.response?.config, err?.response?.status);
+    logger.errorRequest(err);
     logger.error(err);
     process.exit(1);
   }
