@@ -1,4 +1,6 @@
 const joi = require('joi');
+const fs = require('fs-extra');
+const path = require('path');
 
 const logger = require('../lib/logger');
 
@@ -265,9 +267,63 @@ const apiKeyGet = async (option) => {
   process.exit(1);
 };
 
+/**
+ * load apikey with json file
+ *
+ * @param {String} option.file --file | json file with apikey and config
+ */
+const apiKeyLoad = async (option) => {
+  const ezunpaywall = await connection();
+  const config = await getConfig();
+
+  const { error, value } = joi.string().required().validate(option?.file);
+
+  if (error) {
+    logger.error(error.details[0].message);
+    process.exit(1);
+  }
+
+  const filepath = value;
+
+  if (!await fs.pathExists(filepath)) {
+    logger.error(`[${filepath}] not fount`);
+    process.exit(1);
+  }
+
+  let data;
+
+  try {
+    data = await fs.readFile(filepath);
+    data = JSON.parse(data);
+  } catch (err) {
+    logger.error(err);
+  }
+
+  let res;
+
+  try {
+    res = await ezunpaywall({
+      method: 'POST',
+      url: '/api/apikey/load',
+      responseType: 'json',
+      headers: {
+        'redis-password': config.redisPassword,
+      },
+      data,
+    });
+  } catch (err) {
+    logger.errorRequest(err);
+    process.exit(1);
+  }
+
+  logger.info('Your apikey file are loaded successfully');
+  process.exit(0);
+};
+
 module.exports = {
   apiKeyCreate,
   apiKeyUpdate,
   apiKeyDelete,
   apiKeyGet,
+  apiKeyLoad,
 };

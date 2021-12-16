@@ -42,8 +42,11 @@ describe('Test: enrichment with a CSV file', async () => {
     it('Should enrich the file on 3 lines with all unpaywall attributes and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       do {
@@ -60,8 +63,11 @@ describe('Test: enrichment with a CSV file', async () => {
     it('Should enrich the file on 2 lines with all unpaywall attributes and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file2.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       do {
@@ -80,8 +86,11 @@ describe('Test: enrichment with a CSV file', async () => {
     it('Should enrich the file on 3 lines with args { is_oa } and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{is_oa}" --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{is_oa}" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       do {
@@ -98,8 +107,11 @@ describe('Test: enrichment with a CSV file', async () => {
     it('Should enrich the file on 3 lines with args { best_oa_location { license } } and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ best_oa_location { license } }" --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ best_oa_location { license } }" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       do {
@@ -116,8 +128,11 @@ describe('Test: enrichment with a CSV file', async () => {
     it('Should enrich the file on 3 lines with args { z_authors { given } } and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ z_authors { given } }" --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ z_authors { given } }" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       do {
@@ -134,8 +149,11 @@ describe('Test: enrichment with a CSV file', async () => {
     it('Should enrich the file on 3 lines with args { is_oa, best_oa_location { license }, z_authors{ family } } and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }" --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       do {
@@ -154,8 +172,11 @@ describe('Test: enrichment with a CSV file', async () => {
     it('Should enrich the file on 3 lines with all unpaywall attributes and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --separator ";" --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --separator ";" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       do {

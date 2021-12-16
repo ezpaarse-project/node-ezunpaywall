@@ -17,6 +17,8 @@ const {
 
 const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 
+const sourcesDir = path.resolve(__dirname, 'sources');
+
 const greenColor = ['\u001b[32m', '\u001b[39m'];
 const info = `${greenColor[0]}info${greenColor[1]}`;
 
@@ -40,7 +42,7 @@ describe('Apikey: test apikey command', async () => {
       let key;
 
       try {
-        key = JSON.parse(res?.stdout.trim());
+        key = JSON.parse(res?.stdout?.trim());
       } catch (err) {
         console.error(err);
       }
@@ -418,5 +420,26 @@ describe('Apikey: test apikey command', async () => {
       await deleteAll();
       await load();
     });
+  });
+
+  describe('Apikey: update', async () => {
+    it('Should load apikey file', async () => {
+      const keysPath = path.resolve(sourcesDir, 'apikey', 'keys.json');
+
+      let res;
+      try {
+        await exec(`${ezu} apikey-load --file ${keysPath}`);
+      } catch (err) {
+        res = err;
+      }
+
+      // TODO test apikey are present
+      expect(res).to.not.equal('undefined');
+    });
+  });
+
+  after(async () => {
+    await deleteAll();
+    await load();
   });
 });

@@ -6,8 +6,8 @@
   "author": "felixleo22",
   "license": "CeCILL",
   "bin": {
-    "ezunpaywall": "./bin/ezunpaywall",
-    "ezu": "./bin/ezunpaywall"
+    "ezunpaywall": "./ezunpaywall",
+    "ezu": "./ezunpaywall"
   },
   "scripts": {
     "precommit": "npm run lint",

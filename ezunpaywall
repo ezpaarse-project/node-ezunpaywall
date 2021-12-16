@@ -22,6 +22,7 @@ const {
   apiKeyUpdate,
   apiKeyDelete,
   apiKeyGet,
+  apiKeyLoad,
 } = require('./cmds/apikey');
 
 program.on('command:*', () => {
@@ -146,5 +147,13 @@ program
   .action((
     option,
   ) => apiKeyGet(option).catch((err) => console.log(err)));
+
+program
+  .command('apikey-load')
+  .description('load the content of JSON file of apikey')
+  .option('--file <file>', 'filepath of JSON file of apikey')
+  .action((
+    option,
+  ) => apiKeyLoad(option).catch((err) => console.log(err)));
 
 program.parse(process.argv);

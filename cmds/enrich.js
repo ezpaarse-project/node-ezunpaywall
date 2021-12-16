@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 const fs = require('fs-extra');
 const path = require('path');
+const joi = require('joi');
 const FormData = require('form-data');
 
 const connection = require('../lib/ezunpaywall');
@@ -23,12 +24,21 @@ const enrich = async (option) => {
 
   const extAccepted = ['csv', 'jsonl'];
 
-  if (!option.file) {
-    logger.error('file expected');
+  const { error, value } = joi.string().required().validate(option?.file);
+
+  if (error) {
+    logger.error(error.details[0].message);
     process.exit(1);
   }
 
-  const type = path.extname(option.file).substring(1);
+  const filepath = value;
+
+  if (!await fs.pathExists(filepath)) {
+    logger.error(`[${filepath}] not fount`);
+    process.exit(1);
+  }
+
+  const type = path.extname(filepath).substring(1);
 
   if (!extAccepted.includes(type)) {
     logger.error(`${type} is not suported for enrich. Required csv or jsonl`);
@@ -46,10 +56,10 @@ const enrich = async (option) => {
   if (option.attributes) data.args = option.attributes;
   if (option.index) data.index = option.index;
 
-  const stat = await fs.stat(option.file);
+  const stat = await fs.stat(filepath);
 
   const formData = new FormData();
-  formData.append('file', fs.createReadStream(option.file));
+  formData.append('file', fs.createReadStream(filepath));
 
   let res1;
   try {

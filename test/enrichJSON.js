@@ -41,8 +41,11 @@ describe('Test: enrichment with a json file', async () => {
     it('Should enrich the file on 3 lines with all unpaywall attributes and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       while (!state?.done) {
@@ -60,7 +63,11 @@ describe('Test: enrichment with a json file', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file2.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
 
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
 
       let state;
       do {
@@ -77,9 +84,11 @@ describe('Test: enrichment with a json file', async () => {
     it('Should enrich the file on 3 lines with { is_oa } attributes and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa }" --index unpaywall-test`);
-
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa }" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
       let state;
       do {
         state = await getState();
@@ -95,9 +104,11 @@ describe('Test: enrichment with a json file', async () => {
     it('Should enrich the file on 3 lines with args { best_oa_location { license } } and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ best_oa_location { license } }" --index unpaywall-test`);
-
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ best_oa_location { license } }" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
       let state;
       do {
         state = await getState();
@@ -113,9 +124,11 @@ describe('Test: enrichment with a json file', async () => {
     it('Should enrich the file on 3 lines with args { z_authors { family } } and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ z_authors { family } }" --index unpaywall-test`);
-
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ z_authors { family } }" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
       let state;
       do {
         state = await getState();
@@ -131,9 +144,11 @@ describe('Test: enrichment with a json file', async () => {
     it('Should enrich the file on 3 lines with args { is_oa, best_oa_location { license }, z_authors{ family } } and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.jsonl');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.jsonl');
-
-      await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }" --index unpaywall-test`);
-
+      try {
+        await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }" --index unpaywall-test`);
+      } catch (err) {
+        console.error(err);
+      }
       let state;
       do {
         state = await getState();

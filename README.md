@@ -81,7 +81,7 @@ redisPassword
 ```
 
 ```bash
-$ ezunpaywall config --set baseURL https://localhost.test.fr
+ezunpaywall config --set baseURL https://localhost.test.fr
 ```
 
 ```bash
@@ -100,7 +100,7 @@ Check if services are available.
 | -u --use | Use a custom config |
 #### Example
 ```bash
-$ ezunpaywall ping
+ezunpaywall ping
 
 info: Ping graphql service: OK
 info: Ping update service: OK
@@ -127,7 +127,7 @@ insert the content of changefile installed on ezunpaywall
 #### Example
 
 ```bash
-$ ezu update-job-file --file fake1.jsonl.gz
+ezu update-job-file --file fake1.jsonl.gz
 
 info: Insert "fake1.jsonl.gz"
 ```
@@ -149,13 +149,13 @@ start an unpaywall data update process
 | | |
 
 ```bash
-$ ezu update-job-period --startDate 2021-12-01 --endDate 2021-12-07
+ezu update-job-period --startDate 2021-12-01 --endDate 2021-12-07
 
 info: Insert "day" changefiles between "2021-12-01" and "2021-12-07"
 ```
 
 ```bash
-$ ezu update-job-period --period week --startDate 2021-12-01 --endDate 2021-12-07
+ezu update-job-period --period week --startDate 2021-12-01 --endDate 2021-12-07
 
 info: Insert "week" changefiles between "2021-12-01" and "2021-12-07"
 ```
@@ -171,7 +171,7 @@ download and insert the current snapshot
 | | |
 
 ```bash
-$ ezu update-job-snapshot
+ezu update-job-snapshot
 
 info: Insert current snapshot
 ```
@@ -195,7 +195,7 @@ get report of update process
 
 
 ```bash
-$ ezu update report -L
+ezu update report -L
 
 ? reports (Use arrow keys)
 ❯ report1.json
@@ -222,7 +222,7 @@ $ ezu update report -L
 ```
 
 ```bash
-$ ezu update report --latest
+ezu update report --latest
 
 {
   "done": true,
@@ -258,9 +258,9 @@ get status of update process
 #### Example
 
 ```bash
-$ ezu update status
+ezu update status
 
-$ info: An update is being done
+info: An update is being done
 {
   "state": {
     "done": false,
@@ -289,10 +289,10 @@ $ info: An update is being done
 or
 
 ```bash
-$ ezu update status
+ezu update status
 
-$ info: No update is in progress
-$ info: Use ezu update report --latest to see the latest report
+info: No update is in progress
+info: Use ezu update report --latest to see the latest report
 ```
 ---
 ### enrich
@@ -313,9 +313,9 @@ enrich file with unpaywall attributes
 #### Examples
 
 ```bash
-$ ezu enrich job --file mustBeEnrich.csv --separator ";"
+ezu enrich job --file mustBeEnrich.csv --separator ";"
 
-$ ezu enrich job --file mustBeEnrich.jsonl --separator ";" --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }"
+ezu enrich job --file mustBeEnrich.jsonl --separator ";" --attributes "{ is_oa, best_oa_location { license }, z_authors{ family } }"
 ```
 
 ---
@@ -339,23 +339,23 @@ create new apikey
 ezu apikey-create --keyname user1
 
 {
-  "apikey": "b5a975cac5d54839e8cf61d58df3c408f7ac9067eee86d270b0e4ff80d3e198e",
+  "apikey": "abcd1",
   "config": {
     "name": "user1",
     "access": [
       "graphql"
     ],
-    "attributes": "*",
+    "attributes": ["*"],
     "allowed": true
   }
 }
 ```
 
 ```bash
-ezu apikey-create --keyname user2 --access graphql,enrich,update --allowed false --attributes doi
+ezu apikey-create --keyname user2 --access graphql,enrich,update --allowed false --attributes doi,is_oa
 
 {
-  "apikey": "597a0ece8c2faf36f6567709025741f804fca9a9af065e7a59324ef19dd9846d",
+  "apikey": "abcd2",
   "config": {
     "name": "user2",
     "access": [
@@ -363,7 +363,7 @@ ezu apikey-create --keyname user2 --access graphql,enrich,update --allowed false
       "enrich",
       "update"
     ],
-    "attributes": "doi",
+    "attributes": ["doi", "is_oa"],
     "allowed": false
   }
 }
@@ -385,6 +385,23 @@ update apikey
 | --allowed <allowed> | indicates if the key is authorized or not. "true" or "false" only. By default it set at true |
 | | |
 
+#### Example
+
+```bash
+ezu apikey-update --apikey demo --keyname updated-demo --access graphql --attributes doi,is_oa
+
+{
+  "apikey": "demo",
+  "config": {
+    "name": "updated-demo",
+    "access": [
+      "graphql"
+    ],
+    "attributes": ["doi","is_oa"],
+    "allowed": true
+  }
+}
+```
 ---
 
 ### apikey-delete
@@ -396,6 +413,14 @@ delete apikey
 | --apikey <apikey> | apikey |
 | | |
 
+#### Example
+
+```bash
+apikey-delete --apikey demo
+
+info: apikey [demo] is deleted successfully
+```
+
 ---
 ### apikey-get
 
@@ -406,9 +431,42 @@ get config of apikey
 | Name | Description |
 | --- | --- |
 | --apikey <apikey> | apikey |
+| --all | get all apikey |
+
+#### Example
+
+```bash
+ezu apikey-get --apikey demo
+
+{
+  "name": "user3",
+  "access": [
+    "enrich",
+    "admin"
+  ],
+  "attributes": "*",
+  "allowed": true
+}
+```
+
+### apikey-load
+
+load the content of JSON file of apikey
+
+#### Parameters
+
+| Name | Description |
+| --- | --- |
+| --file <file> | filepath of JSON file of apikey  |
 | | |
 
+#### Example
 
+```bash
+ezu apikey-load --file ./keys.json
+
+info: Your apikey file are loaded successfully
+```
 
 
 ## Unpaywall structure
