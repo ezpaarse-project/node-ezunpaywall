@@ -468,7 +468,6 @@ ezu apikey-load --file ./keys.json
 info: Your apikey file are loaded successfully
 ```
 
-
 ## Unpaywall structure
 To see all available unpaywall attributes, [click here](https://github.com/ezpaarse-project/ez-unpaywall/tree/master#object-structure).
 

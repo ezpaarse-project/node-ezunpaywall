@@ -77,7 +77,7 @@ const ping = async () => {
     });
   } catch (err) {
     logger.errorRequest(err);
-    process.exit(1);
+    process.exit(0);
   }
 
   logger.info(`You have access to ${configApikey?.data?.access.join(', ')} service(s)`);

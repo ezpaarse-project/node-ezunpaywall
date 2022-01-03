@@ -1,6 +1,5 @@
 const joi = require('joi');
 const fs = require('fs-extra');
-const path = require('path');
 
 const logger = require('../lib/logger');
 
@@ -299,10 +298,8 @@ const apiKeyLoad = async (option) => {
     logger.error(err);
   }
 
-  let res;
-
   try {
-    res = await ezunpaywall({
+    await ezunpaywall({
       method: 'POST',
       url: '/api/apikey/load',
       responseType: 'json',
