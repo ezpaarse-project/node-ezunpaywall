@@ -25,7 +25,7 @@ const ping = async () => {
   }
   logger.info('Ping graphql service: OK');
 
-  if (res?.data?.elastic !== 'Alive') {
+  if (!res?.data?.elastic) {
     logger.error('Cannot request elastic');
     process.exit(1);
   }
