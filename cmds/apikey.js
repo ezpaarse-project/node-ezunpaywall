@@ -6,7 +6,7 @@ const logger = require('../lib/logger');
 const connection = require('../lib/ezunpaywall');
 const { getConfig } = require('../lib/config');
 
-const availableAccess = ['admin', 'update', 'enrich', 'graphql'];
+const availableAccess = ['update', 'enrich', 'graphql'];
 
 const unpaywallAttrs = [
   '*',
