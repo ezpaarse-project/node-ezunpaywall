@@ -23,6 +23,7 @@
     "inquirer": "^7.3.3",
     "lodash.get": "^4.4.2",
     "lodash.has": "^4.5.2",
+    "lodash.isequal": "^4.5.0",
     "lodash.set": "^4.3.2",
     "lodash.setwith": "^4.3.2",
     "papaparse": "^5.3.0",

@@ -317,6 +317,7 @@ const update = async (command, options) => {
     if (options.endDate) data.endDate = options.endDate;
     if (options.index) data.index = options.index;
     if (options.interval) data.interval = options.interval;
+    if (options.snapshot) data.snapshot = true;
 
     let res;
 
@@ -326,7 +327,7 @@ const update = async (command, options) => {
         url: '/api/update/job',
         data,
         headers: {
-          'X-API-KEY': config.apikey,
+          'x-api-key': config.apikey,
         },
       });
     } catch (err) {

@@ -29,10 +29,13 @@ const info = `${greenColor[0]}info${greenColor[1]}`;
 const redColor = ['\x1B[31m', '\x1B[39m'];
 const error = `${redColor[0]}error${redColor[1]}`;
 
-describe('Week: test week update', async () => {
-  describe('Week: Do weekly update', () => {
+describe('Update: test week update', async () => {
+  before(async () => {
+    await ping();
+  });
+
+  describe('Update: Do weekly update', () => {
     before(async () => {
-      await ping();
       await updateChangeFile('week');
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteSnapshot('fake2.jsonl.gz');
@@ -100,7 +103,7 @@ describe('Week: test week update', async () => {
   });
 });
 
-describe('Week: download and insert file from unpaywall between a period', async () => {
+describe('Update: download and insert file from unpaywall between a period', async () => {
   const now = Date.now();
   const oneDay = (1 * 24 * 60 * 60 * 1000);
 
@@ -117,9 +120,8 @@ describe('Week: download and insert file from unpaywall between a period', async
   const date5 = new Date(now - (5 * oneDay)).toISOString().slice(0, 10);
   const tomorrow = new Date(now + (1 * oneDay)).toISOString().slice(0, 10);
 
-  describe(`Week: do a download and insert between ${date2} and ${dateNow}`, async () => {
+  describe(`Update: do a download and insert between ${date2} and ${dateNow}`, async () => {
     before(async () => {
-      await ping();
       await updateChangeFile('week');
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteSnapshot('fake2.jsonl.gz');
@@ -189,9 +191,8 @@ describe('Week: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe(`Week: do a download and insert between ${date3} and ${date2}`, () => {
+  describe(`Update: do a download and insert between ${date3} and ${date2}`, () => {
     before(async () => {
-      await ping();
       await updateChangeFile('week');
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteSnapshot('fake2.jsonl.gz');
@@ -261,9 +262,8 @@ describe('Week: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe(`Week: don't download and insert between ${date5} and ${date4} because there is no file between these dates in ezunpaywall`, () => {
+  describe(`Update: don't download and insert between ${date5} and ${date4} because there is no file between these dates in ezunpaywall`, () => {
     before(async () => {
-      await ping();
       await updateChangeFile('week');
       await deleteSnapshot('fake1.jsonl.gz');
       await deleteSnapshot('fake2.jsonl.gz');
@@ -289,7 +289,7 @@ describe('Week: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe(`Week: don't do a download and insert with endDate=${date1} only`, () => {
+  describe(`Update: don't do a download and insert with endDate=${date1} only`, () => {
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update job --endDate ${date1} --interval week`);
@@ -299,7 +299,7 @@ describe('Week: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe('Week: don\'t do a download and insert with startDate in the wrong format', () => {
+  describe('Update: don\'t do a download and insert with startDate in the wrong format', () => {
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update job --startDate LookAtMyDab --interval week`);
@@ -325,7 +325,7 @@ describe('Week: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe(`Week: don't download and insert between ${date2} and ${date3} because startDate=${date2} is superior than endDate=${date3}`, () => {
+  describe(`Update: don't download and insert between ${date2} and ${date3} because startDate=${date2} is superior than endDate=${date3}`, () => {
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update job --startDate ${date2} --endDate ${date3} --interval week`);
@@ -335,7 +335,7 @@ describe('Week: download and insert file from unpaywall between a period', async
     });
   });
 
-  describe(`Week: don't download and insert with startDate=${tomorrow} because there can be no futuristic file`, () => {
+  describe(`Update: don't download and insert with startDate=${tomorrow} because there can be no futuristic file`, () => {
     it('Should return a error message', async () => {
       try {
         await exec(`${ezu} update job --startDate ${tomorrow} --interval week`);

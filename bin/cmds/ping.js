@@ -63,9 +63,6 @@ const ping = async (options) => {
     await ezunpaywall({
       method: 'GET',
       url: '/api/apikey/',
-      headers: {
-        'x-api-key': config.apikey
-      },
     });
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywall.defaults.baseURL}/api/apikey`);
@@ -73,7 +70,7 @@ const ping = async (options) => {
     process.exit(1);
   }
 
-  logger.info('Ping auth service: OK');
+  logger.info('Ping apikey service: OK');
 
   let configApikey;
 
