@@ -205,7 +205,7 @@ const updateJobSnapshot = async (option) => {
   try {
     await ezunpaywall({
       method: 'POST',
-      url: '/api/update/job/period',
+      url: '/api/update/job/snapshot',
       data,
       headers: {
         'x-api-key': config.apikey,

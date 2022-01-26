@@ -48,10 +48,10 @@ program
 program
   .command('update-job-file')
   .description('insert the content of changefile installed on ezunpaywall')
-  .option('--file <file>', 'snapshot\'s file installed on ezunpaywall')
+  .option('--file <file>', 'changefiles file installed on ezunpaywall')
   .option('--offset <offset>', 'line where processing will start')
   .option('--limit <limit>', 'line where processing will end')
-  .option('-L --list', 'list of snapshot installed on ezunpaywall')
+  .option('-L --list', 'list of changefile installed on ezunpaywall')
   .option('-I --index <index>', 'name of the index to which the data is inserted')
   .action((
     option,
@@ -80,7 +80,7 @@ program
 program
   .command('update-report')
   .description('get report of update process')
-  .option('--file <file>', 'snapshot\'s file installed on ezunpaywall')
+  .option('--file <file>', 'name of report on ezunpaywall')
   .option('--latest', 'latest report')
   .option('-L --list', 'list of reports on ezunpaywall')
   .action((
@@ -90,7 +90,7 @@ program
 program
   .command('update-status')
   .description('get status of update process')
-  .option('--verbose', 'snapshot\'s file installed on ezunpaywall')
+  .option('--verbose', 'dynamic display')
   .action((
     option,
   ) => updateStatus(option).catch((err) => console.log(err)));
