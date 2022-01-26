@@ -29,8 +29,7 @@ const updateJobFile = async (option) => {
   const config = await getConfig();
 
   if (option.file) {
-    const pattern = /^[a-zA-Z0-9_.-]+(.gz)$/;
-    if (!pattern.test(option.file)) {
+    if (!/\.gz$/i.test(option.file)) {
       logger.error('Only ".gz" files are accepted');
       process.exit(1);
     }
@@ -38,7 +37,7 @@ const updateJobFile = async (option) => {
 
   if (option.limit && option.offset) {
     if (Number(option.limit) <= Number(option.offset)) {
-      logger.error('Limit cannot be low than offset or 0');
+      logger.error('Limit cannot be lower than offset or 0');
       process.exit(1);
     }
   }
@@ -116,7 +115,7 @@ const updateJobPeriod = async (option) => {
   }
 
   if (new Date(option.startDate).getTime() > Date.now()) {
-    logger.error('startDate cannot be in the futur');
+    logger.error('startDate cannot be in the future');
     process.exit(1);
   }
 
@@ -135,12 +134,12 @@ const updateJobPeriod = async (option) => {
   const pattern = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
 
   if (option.startDate && !pattern.test(option.startDate)) {
-    logger.error('startDate are in wrong format, required YYYY-mm-dd');
+    logger.error('startDate is in wrong format, required YYYY-mm-dd');
     process.exit(1);
   }
 
   if (option.endDate && !pattern.test(option.endDate)) {
-    logger.error('endDate are in wrong format, required YYYY-mm-dd');
+    logger.error('endDate is in wrong format, required YYYY-mm-dd');
     process.exit(1);
   }
 
@@ -241,8 +240,7 @@ const updateReport = async (option) => {
       logger.info('No reports on ezunpaywall');
       process.exit(0);
     }
-    let filename;
-    filename = await inquirer.prompt([{
+    const { files: filename } = await inquirer.prompt([{
       type: 'list',
       pageSize: 5,
       name: 'files',
@@ -255,7 +253,6 @@ const updateReport = async (option) => {
         resolve(result);
       }),
     }]);
-    filename = filename.files;
 
     report = await getReport(filename, {});
     console.log(JSON.stringify(report, null, 2));
@@ -299,15 +296,15 @@ const updateStatus = async (option) => {
     logger.info('No update is in progress');
     logger.info('Use ezu update report --latest to see the latest report');
     process.exit(0);
+  }
+
+  logger.info('An update is in progress');
+
+  if (option.verbose) {
+    await verbose();
   } else {
-    logger.info('An update is being done');
-    if (option.verbose) {
-      await verbose();
-    } else {
-      const state = await getState('', true);
-      console.log(JSON.stringify(state, null, 2));
-      process.exit(0);
-    }
+    const state = await getState('', true);
+    console.log(JSON.stringify(state, null, 2));
   }
   process.exit(0);
 };

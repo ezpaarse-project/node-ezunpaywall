@@ -305,7 +305,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
       try {
         await exec(`${ezu} update-job-period --startDate LookAtMyDab --interval week`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
+        expect(err?.stdout.trim()).equal(`${error}: startDate is in wrong format, required YYYY-mm-dd`);
       }
     });
 
@@ -313,7 +313,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
       try {
         await exec(`${ezu} update-job-period --startDate 01-01-2000 --interval week`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
+        expect(err?.stdout.trim()).equal(`${error}: startDate is in wrong format, required YYYY-mm-dd`);
       }
     });
 
@@ -321,7 +321,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
       try {
         await exec(`${ezu} update-job-period --startDate 2000-50-50 --interval week`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: startDate are in wrong format, required YYYY-mm-dd`);
+        expect(err?.stdout.trim()).equal(`${error}: startDate is in wrong format, required YYYY-mm-dd`);
       }
     });
   });
@@ -341,7 +341,7 @@ describe('Update: download and insert file from unpaywall between a period', asy
       try {
         await exec(`${ezu} update-job-period --startDate ${tomorrow} --interval week`);
       } catch (err) {
-        expect(err?.stdout.trim()).equal(`${error}: startDate cannot be in the futur`);
+        expect(err?.stdout.trim()).equal(`${error}: startDate cannot be in the future`);
       }
     });
   });

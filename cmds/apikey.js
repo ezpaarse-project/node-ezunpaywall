@@ -284,18 +284,17 @@ const apiKeyLoad = async (option) => {
 
   const filepath = value;
 
-  if (!await fs.pathExists(filepath)) {
-    logger.error(`[${filepath}] not fount`);
-    process.exit(1);
-  }
-
   let data;
-
   try {
-    data = await fs.readFile(filepath);
-    data = JSON.parse(data);
+    const content = await fs.readFile(filepath);
+    data = JSON.parse(content);
   } catch (err) {
-    logger.error(err);
+    if (err.code === 'ENOENT') {
+      logger.error(`[${filepath}] not found`);
+    } else {
+      logger.error(err);
+    }
+    process.exit(1);
   }
 
   try {

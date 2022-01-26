@@ -38,13 +38,12 @@ const getState = async (file, latest) => {
 
 const verbose = async () => {
   let index = 0;
-  let state;
-  state = await getState('', true);
+  let state = await getState('', true);
   let { steps } = state;
   steps.forEach(async (step) => {
     if (step?.percent === 100) {
       createCliProgress(100, step?.task, step?.file);
-      console.log('\r');
+      console.log();
       index += 1;
     }
   });
@@ -80,7 +79,7 @@ const verbose = async () => {
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-      console.log('\r');
+      console.log();
       index += 1;
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -197,8 +196,7 @@ const force = async () => {
   const report = await getReport('', { latest: true });
 
   if (report) {
-    const tasks = report.steps.filter((x) => x.task === 'insert');
-    const [task] = tasks.reverse();
+    const task = report.steps.filter((x) => x.task === 'insert').pop();
     if (task) {
       if (latestSnapshotFromUnpaywall.filename === task.file && !report.error) {
         logger.info(`No new update available from unpaywall, the last one has already been inserted at "${report.endAt}" with [${task.file}]`);
