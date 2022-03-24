@@ -3,8 +3,7 @@ const fs = require('fs-extra');
 
 const logger = require('../lib/logger');
 
-const connection = require('../lib/ezunpaywall');
-const { getConfig } = require('../lib/config');
+const apikeyLib = require('../lib/apikey');
 
 const availableAccess = ['update', 'enrich', 'graphql'];
 
@@ -79,9 +78,6 @@ const unpaywallAttrs = [
  * "true" or "false" only. By default it set at true
  */
 const apiKeyCreate = async (option) => {
-  const ezunpaywall = await connection();
-  const config = await getConfig();
-
   const options = {
     name: option?.keyname,
     attributes: option?.attributes?.split(','),
@@ -101,24 +97,9 @@ const apiKeyCreate = async (option) => {
     process.exit(1);
   }
 
-  let res;
+  const res = await apikeyLib.create(value);
 
-  try {
-    res = await ezunpaywall({
-      method: 'POST',
-      url: '/api/apikey/create',
-      responseType: 'json',
-      data: value,
-      headers: {
-        'redis-password': config.redisPassword,
-      },
-    });
-  } catch (err) {
-    logger.errorRequest(err);
-    process.exit(1);
-  }
-
-  console.log(JSON.stringify(res?.data, null, 2));
+  console.log(JSON.stringify(res, null, 2));
   process.exit(0);
 };
 
@@ -135,48 +116,41 @@ const apiKeyCreate = async (option) => {
  * is authorized or not. "true" or "false" only
  */
 const apiKeyUpdate = async (option) => {
-  const ezunpaywall = await connection();
-  const config = await getConfig();
+  let { apikey } = option;
 
   const options = {
-    apikey: option.apikey,
     name: option?.keyname,
     attributes: option?.attributes?.split(','),
     access: option?.access?.split(','),
     allowed: option?.allowed,
   };
 
-  const { error, value } = joi.object({
-    apikey: joi.string().required(),
+  const checkApikey = joi.string().trim().required().validate(apikey);
+
+  if (checkApikey?.error) {
+    logger.error(checkApikey.details[0].message);
+    process.exit(1);
+  }
+
+  apikey = checkApikey?.value;
+
+  const checkConfig = joi.object({
     name: joi.string().trim(),
     attributes: joi.array().items(joi.string().trim().valid(...unpaywallAttrs)).default(['*']),
     access: joi.array().items(joi.string().trim().valid(...availableAccess)).default(['graphql', 'enrich']),
     allowed: joi.boolean().default(true),
   }).validate(options);
 
-  if (error) {
-    logger.error(error.details[0].message);
+  if (checkConfig?.error) {
+    logger.error(checkConfig?.error.details[0].message);
     process.exit(1);
   }
 
-  let res;
+  const data = checkConfig?.value;
 
-  try {
-    res = await ezunpaywall({
-      method: 'PUT',
-      url: '/api/apikey/update',
-      responseType: 'json',
-      data: value,
-      headers: {
-        'redis-password': config.redisPassword,
-      },
-    });
-  } catch (err) {
-    logger.errorRequest(err);
-    process.exit(1);
-  }
+  const res = await apikeyLib.update(apikey, data);
 
-  console.log(JSON.stringify(res?.data, null, 2));
+  console.log(JSON.stringify(res, null, 2));
   process.exit(0);
 };
 
@@ -186,9 +160,6 @@ const apiKeyUpdate = async (option) => {
  * @param {String} option.apikey --apikey <apikey> | apikey
  */
 const apiKeyDelete = async (option) => {
-  const ezunpaywall = await connection();
-  const config = await getConfig();
-
   const { error, value } = joi.string().required().validate(option.apikey);
 
   if (error) {
@@ -196,19 +167,8 @@ const apiKeyDelete = async (option) => {
     process.exit(1);
   }
 
-  try {
-    await ezunpaywall({
-      method: 'DELETE',
-      url: `/api/apikey/delete/${value}`,
-      responseType: 'json',
-      headers: {
-        'redis-password': config.redisPassword,
-      },
-    });
-  } catch (err) {
-    logger.errorRequest(err);
-    process.exit(1);
-  }
+  await apikeyLib.del(value);
+
   logger.info(`apikey [${option.apikey}] is deleted successfully`);
   process.exit(0);
 };
@@ -220,45 +180,15 @@ const apiKeyDelete = async (option) => {
  * @param {String} option.apikey --apikey <apikey> | get informations about this apikey
  */
 const apiKeyGet = async (option) => {
-  const ezunpaywall = await connection();
-  const config = await getConfig();
-
   if (option.all) {
-    let res;
-
-    try {
-      res = await ezunpaywall({
-        method: 'GET',
-        url: '/api/apikey/all',
-        responseType: 'json',
-        headers: {
-          'redis-password': config.redisPassword,
-        },
-      });
-    } catch (err) {
-      logger.errorRequest(err);
-      process.exit(1);
-    }
-
-    console.log(JSON.stringify(res?.data, null, 2));
+    const res = await apikeyLib.getAll();
+    console.log(JSON.stringify(res, null, 2));
     process.exit(0);
   }
 
   if (option.apikey) {
-    let res;
-
-    try {
-      res = await ezunpaywall({
-        method: 'GET',
-        url: `/api/apikey/config/${option.apikey}`,
-        responseType: 'json',
-      });
-    } catch (err) {
-      logger.errorRequest(err);
-      process.exit(1);
-    }
-
-    console.log(JSON.stringify(res?.data, null, 2));
+    const res = await apikeyLib.get(option.apikey);
+    console.log(JSON.stringify(res, null, 2));
     process.exit(0);
   }
 
@@ -272,9 +202,6 @@ const apiKeyGet = async (option) => {
  * @param {String} option.file --file | json file with apikey and config
  */
 const apiKeyLoad = async (option) => {
-  const ezunpaywall = await connection();
-  const config = await getConfig();
-
   const { error, value } = joi.string().required().validate(option?.file);
 
   if (error) {
@@ -297,20 +224,7 @@ const apiKeyLoad = async (option) => {
     process.exit(1);
   }
 
-  try {
-    await ezunpaywall({
-      method: 'POST',
-      url: '/api/apikey/load',
-      responseType: 'json',
-      headers: {
-        'redis-password': config.redisPassword,
-      },
-      data,
-    });
-  } catch (err) {
-    logger.errorRequest(err);
-    process.exit(1);
-  }
+  await apikeyLib.load(data);
 
   logger.info('Your apikey file are loaded successfully');
   process.exit(0);
