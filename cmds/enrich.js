@@ -4,8 +4,7 @@ const path = require('path');
 const joi = require('joi');
 const FormData = require('form-data');
 
-const connection = require('../lib/ezunpaywall');
-const { getConfig } = require('../lib/config');
+const enrichLib = require('../lib/enrich');
 const logger = require('../lib/logger');
 
 /**
@@ -19,9 +18,6 @@ const logger = require('../lib/logger');
  * @param {boolean} option.use --use <use> - filepath of custom config
  */
 const enrich = async (option) => {
-  const ezunpaywall = await connection();
-  const config = await getConfig();
-
   const extAccepted = ['csv', 'jsonl'];
 
   const { error, value } = joi.string().required().validate(option?.file);
@@ -61,65 +57,23 @@ const enrich = async (option) => {
   const formData = new FormData();
   formData.append('file', fs.createReadStream(filepath));
 
-  let res1;
-  try {
-    res1 = await ezunpaywall({
-      method: 'POST',
-      url: '/api/enrich/upload',
-      data: formData,
-      headers: formData.getHeaders(),
-      responseType: 'json',
-    });
-  } catch (err) {
-    logger.errorRequest(err);
-    process.exit(1);
-  }
+  const res = await enrichLib.upload(formData);
 
-  const id = res1?.data?.id;
-  data.id = id;
+  const { id } = res;
 
-  try {
-    await ezunpaywall({
-      method: 'POST',
-      url: '/api/enrich/job',
-      data,
-      headers: {
-        'Content-length': stat.size,
-        'x-api-key': config.apikey,
-      },
-      responseType: 'json',
-    });
-  } catch (err) {
-    logger.errorRequest(err);
-    process.exit(1);
-  }
+  await enrichLib.job(id, data, stat.size);
 
-  let res2;
+  let state;
 
   do {
-    res2 = await ezunpaywall({
-      method: 'GET',
-      url: `/api/enrich/state/${id}.json`,
-      responseType: 'json',
-    });
+    state = await enrichLib.getState(id);
     await new Promise((resolve) => setTimeout(resolve, 100));
-  } while (!res2?.data?.done);
+  } while (!state?.done);
 
-  let enrichedFile;
-
-  try {
-    enrichedFile = await ezunpaywall({
-      method: 'GET',
-      url: `/api/enrich/enriched/${id}.${type}`,
-      responseType: 'stream',
-    });
-  } catch (err) {
-    logger.errorRequest(err);
-    process.exit(1);
-  }
+  const enrichedFile = await enrichLib.download(id, type);
 
   const writer = fs.createWriteStream(out);
-  enrichedFile.data.pipe(writer);
+  enrichedFile.pipe(writer);
   logger.info(`File enriched at ${path.resolve(out)}`);
 };
 

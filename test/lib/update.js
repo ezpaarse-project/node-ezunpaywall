@@ -18,9 +18,9 @@ const fakeUnpaywall = 'http://localhost:12000';
 const deleteSnapshot = async (filename) => {
   try {
     await chai.request(ezunpaywallURL)
-      .delete(`/api/update/snapshot/${filename}`);
+      .delete(`/api/update/snapshots/${filename}`);
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywallURL}/api/update/snapshot/${filename} - ${err?.response?.status}`);
+    logger.error(`Cannot request ${ezunpaywallURL}/api/update/snapshots/${filename} - ${err?.response?.status}`);
     process.exit(1);
   }
 };
@@ -32,11 +32,11 @@ const deleteSnapshot = async (filename) => {
 const addSnapshot = async (filename) => {
   try {
     await chai.request(ezunpaywallURL)
-      .post('/api/update/snapshot')
+      .post('/api/update/snapshots')
       .set('x-api-key', 'admin')
       .attach('file', path.resolve(snapshotsDir, filename), filename);
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywallURL}/api/update/snapshot - ${err?.response?.status}`);
+    logger.error(`Cannot request ${ezunpaywallURL}/api/update/snapshots - ${err?.response?.status}`);
     process.exit(1);
   }
 };
@@ -77,9 +77,9 @@ const checkIfInUpdate = async () => {
 const getState = async () => {
   let res;
   try {
-    res = await chai.request(ezunpaywallURL).get('/api/update/state');
+    res = await chai.request(ezunpaywallURL).get('/api/update/states');
   } catch (err) {
-    logger.error(`Cannot request ${ezunpaywallURL}/api/update/state - ${err?.response?.status}`);
+    logger.error(`Cannot request ${ezunpaywallURL}/api/update/states - ${err?.response?.status}`);
     process.exit(1);
   }
   return res?.body?.state;
