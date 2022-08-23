@@ -31,6 +31,7 @@ const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 describe('Test: enrichment with a CSV file', async () => {
   before(async () => {
     await ping();
+    await deleteIndex('unpaywall-test');
     await createIndex('unpaywall-test', indexUnpawall);
     await insertDataUnpaywall();
 

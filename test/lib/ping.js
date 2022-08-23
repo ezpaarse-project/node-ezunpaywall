@@ -15,9 +15,9 @@ const ping = async () => {
   // graphql service
   while (res?.status !== 200) {
     try {
-      res = await chai.request(ezunpaywallURL).get('/api/');
+      res = await chai.request(ezunpaywallURL).get('/api');
     } catch (err) {
-      logger.error(`Cannot ping ${ezunpaywallURL}/api/`);
+      logger.error(`Cannot ping ${ezunpaywallURL}/api`);
       logger.error(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -28,9 +28,9 @@ const ping = async () => {
   // update service
   while (res?.status !== 200) {
     try {
-      res = await chai.request(ezunpaywallURL).get('/api/update/');
+      res = await chai.request(ezunpaywallURL).get('/api/update/ping');
     } catch (err) {
-      logger.error(`Cannot ping ${ezunpaywallURL}/api/update/`);
+      logger.error(`Cannot ping ${ezunpaywallURL}/api/update/ping`);
       logger.error(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -41,9 +41,9 @@ const ping = async () => {
   // enrich service
   while (res?.status !== 200) {
     try {
-      res = await chai.request(ezunpaywallURL).get('/api/enrich/');
+      res = await chai.request(ezunpaywallURL).get('/api/enrich/ping');
     } catch (err) {
-      logger.error(`Cannot ping ${ezunpaywallURL}/api/enrich/`);
+      logger.error(`Cannot ping ${ezunpaywallURL}/api/enrich/ping`);
       logger.error(err);
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -54,11 +54,12 @@ const ping = async () => {
   // fakeUnpaywall service
   while (res?.status !== 200) {
     try {
-      res = await chai.request(fakeUnpaywallURL).get('/');
+      res = await chai.request(fakeUnpaywallURL).get('/ping');
     } catch (err) {
-      logger.error(`Cannot ping ${fakeUnpaywallURL}/`);
+      logger.error(`Cannot ping ${fakeUnpaywallURL}/ping`);
       logger.error(err);
     }
+
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
