@@ -27,8 +27,8 @@ The tools you need to let node-ezunpaywall run are :
 ## Installation
 
 ```bash
-$ git clone https://github.com/ezpaarse-project/node-ezunoaywall.git
-$ cd node-ezunoaywall
+$ git clone https://github.com/ezpaarse-project/node-ezunpaywall.git
+$ cd node-ezunaywall
 $ npm i -g .
 ```
 ## Development
