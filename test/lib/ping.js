@@ -1,78 +1,37 @@
 /* eslint-disable no-await-in-loop */
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const logger = require('../../lib/logger');
-const { client } = require('./elastic');
 
 chai.use(chaiHttp);
 
-const ezunpaywallURL = 'http://localhost';
-const fakeUnpaywallURL = 'http://localhost:12000';
+const nginxHost = 'http://localhost';
+const fakeUnpaywallHost = process.env.FAKE_UNPAYWALL_URL || 'http://localhost:59799';
+const elasticHost = process.env.UPDATE_HOST || 'http://elastic:changeme@localhost:9200';
 
 const ping = async () => {
-  let res;
-
-  // graphql service
-  while (res?.status !== 200) {
-    try {
-      res = await chai.request(ezunpaywallURL).get('/api/');
-    } catch (err) {
-      logger.error(`Cannot ping ${ezunpaywallURL}/api/`);
-      logger.error(err);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  const nginx = await chai.request(nginxHost).get('/api');
+  if (nginx.status !== 200) {
+    throw new Error(`[nginx] Bad status : ${nginx?.status}`);
   }
 
-  res = '';
-
-  // update service
-  while (res?.status !== 200) {
-    try {
-      res = await chai.request(ezunpaywallURL).get('/api/update/');
-    } catch (err) {
-      logger.error(`Cannot ping ${ezunpaywallURL}/api/update/`);
-      logger.error(err);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  const update = await chai.request(nginxHost).get('/api/update/ping');
+  if (update.status !== 200) {
+    throw new Error(`[update] Bad status : ${nginx?.status}`);
   }
 
-  res = '';
-
-  // enrich service
-  while (res?.status !== 200) {
-    try {
-      res = await chai.request(ezunpaywallURL).get('/api/enrich/');
-    } catch (err) {
-      logger.error(`Cannot ping ${ezunpaywallURL}/api/enrich/`);
-      logger.error(err);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  const enrich = await chai.request(nginxHost).get('/api/enrich/ping');
+  if (enrich.status !== 200) {
+    throw new Error(`[enrich] Bad status : ${nginx?.status}`);
   }
 
-  res = '';
-
-  // fakeUnpaywall service
-  while (res?.status !== 200) {
-    try {
-      res = await chai.request(fakeUnpaywallURL).get('/');
-    } catch (err) {
-      logger.error(`Cannot ping ${fakeUnpaywallURL}/`);
-      logger.error(err);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  const fakeUnpaywall = await chai.request(fakeUnpaywallHost).get('/ping');
+  if (fakeUnpaywall?.status !== 200) {
+    throw new Error(`[fakeUnpaywall] Bad status : ${fakeUnpaywall?.status}`);
   }
 
-  res = '';
-
-  // elastic service
-  while (res?.statusCode !== 200) {
-    try {
-      res = await client.ping();
-    } catch (err) {
-      logger.error('Cannot ping elatic');
-      logger.error(err);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  const elastic = await chai.request(elasticHost).get('/');
+  if (elastic?.status !== 200) {
+    throw new Error(`[elastic] Bad status : ${elastic?.status}`);
   }
 };
 

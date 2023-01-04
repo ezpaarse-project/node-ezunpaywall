@@ -1,18 +1,124 @@
 /* eslint-disable no-param-reassign */
 const inquirer = require('inquirer');
 const { format } = require('date-fns');
+const cliProgress = require('cli-progress');
+
 const connection = require('../lib/ezunpaywall');
 const { getConfig } = require('../lib/config');
 const logger = require('../lib/logger');
+const updateLib = require('../lib/update');
 
-const {
-  getState,
-  verbose,
-  getSnapshots,
-  getReport,
-  getReports,
-  force,
-} = require('../bin/update');
+const createCliProgress = (percent, task, file) => {
+  const bar = new cliProgress.SingleBar({
+    format: `progress [{bar}] {percentage}% | {value}/{total} | ${task} - ${file}`,
+  });
+  bar.start(100, percent);
+  return bar;
+};
+
+const verbose = async () => {
+  let index = 0;
+  let state = await updateLib.getLatestState();
+  let { steps } = state;
+  steps.forEach(async (step) => {
+    if (step?.percent === 100) {
+      createCliProgress(100, step?.task, step?.file);
+      console.log();
+      index += 1;
+    }
+  });
+
+  while (!state?.done) {
+    state = await updateLib.getLatestState();
+    steps = state.steps;
+    steps = steps.filter((x) => x.task !== 'getChangefiles');
+    let latestStep = steps[index];
+
+    let bar;
+    if (latestStep?.task === 'insert' || latestStep?.task === 'download') {
+      bar = createCliProgress(latestStep?.percent, latestStep?.task, latestStep?.file);
+    }
+
+    if (latestStep?.status === 'inProgress') {
+      while (latestStep?.percent !== 100) {
+        if (state?.error) {
+          logger.error('process ended by error');
+          process.exit(1);
+        }
+        try {
+          state = await updateLib.getLatestState();
+        } catch (err) {
+          logger.error('Cannot get state');
+          logger.error(err);
+        }
+        steps = state?.steps;
+        if (Array.isArray(steps)) {
+          steps = steps.filter((x) => x.task !== 'getChangefiles');
+          latestStep = steps[index];
+          bar.update(Number(latestStep.percent));
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      console.log();
+      index += 1;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    process.exit(0);
+  }
+};
+
+const force = async () => {
+  const ezunpaywall = await connection();
+  let latestSnapshotFromUnpaywall;
+
+  try {
+    latestSnapshotFromUnpaywall = await ezunpaywall({
+      method: 'GET',
+      url: '/api/update/unpaywall/changefiles',
+      params: {
+        latest: true,
+      },
+    });
+    latestSnapshotFromUnpaywall = latestSnapshotFromUnpaywall?.data;
+  } catch (err) {
+    logger.errorRequest(err);
+    process.exit(1);
+  }
+
+  let snapshotsInstalled;
+
+  try {
+    snapshotsInstalled = await ezunpaywall({
+      method: 'GET',
+      url: '/api/update/snapshot',
+      params: {
+        latest: true,
+      },
+    });
+  } catch (err) {
+    logger.errorRequest(err);
+    process.exit(1);
+  }
+
+  if (!snapshotsInstalled?.data) {
+    logger.warn('No snapshots are installed in ezunpaywall, it is recommended to install the large snapshot available every 6 months before launching the updates');
+    logger.warn('you can force the update with --force');
+    process.exit(0);
+  }
+
+  const report = await updateLib.getLatestReport();
+
+  if (report) {
+    const task = report.steps.filter((x) => x.task === 'insert').pop();
+    if (task) {
+      if (latestSnapshotFromUnpaywall.filename === task.file && !report.error) {
+        logger.info(`No new update available from unpaywall, the last one has already been inserted at "${report.endAt}" with [${task.file}]`);
+        logger.info('You can reload it with option --force');
+        process.exit(0);
+      }
+    }
+  }
+};
 
 /**
  * Starts an unpaywall data update process
@@ -43,7 +149,7 @@ const updateJobFile = async (option) => {
   }
 
   if (option.list) {
-    const snapshots = await getSnapshots();
+    const snapshots = await updateLib.getSnapshots();
     if (!snapshots.length) {
       logger.info('No snapshots on ezunpaywall');
       process.exit(0);
@@ -235,7 +341,7 @@ const updateReport = async (option) => {
   let report;
 
   if (option.list) {
-    const reports = await getReports();
+    const reports = await updateLib.getReports();
     if (!reports.length) {
       logger.info('No reports on ezunpaywall');
       process.exit(0);
@@ -254,19 +360,19 @@ const updateReport = async (option) => {
       }),
     }]);
 
-    report = await getReport(filename, {});
+    report = await updateLib.getReportByFilename(filename);
     console.log(JSON.stringify(report, null, 2));
     process.exit(0);
   }
 
   if (option.file) {
-    report = await getReport(option.file, {});
+    report = await updateLib.getReportByFilename(option.file);
     console.log(JSON.stringify(report, null, 2));
     process.exit(0);
   }
 
   if (option.latest) {
-    report = await getReport('', { latest: true });
+    report = await updateLib.getLatestReport();
     console.log(JSON.stringify(report, null, 2));
     process.exit(0);
   }
@@ -303,7 +409,7 @@ const updateStatus = async (option) => {
   if (option.verbose) {
     await verbose();
   } else {
-    const state = await getState('', true);
+    const state = await updateLib.getLatestState();
     console.log(JSON.stringify(state, null, 2));
   }
   process.exit(0);
