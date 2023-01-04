@@ -43,6 +43,7 @@ describe('Test: enrichment with a CSV file', async () => {
     it('Should enrich the file on 3 lines with all unpaywall attributes and download it', async () => {
       const filepath = path.resolve(sourcesDir, 'mustBeEnrich', 'file1.csv');
       const enriched = path.resolve(sourcesDir, 'tmp', 'enriched.csv');
+
       try {
         await exec(`${ezu} enrich job --file ${filepath} --out ${enriched} --index unpaywall-test`);
       } catch (err) {

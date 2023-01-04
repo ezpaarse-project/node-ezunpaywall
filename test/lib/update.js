@@ -9,7 +9,7 @@ const logger = require('../../lib/logger');
 const snapshotsDir = path.resolve(__dirname, '..', 'sources', 'snapshots');
 
 const ezunpaywallURL = 'http://localhost';
-const fakeUnpaywall = 'http://localhost:12000';
+const fakeUnpaywall = 'http://localhost:59799';
 
 /**
  * delete a snapshot in ezunpaywall

@@ -57,9 +57,7 @@ const enrich = async (option) => {
   const formData = new FormData();
   formData.append('file', fs.createReadStream(filepath));
 
-  const res = await enrichLib.upload(formData);
-
-  const { id } = res;
+  const id = await enrichLib.upload(formData);
 
   await enrichLib.job(id, data, stat.size);
 
