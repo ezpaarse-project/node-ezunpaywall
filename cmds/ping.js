@@ -17,20 +17,30 @@ const ping = async () => {
   try {
     res = await ezunpaywall({
       method: 'GET',
-      url: '/api/',
+      url: '/api',
     });
   } catch (err) {
-    logger.errorRequest(err);
+    logger.errorRequest(err?.message);
     process.exit(1);
   }
-  logger.info('Ping graphql service: OK');
+  logger.info('[graphql] ping - OK');
 
-  if (!res?.data?.elastic) {
-    logger.error('Cannot request elastic');
+  try {
+    res = await ezunpaywall({
+      method: 'GET',
+      url: '/api/update/ping/elastic',
+    });
+  } catch (err) {
+    logger.errorRequest(err?.message);
     process.exit(1);
   }
 
-  logger.info('ezmeta: OK');
+  if (res?.data?.message?.statusCode !== 200) {
+    logger.error(`Cannot ping elastic ${res?.data?.message?.statusCode}`);
+    process.exit(1);
+  }
+
+  logger.info('[elastic] ping - OK');
 
   try {
     await ezunpaywall({
@@ -42,7 +52,7 @@ const ping = async () => {
     process.exit(1);
   }
 
-  logger.info('Ping update service: OK');
+  logger.info('[update] ping - OK');
 
   try {
     await ezunpaywall({
@@ -54,7 +64,7 @@ const ping = async () => {
     process.exit(1);
   }
 
-  logger.info('Ping enrich service: OK');
+  logger.info('[enrich] ping - OK');
 
   try {
     await ezunpaywall({
@@ -66,7 +76,7 @@ const ping = async () => {
     process.exit(1);
   }
 
-  logger.info('Ping apikey service: OK');
+  logger.info('[apikey] ping - OK');
 
   let configApikey;
 
