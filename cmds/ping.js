@@ -45,7 +45,7 @@ const ping = async () => {
   try {
     await ezunpaywall({
       method: 'GET',
-      url: '/api/update/',
+      url: '/api/update',
     });
   } catch (err) {
     logger.errorRequest(err);
@@ -57,7 +57,7 @@ const ping = async () => {
   try {
     await ezunpaywall({
       method: 'GET',
-      url: '/api/enrich/',
+      url: '/api/enrich',
     });
   } catch (err) {
     logger.errorRequest(err);
@@ -69,7 +69,7 @@ const ping = async () => {
   try {
     await ezunpaywall({
       method: 'GET',
-      url: '/api/apikey/',
+      url: '/api/apikey',
     });
   } catch (err) {
     logger.errorRequest(err);
@@ -83,7 +83,7 @@ const ping = async () => {
   try {
     configApikey = await ezunpaywall({
       method: 'GET',
-      url: `/api/apikey/config/${config.apikey}`,
+      url: `/api/apikey/keys/${config.apikey}`,
     });
   } catch (err) {
     logger.errorRequest(err);
