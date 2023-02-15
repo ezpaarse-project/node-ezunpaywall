@@ -77,7 +77,7 @@ $ ezunpaywall config -L
 ```
 baseURL
 apikey
-redisPassword
+apikey
 ```
 
 ```bash
@@ -87,8 +87,7 @@ ezunpaywall config --set baseURL https://localhost.test.fr
 ```bash
 {
   "baseURL": "https://localhost.test.fr",
-  "apikey": "admin",
-  "redisPassword": "changeme"
+  "apikey": "changeme",
 }
 info: from /home/user/.config/ezunpaywall.json
 ```
@@ -442,7 +441,7 @@ ezu apikey-get --apikey demo
   "name": "user3",
   "access": [
     "enrich",
-    "admin"
+    "graphql"
   ],
   "attributes": "*",
   "allowed": true

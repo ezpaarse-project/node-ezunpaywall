@@ -31,8 +31,8 @@ describe('Test: command config', async () => {
 
       const config2 = {
         baseURL: 'http://localhost',
-        apikey: 'admin',
-        redisPassword: 'changeme',
+        adminPassword: 'changeme',
+        apikey: 'changeme',
       };
 
       expect(config).be.eql(config2);
@@ -46,8 +46,8 @@ describe('Test: command config', async () => {
 
       const config2 = {
         baseURL: 'http://localhost',
-        apikey: 'admin',
-        redisPassword: 'changeme',
+        adminPassword: 'changeme',
+        apikey: 'changeme',
       };
 
       expect(config).be.eql(config2);
@@ -66,38 +66,38 @@ describe('Test: command config', async () => {
 
       const config2 = {
         baseURL: 'https://test.fr',
-        apikey: 'admin',
-        redisPassword: 'changeme',
+        adminPassword: 'changeme',
+        apikey: 'changeme',
       };
 
       expect(config).be.eql(config2);
     });
 
-    it('Should update apikey on custom config', async () => {
-      await exec(`${ezu} config --set apikey keykey`);
+    it('Should update adminPassword on custom config', async () => {
+      await exec(`${ezu} config --set adminPassword password`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
 
       const config2 = {
         baseURL: 'http://localhost',
-        apikey: 'keykey',
-        redisPassword: 'changeme',
+        adminPassword: 'password',
+        apikey: 'changeme',
       };
 
       expect(config).be.eql(config2);
     });
 
     it('Should update apikey on custom config', async () => {
-      await exec(`${ezu} config --set redisPassword password`);
+      await exec(`${ezu} config --set apikey password`);
 
       // TODO put customConfig path for from
       const config = JSON.parse(await fs.readFile(customConfig, 'utf-8'));
 
       const config2 = {
         baseURL: 'http://localhost',
-        apikey: 'admin',
-        redisPassword: 'password',
+        adminPassword: 'changeme',
+        apikey: 'password',
       };
 
       expect(config).be.eql(config2);

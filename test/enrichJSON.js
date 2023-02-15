@@ -5,9 +5,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const indexUnpawall = require('./sources/index/unpaywall.json');
 
-const {
-  ping,
-} = require('./lib/ping');
+const ping = require('./lib/ping');
 
 const {
   compareFile,
@@ -20,9 +18,7 @@ const {
   insertDataUnpaywall,
 } = require('./lib/elastic');
 
-const {
-  getState,
-} = require('./lib/enrich');
+const getState = require('./lib/enrich');
 
 const sourcesDir = path.resolve(__dirname, 'sources');
 

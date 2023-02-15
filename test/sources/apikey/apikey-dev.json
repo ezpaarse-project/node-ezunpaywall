@@ -1,15 +1,17 @@
 [
   {
-    "demo": {
+    "apikey": "demo",
+    "config": {
       "name": "demo",
       "access": ["graphql", "enrich"],
-      "attributes": "*",
+      "attributes": ["*"],
       "allowed": true,
       "count": 100000
     }
   },
   {
-    "user": {
+    "apikey": "user",
+    "config": {
       "name": "user",
       "access": ["graphql", "enrich"],
       "attributes": ["*"],
@@ -17,7 +19,8 @@
     }
   },
   {
-    "userRestricted": {
+    "apikey": "userRestricted",
+    "config": {
       "name": "userRestricted",
       "access": ["graphql", "enrich"],
       "attributes": ["doi", "is_oa", "best_oa_location.license"],
@@ -25,15 +28,8 @@
     }
   },
   {
-    "admin": {
-      "name": "admin",
-      "access": ["graphql", "enrich", "update"],
-      "attributes": ["*"],
-      "allowed": true
-    }
-  },
-  {
-    "graphql": {
+    "apikey": "graphql",
+    "config": {
       "name": "graphql",
       "access": ["graphql"],
       "attributes": ["*"],
@@ -41,7 +37,8 @@
     }
   },
   {
-    "enrich": {
+    "apikey": "enrich",
+    "config": {
       "name": "enrich",
       "access": ["enrich"],
       "attributes": ["*"],
@@ -49,17 +46,10 @@
     }
   },
   {
-    "update": {
-      "name": "update",
-      "access": ["update"],
-      "attributes": ["*"],
-      "allowed": true
-    }
-  },
-  {
-    "notAllowed": {
+    "apikey": "notAllowed",
+    "config": {
       "name": "notAllowed",
-      "access": ["graphql", "enrich", "update"],
+      "access": ["graphql", "enrich"],
       "attributes": ["*"],
       "allowed": false
     }

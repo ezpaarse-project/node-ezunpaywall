@@ -182,7 +182,7 @@ const updateJobFile = async (option) => {
       url: `/api/update/job/changefile/${option.file}`,
       data,
       headers: {
-        'x-api-key': config.apikey,
+        'x-api-key': config.adminPassword,
       },
     });
   } catch (err) {
@@ -266,7 +266,7 @@ const updateJobPeriod = async (option) => {
       url: '/api/update/job/period',
       data,
       headers: {
-        'x-api-key': config.apikey,
+        'x-api-key': config.adminPassword,
       },
     });
   } catch (err) {
@@ -314,7 +314,7 @@ const updateJobSnapshot = async (option) => {
       url: '/api/update/job/snapshot',
       data,
       headers: {
-        'x-api-key': config.apikey,
+        'x-api-key': config.adminPassword,
       },
     });
   } catch (err) {

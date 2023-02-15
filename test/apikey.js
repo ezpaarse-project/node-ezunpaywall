@@ -11,9 +11,7 @@ const {
   deleteAll,
 } = require('./lib/apikey');
 
-const {
-  ping,
-} = require('./lib/ping');
+const ping = require('./lib/ping');
 
 const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 
@@ -144,6 +142,7 @@ describe('Apikey: test apikey command', async () => {
         key = JSON.parse(res?.stdout.trim());
       } catch (err) {
         console.error(err);
+        process.exit(1);
       }
 
       expect(key).have.property('apikey').equal('user');
@@ -156,7 +155,7 @@ describe('Apikey: test apikey command', async () => {
     it('Should update config.access of apikey', async () => {
       let res;
       try {
-        res = await exec(`${ezu} apikey-update --apikey user --access update`);
+        res = await exec(`${ezu} apikey-update --apikey user --access graphql`);
       } catch (err) {
         console.error(err);
       }
@@ -171,7 +170,7 @@ describe('Apikey: test apikey command', async () => {
 
       expect(key).have.property('apikey').equal('user');
       expect(key).have.property('name').equal('user');
-      expect(key).have.property('access').to.be.an('array').eql(['update']);
+      expect(key).have.property('access').to.be.an('array').eql(['graphql']);
       expect(key).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key).have.property('allowed').equal(true);
     });
@@ -275,7 +274,7 @@ describe('Apikey: test apikey command', async () => {
     it('Should update config.name and config.access of apikey', async () => {
       let res;
       try {
-        res = await exec(`${ezu} apikey-update --apikey user --keyname new-name --access update`);
+        res = await exec(`${ezu} apikey-update --apikey user --keyname new-name --access graphql`);
       } catch (err) {
         console.error(err);
       }
@@ -290,7 +289,7 @@ describe('Apikey: test apikey command', async () => {
 
       expect(key).have.property('apikey').equal('user');
       expect(key).have.property('name').equal('new-name');
-      expect(key).have.property('access').to.be.an('array').eql(['update']);
+      expect(key).have.property('access').to.be.an('array').eql(['graphql']);
       expect(key).have.property('attributes').to.be.an('array').eql(['*']);
       expect(key).have.property('allowed').equal(true);
     });
@@ -401,6 +400,16 @@ describe('Apikey: test apikey command', async () => {
 
       let apikeyDev = await fs.readFile(path.resolve(__dirname, 'sources', 'apikey', 'apikey-dev.json'));
       apikeyDev = JSON.parse(apikeyDev);
+
+      function sortApikey(a, b) {
+        if (a.config.name < b.config.name) { return -1; }
+        if (a.config.name > b.config.name) { return 1; }
+        return 0;
+      }
+
+      apikeyDev.sort(sortApikey);
+      keys.sort(sortApikey);
+
       const equal = isEqual(keys, apikeyDev);
 
       expect(equal).equal(true);

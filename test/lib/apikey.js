@@ -11,9 +11,9 @@ const apikeyURL = process.env.AUTH_URL || 'http://localhost:59704';
 const load = async () => {
   try {
     await chai.request(apikeyURL)
-      .post('/keys/load')
+      .post('/keys/loadDev')
       .query({ dev: true })
-      .set('redis-password', 'changeme');
+      .set('x-api-key', 'changeme');
   } catch (err) {
     console.error('Cannot request apikey service');
     console.error(err);
@@ -27,7 +27,7 @@ const deleteAll = async () => {
   try {
     await chai.request(apikeyURL)
       .delete('/keys')
-      .set('redis-password', 'changeme');
+      .set('x-api-key', 'changeme');
   } catch (err) {
     console.error('Cannot request apikey service');
     console.error(err);

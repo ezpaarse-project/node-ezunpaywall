@@ -5,9 +5,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const indexUnpawall = require('./sources/index/unpaywall.json');
 
-const {
-  ping,
-} = require('./lib/ping');
+const ping = require('./lib/ping');
 
 const {
   compareFile,
@@ -21,8 +19,10 @@ const {
 } = require('./lib/elastic');
 
 const {
-  getState,
-} = require('./lib/enrich');
+  setApikey,
+} = require('./lib/config');
+
+const getState = require('./lib/enrich');
 
 const sourcesDir = path.resolve(__dirname, 'sources');
 
@@ -31,6 +31,7 @@ const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 describe('Test: enrichment with a CSV file', async () => {
   before(async () => {
     await ping();
+    await setApikey();
     await deleteIndex('unpaywall-test');
     await createIndex('unpaywall-test', indexUnpawall);
     await insertDataUnpaywall();

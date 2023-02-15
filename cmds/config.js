@@ -18,8 +18,8 @@ const manageConfig = async (option) => {
   if (option.list) {
     console.log(`
       baseURL
-      apikey
-      redisPassword`.trim().replace(/^\s*/gm, ''));
+      adminPassword
+      apikey`.trim().replace(/^\s*/gm, ''));
     process.exit(0);
   }
 

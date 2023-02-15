@@ -5,7 +5,7 @@ const logger = require('../lib/logger');
 
 const apikeyLib = require('../lib/apikey');
 
-const availableAccess = ['update', 'enrich', 'graphql'];
+const availableAccess = ['enrich', 'graphql'];
 
 const unpaywallAttrs = [
   '*',

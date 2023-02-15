@@ -6,9 +6,7 @@ const exec = util.promisify(require('child_process').exec);
 const { format } = require('date-fns');
 const indexUnpawall = require('./sources/index/unpaywall.json');
 
-const {
-  ping,
-} = require('./lib/ping');
+const ping = require('./lib/ping');
 
 const {
   deleteSnapshot,
