@@ -28,15 +28,16 @@ const ping = async () => {
   try {
     res = await ezunpaywall({
       method: 'GET',
-      url: '/api/update/ping/elastic',
+      url: '/api/update/health/elastic',
     });
   } catch (err) {
+    console.log(err);
     logger.errorRequest(err?.message);
     process.exit(1);
   }
 
-  if (res?.data?.message?.statusCode !== 200) {
-    logger.error(`Cannot ping elastic ${res?.data?.message?.statusCode}`);
+  if (!res?.data?.healthy) {
+    logger.error('Cannot ping elastic: unhealthy');
     process.exit(1);
   }
 
