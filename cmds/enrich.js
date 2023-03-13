@@ -30,7 +30,7 @@ const enrich = async (option) => {
   const filepath = value;
 
   if (!await fs.pathExists(filepath)) {
-    logger.error(`[${filepath}] not fount`);
+    logger.error(`[${filepath}] not found`);
     process.exit(1);
   }
 
