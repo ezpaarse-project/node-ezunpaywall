@@ -18,7 +18,8 @@ const fakeUnpaywall = 'http://localhost:59799';
 const deleteSnapshot = async (filename) => {
   try {
     await chai.request(ezunpaywallURL)
-      .delete(`/api/update/snapshots/${filename}`);
+      .delete(`/api/update/snapshots/${filename}`)
+      .set('x-api-key', 'changeme');
   } catch (err) {
     logger.error(`Cannot request ${ezunpaywallURL}/api/update/snapshots/${filename} - ${err?.response?.status}`);
     process.exit(1);
