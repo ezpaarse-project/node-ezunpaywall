@@ -20,7 +20,7 @@ const ping = async () => {
       url: '/api',
     });
   } catch (err) {
-    logger.errorRequest(err?.message);
+    logger.errorRequest(err);
     process.exit(1);
   }
   logger.info('[graphql] ping - OK');
@@ -32,7 +32,7 @@ const ping = async () => {
     });
   } catch (err) {
     console.log(err);
-    logger.errorRequest(err?.message);
+    logger.errorRequest(err);
     process.exit(1);
   }
 
