@@ -11,7 +11,8 @@ const { reset } = require('./lib/config');
 const ezu = path.resolve(__dirname, '..', 'ezunpaywall');
 
 // TODO use custom config
-const customConfig = path.resolve(os.homedir(), '.config', 'ezunpaywall.json');
+const configDir = process.env.XDG_CONFIG_HOME || path.resolve(os.homedir(), '.config');
+const customConfig = path.join(configDir, 'ezunpaywall.json');
 
 describe('Test: command config', async () => {
   before(async () => {

@@ -4,7 +4,8 @@ const os = require('os');
 const logger = require('../../lib/logger');
 
 const reset = async () => {
-  const pathConfig = path.resolve(os.homedir(), '.config', 'ezunpaywall.json');
+  const configDir = process.env.XDG_CONFIG_HOME || path.resolve(os.homedir(), '.config');
+  const pathConfig = path.join(configDir, 'ezunpaywall.json');
 
   const config = {
     baseURL: 'http://localhost',
@@ -22,7 +23,8 @@ const reset = async () => {
 };
 
 const setApikey = async () => {
-  const pathConfig = path.resolve(os.homedir(), '.config', 'ezunpaywall.json');
+  const configDir = process.env.XDG_CONFIG_HOME || path.resolve(os.homedir(), '.config');
+  const pathConfig = path.join(configDir, 'ezunpaywall.json');
 
   const config = {
     baseURL: 'http://localhost',

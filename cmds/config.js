@@ -23,7 +23,8 @@ const manageConfig = async (option) => {
     process.exit(0);
   }
 
-  const configPath = path.resolve(os.homedir(), '.config', 'ezunpaywall.json');
+  const configDir = process.env.XDG_CONFIG_HOME || path.resolve(os.homedir(), '.config');
+  const configPath = path.join(configDir, 'ezunpaywall.json');
 
   if (!await fs.pathExists(configPath)) {
     await setConfig();
